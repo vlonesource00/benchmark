@@ -1,0 +1,13 @@
+# Benchmark-owned subject checkouts can contain large source trees and dependencies.
+subjects/*
+!subjects/.gitkeep
+subjects/*/node_modules/
+subjects/*/.npm/
+
+# Runs are reproducible artifacts but are intentionally not committed by default.
+results/*
+!results/.gitkeep
+
+# Local editor and OS files.
+.DS_Store
+Thumbs.db

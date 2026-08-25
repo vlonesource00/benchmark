@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-08-25",
+  "description": "Pinned benchmark subjects. Each checkout is created under this benchmark repo and is never read from or written to the original development folders.",
+  "subjects": [
+    {
+      "id": "gpt-racing",
+      "label": "GPT Racing",
+      "repoUrl": "https://github.com/vlonesource00/apex-sim-racing.git",
+      "branch": "codex/flat-track-racecraft",
+      "commit": "0dcd4744d4e5f4036db0894a62ab9976d091e370",
+      "testNotes": "Field-arbitrated racecraft stack.",
+      "tests": [
+        {
+          "id": "solo-pace",
+          "label": "Solo pace and stability",
+          "command": ["node", "tests/ai-solo-pace.mjs"],
+          "suites": ["quick", "full"],
+          "timeoutSeconds": 180
+        },
+        {
+          "id": "field-race",
+          "label": "Eight-car field race",
+          "command": ["node", "tests/ai-field-race.mjs"],
+          "suites": ["quick", "full"],
+          "timeoutSeconds": 240
+        },
+        {
+          "id": "three-lap-soak",
+          "label": "Three-lap field soak",
+          "command": ["node", "tests/ai-three-lap-soak.mjs"],
+          "suites": ["full"],
+          "timeoutSeconds": 360
+        }
+      ]
+    },
+    {
+      "id": "claude-racing",
+      "label": "Claude Racing",
+      "repoUrl": "https://github.com/vlonesource00/claude-racing.git",
+      "branch": "main",
+      "commit": "96334bc195255ecccf47416894c9ab072c447aed",
+      "testNotes": "Offline TrackGrid/value-function plus runtime lattice and racecraft.",
+      "tests": [
+        {
+          "id": "solo-pace",
+          "label": "Solo pace versus offline optimum",
+          "command": ["node", "tests/ai-lap.mjs"],
+          "suites": ["quick", "full"],
+          "timeoutSeconds": 300
+        },
+        {
+          "id": "duel-racecraft",
+          "label": "Racecraft duel scenarios",
+          "command": ["node", "tests/duel.mjs"],
+          "suites": ["quick", "full"],
+          "timeoutSeconds": 360
+        }
+      ]
+    },
+    {
+      "id": "gemini-nmpcc",
+      "label": "Gemini NMPCC",
+      "repoUrl": "https://github.com/vlonesource00/gemini-gauntlet.git",
+      "branch": "feat/apex-nmpcc-combat-ai",
+      "commit": "17ccafbd3a65a4b8cc0f4b3d32342c6a127c714a",
+      "testNotes": "Earlier V2/NMPCC branch; kept as a separate architecture as requested.",
+      "tests": [
+        {
+          "id": "pace-benchmark",
+          "label": "Multi-class pace benchmark",
+          "command": ["node", "tests/pace-benchmark-test.mjs"],
+          "suites": ["quick", "full"],
+          "timeoutSeconds": 420
+        },
+        {
+          "id": "full-grid",
+          "label": "Twelve-car full grid",
+          "command": ["node", "tests/twelve-car-race-test.mjs"],
+          "suites": ["quick", "full"],
+          "timeoutSeconds": 240
+        },
+        {
+          "id": "generation-head-to-head",
+          "label": "V1 versus V2 head-to-head",
+          "command": ["node", "tests/head-to-head-generations-test.mjs"],
+          "suites": ["full"],
+          "timeoutSeconds": 600
+        }
+      ]
+    },
+    {
+      "id": "gemini-grand-prix",
+      "label": "Gemini Grand Prix",
+      "repoUrl": "https://github.com/vlonesource00/gemini-gauntlet.git",
+      "branch": "feat/grand-prix-sim-and-cockpit-hud",
+      "commit": "cbced43f5538bc72a497b17fbc74849f21955397",
+      "testNotes": "Later Gemini GP branch with strict 25 Hz tactical replanning and committed side-by-side maneuvers.",
+      "tests": [
+        {
+          "id": "pace-benchmark",
+          "label": "Multi-class pace benchmark",
+          "command": ["node", "tests/pace-benchmark-test.mjs"],
+          "suites": ["quick", "full"],
+          "timeoutSeconds": 420
+        },
+        {
+          "id": "full-grid",
+          "label": "Twelve-car full grid",
+          "command": ["node", "tests/twelve-car-race-test.mjs"],
+          "suites": ["quick", "full"],
+          "timeoutSeconds": 240
+        },
+        {
+          "id": "generation-head-to-head",
+          "label": "V1 versus V2 head-to-head",
+          "command": ["node", "tests/head-to-head-generations-test.mjs"],
+          "suites": ["full"],
+          "timeoutSeconds": 600
+        }
+      ]
+    }
+  ]
+}

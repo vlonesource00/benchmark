@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "title": "Racing architecture benchmark scenarios",
+  "scenarios": [
+    {
+      "id": "solo-pace",
+      "question": "Can one AI car complete a competitive, stable lap without leaving the circuit?",
+      "primaryMetrics": ["lapTimeSeconds", "offTrackSeconds", "stabilityExcursions"],
+      "comparison": "Lower lap time and off-track time are better. Native tests use each project's own track and vehicle model, so lap times are not pooled across incompatible physics engines."
+    },
+    {
+      "id": "field-race",
+      "question": "Can a pack race without sustained contact, deep overlap, spins, or marshal recovery?",
+      "primaryMetrics": ["finishCount", "contactFrames", "maxImpact", "deepOverlaps", "offTrackSeconds"],
+      "comparison": "Safety and completion metrics are comparable by direction, while exact thresholds remain architecture-native."
+    },
+    {
+      "id": "racecraft-duel",
+      "question": "Can an AI attack, defend, and complete clean passes in named tactical scenarios?",
+      "primaryMetrics": ["passes", "contacts", "spins", "defenseHoldTime"],
+      "comparison": "Scenario coverage differs slightly by repository; raw logs are retained for audit."
+    },
+    {
+      "id": "full-grid",
+      "question": "Does a twelve-car mixed-class field progress while preserving pack and collision invariants?",
+      "primaryMetrics": ["travelledDistance", "wakeInteractions", "maxPackSize", "contactFrames", "deepOverlapFrames"],
+      "comparison": "The Gemini branches expose the richest common twelve-car harness; other subjects use their closest native field test."
+    }
+  ]
+}

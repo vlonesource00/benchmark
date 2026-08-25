@@ -1,0 +1,14 @@
+{
+  "name": "racing-ai-benchmark",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Isolated, pinned benchmark harness for the four racing AI architectures.",
+  "scripts": {
+    "prepare": "node scripts/prepare-subjects.mjs",
+    "verify": "node scripts/verify-pins.mjs",
+    "install:subjects": "node scripts/install-subject-deps.mjs",
+    "benchmark": "node scripts/run-benchmark.mjs",
+    "report": "node scripts/report-results.mjs"
+  }
+}
