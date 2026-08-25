@@ -11,6 +11,11 @@ const run = JSON.parse(await fs.readFile(path.join(runDir, 'run.json'), 'utf8'))
 
 const metricValue = (value) => typeof value === 'object' ? JSON.stringify(value) : String(value);
 const metricText = (metrics) => Object.entries(metrics || {}).map(([key, value]) => `${key}=${metricValue(value)}`).join(', ');
+const compactFailure = (text) => {
+  const assertion = text.match(/AssertionError \[[^\]]+\]:[^\n]*(?:\n[^\n]*)?/);
+  if (assertion) return assertion[0].replace(/\s+/g, ' ').trim().slice(0, 240);
+  return text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean).at(-1)?.slice(0, 240);
+};
 const lines = [
   '# Racing AI benchmark report',
   '',
@@ -22,7 +27,12 @@ const lines = [
   '|---|---|---|---:|---:|---|---|'
 ];
 for (const record of run.records) {
-  const failure = record.failureReason ? record.failureReason.replaceAll('|', '\\|') : '—';
+  let failure = record.failureReason;
+  if (!failure && record.passed === false && record.stderrFile) {
+    const stderr = await fs.readFile(path.join(runDir, record.stderrFile), 'utf8').catch(() => '');
+    failure = compactFailure(stderr);
+  }
+  failure = failure ? failure.replaceAll('|', '\\|') : '—';
   lines.push(`| ${record.subjectLabel} | \`${record.commit.slice(0, 12)}\` | ${record.testLabel} | ${record.passed === null ? 'planned' : record.passed ? 'PASS' : 'FAIL'} | ${record.durationSeconds.toFixed(3)} | ${metricText(record.metrics).replaceAll('|', '\\|') || '—'} | ${failure} |`);
 }
 lines.push('', 'Raw stdout and stderr logs are stored beside `run.json`. Parsed metrics are convenience fields; use the raw logs for audit.', '');
