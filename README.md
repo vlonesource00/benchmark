@@ -29,6 +29,22 @@ npm run benchmark -- --subject claude-racing --suite quick --dry-run
 
 `npm ci` runs only inside the benchmark-owned clones and uses `--ignore-scripts`. Test stdout/stderr, commit metadata, exit status, duration, and a small set of parsed metrics are written under `results/<run-id>/`. Generate the Markdown summary with `npm run report`.
 
+## Full architecture comparison
+
+For the complete comparison, run:
+
+```powershell
+npm run benchmark:full -- --suite full
+```
+
+That command performs three separate evaluations before writing one aggregate report:
+
+1. **Technical architecture audit** — scans only the pinned implementation source and scores explicit dimensions such as global planning, runtime lattice/control separation, racecraft, vehicle dynamics, field coordination, safety, integration closure, and observability. Every awarded signal includes an evidence file and line. It also flags gaps such as a planner that is implemented but not wired into the live control path.
+2. **Same-input tactical replay** — feeds identical normalized state cards (clear track, slow car, corner attack, defending threat, and side-by-side) into adapters for all four tactical layers. The report records each architecture’s decision (`PACE`, `ATTACK`, `DEFEND`), maneuver phase, target corridor, safety bound, and deterministic repeatability.
+3. **Native simulation suite** — runs each repository’s own physics-accurate pace, racecraft, field, and endurance tests, mapped to common semantic scenario labels.
+
+The aggregate `full-comparison-<run-id>.md` report keeps those evidence types separate. The tactical replay is a fair same-input architecture comparison, but it is not a shared physics race; the native tests provide the physics and endurance evidence. Absolute lap seconds remain architecture-native because the simulators use different tracks, vehicle models, and integration rates.
+
 ## What is and is not comparable
 
 The native tests are the most reliable way to exercise each architecture because they use its own physics, track representation, controller, and invariants. The scenario map in [`benchmark/scenarios.json`](benchmark/scenarios.json) names the common questions and directional metrics.

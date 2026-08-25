@@ -9,6 +9,10 @@
     "verify": "node scripts/verify-pins.mjs",
     "install:subjects": "node scripts/install-subject-deps.mjs",
     "benchmark": "node scripts/run-benchmark.mjs",
+    "benchmark:full": "node scripts/full-benchmark.mjs",
+    "audit:architecture": "node scripts/architecture-audit.mjs",
+    "replay:tactics": "node scripts/tactical-replay.mjs",
+    "compare": "node scripts/score-benchmark.mjs",
     "report": "node scripts/report-results.mjs"
   }
 }

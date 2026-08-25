@@ -143,6 +143,7 @@ for (const subject of subjects) {
       commit: subject.commit,
       testId: test.id,
       testLabel: test.label,
+      scenarioIds: test.scenarioIds || [],
       suite,
       command,
       startedAt,

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "protocol": "Normalized tactical state cards. Each adapter receives the same ego/traffic geometry and invokes the subject's tactical decision layer.",
+  "scenarios": [
+    {
+      "id": "clear-pacing",
+      "expected": "PACE",
+      "corner": false,
+      "ego": {"speed": 35, "lateral": 0},
+      "opponents": []
+    },
+    {
+      "id": "slow-car-ahead",
+      "expected": "ATTACK",
+      "corner": false,
+      "ego": {"speed": 35, "lateral": 0},
+      "opponents": [{"id": "target", "delta": 18, "speed": 22, "lateral": 0}]
+    },
+    {
+      "id": "corner-attack",
+      "expected": "ATTACK",
+      "corner": true,
+      "ego": {"speed": 34, "lateral": 0},
+      "opponents": [{"id": "target", "delta": 10, "speed": 25, "lateral": 2}]
+    },
+    {
+      "id": "defending-threat",
+      "expected": "DEFEND",
+      "corner": true,
+      "ego": {"speed": 32, "lateral": 0},
+      "opponents": [{"id": "challenger", "delta": -12, "speed": 42, "lateral": -1}]
+    },
+    {
+      "id": "side-by-side",
+      "expected": "ATTACK",
+      "corner": false,
+      "ego": {"speed": 34, "lateral": -2},
+      "opponents": [{"id": "target", "delta": 2, "speed": 33, "lateral": 2}]
+    }
+  ]
+}

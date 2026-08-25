@@ -15,6 +15,7 @@
           "id": "solo-pace",
           "label": "Solo pace and stability",
           "command": ["node", "tests/ai-solo-pace.mjs"],
+          "scenarioIds": ["solo-pace", "stability"],
           "suites": ["quick", "full"],
           "timeoutSeconds": 180
         },
@@ -22,6 +23,7 @@
           "id": "field-race",
           "label": "Eight-car field race",
           "command": ["node", "tests/ai-field-race.mjs"],
+          "scenarioIds": ["pack-race", "collision-safety"],
           "suites": ["quick", "full"],
           "timeoutSeconds": 240
         },
@@ -29,6 +31,7 @@
           "id": "three-lap-soak",
           "label": "Three-lap field soak",
           "command": ["node", "tests/ai-three-lap-soak.mjs"],
+          "scenarioIds": ["endurance"],
           "suites": ["full"],
           "timeoutSeconds": 360
         }
@@ -46,6 +49,7 @@
           "id": "solo-pace",
           "label": "Solo pace versus offline optimum",
           "command": ["node", "tests/ai-lap.mjs"],
+          "scenarioIds": ["solo-pace", "stability"],
           "suites": ["quick", "full"],
           "timeoutSeconds": 300
         },
@@ -53,6 +57,7 @@
           "id": "duel-racecraft",
           "label": "Racecraft duel scenarios",
           "command": ["node", "tests/duel.mjs"],
+          "scenarioIds": ["obstacle-bypass", "slower-pass", "defense", "planner-budget"],
           "suites": ["quick", "full"],
           "timeoutSeconds": 360
         }
@@ -70,6 +75,7 @@
           "id": "pace-benchmark",
           "label": "Multi-class pace benchmark",
           "command": ["node", "tests/pace-benchmark-test.mjs"],
+          "scenarioIds": ["solo-pace", "stability", "track-complexity"],
           "suites": ["quick", "full"],
           "timeoutSeconds": 420
         },
@@ -77,6 +83,7 @@
           "id": "full-grid",
           "label": "Twelve-car full grid",
           "command": ["node", "tests/twelve-car-race-test.mjs"],
+          "scenarioIds": ["pack-race", "collision-safety", "wake-awareness"],
           "suites": ["quick", "full"],
           "timeoutSeconds": 240
         },
@@ -84,6 +91,7 @@
           "id": "generation-head-to-head",
           "label": "V1 versus V2 head-to-head",
           "command": ["node", "tests/head-to-head-generations-test.mjs"],
+          "scenarioIds": ["generation-head-to-head", "tactical-combat"],
           "suites": ["full"],
           "timeoutSeconds": 600
         }
@@ -101,6 +109,7 @@
           "id": "pace-benchmark",
           "label": "Multi-class pace benchmark",
           "command": ["node", "tests/pace-benchmark-test.mjs"],
+          "scenarioIds": ["solo-pace", "stability", "track-complexity"],
           "suites": ["quick", "full"],
           "timeoutSeconds": 420
         },
@@ -108,6 +117,7 @@
           "id": "full-grid",
           "label": "Twelve-car full grid",
           "command": ["node", "tests/twelve-car-race-test.mjs"],
+          "scenarioIds": ["pack-race", "collision-safety", "wake-awareness"],
           "suites": ["quick", "full"],
           "timeoutSeconds": 240
         },
@@ -115,6 +125,7 @@
           "id": "generation-head-to-head",
           "label": "V1 versus V2 head-to-head",
           "command": ["node", "tests/head-to-head-generations-test.mjs"],
+          "scenarioIds": ["generation-head-to-head", "tactical-combat"],
           "suites": ["full"],
           "timeoutSeconds": 600
         }
