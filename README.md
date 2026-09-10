@@ -1,6 +1,8 @@
 # Racing AI benchmark
 
-This is a separate benchmark repository for the four racing architectures discussed in the comparison:
+This is a separate benchmark repository for the five racing architectures discussed in the comparison:
+
+- Astra — `benchamrk-made` at `709ed88d4aa0bb5f58b8ec8e655a40d016d23cbb`
 
 - GPT Racing — `codex/flat-track-racecraft` at `0dcd4744d4e5f4036db0894a62ab9976d091e370`
 - Claude Racing — `main` at `96334bc195255ecccf47416894c9ab072c447aed`
@@ -40,7 +42,7 @@ npm run benchmark:full -- --suite full
 That command performs three separate evaluations before writing one aggregate report:
 
 1. **Technical architecture audit** — scans only the pinned implementation source and scores explicit dimensions such as global planning, runtime lattice/control separation, racecraft, vehicle dynamics, field coordination, safety, integration closure, and observability. Every awarded signal includes an evidence file and line. It also flags gaps such as a planner that is implemented but not wired into the live control path.
-2. **Same-input tactical replay** — feeds identical normalized state cards (clear track, slow car, corner attack, defending threat, and side-by-side) into adapters for all four tactical layers. The report records each architecture’s decision (`PACE`, `ATTACK`, `DEFEND`), maneuver phase, target corridor, safety bound, and deterministic repeatability.
+2. **Same-input tactical replay** — feeds identical normalized state cards (clear track, slow car, corner attack, defending threat, and side-by-side) into adapters for all five tactical layers. The report records each architecture’s decision (`PACE`, `ATTACK`, `DEFEND`), maneuver phase, target corridor, safety bound, and deterministic repeatability.
 3. **Native simulation suite** — runs each repository’s own physics-accurate pace, racecraft, field, and endurance tests, mapped to common semantic scenario labels.
 
 The aggregate `full-comparison-<run-id>.md` report keeps those evidence types separate. The tactical replay is a fair same-input architecture comparison, but it is not a shared physics race; the native tests provide the physics and endurance evidence. Absolute lap seconds remain architecture-native because the simulators use different tracks, vehicle models, and integration rates.
@@ -55,3 +57,47 @@ Exact lap seconds should not be pooled across repositories: the simulators use d
 2. **Cross-subject evidence:** compare normalized directions (completion, off-track time, contact/deep-overlap safety, clean passes, and stability) while retaining the raw logs and pinned SHAs.
 
 The runner deliberately does not rewrite source tests or inject a shared controller API. That keeps the comparison honest and makes every result reproducible from this repository alone.
+
+## Open the 3D Harbor Ring sandbox
+
+The visual benchmark is a three-car sandbox: GPT Racing, Claude Racing, and the pinned Gemini Grand Prix architecture run as GT cars on one shared Harbor Ring scene and one shared reference physics loop. The 3D renderer has race-TV, chase, orbit, and driver-camera views, live architecture decisions, a leaderboard, race radio, scrubbing, and replay speed controls.
+
+Generate the benchmark-owned race tape and start the local viewer:
+
+```powershell
+npm run race:generate
+npm run viewer
+```
+
+Or use `npm run race:watch` to regenerate and serve in one command.
+
+Open the printed `http://127.0.0.1:4180` address. The scene uses local Three.js from a benchmark-owned subject dependency; no network asset is required.
+
+The architecture source checkouts under `subjects/` are read-only benchmark inputs. The host runner supplies the same canonical race state to each unchanged tactical layer and translates only at the harness boundary into the input shape that layer already expects. The source files are not patched or copied over; their commit SHAs are pinned and can be verified before and after a run. This is the only honest way to put incompatible controller APIs into one common physics sandbox without silently changing the architectures.
+
+## Live five-controller Harbor Ring race
+
+The live sandbox is separate from the replay viewer above. It imports all five pinned controller stacks directly: Astra, GPT Racing, Cloud Racing, Gemini NMPCC, and the newer Gemini Grand Prix branch. Every car uses the same GT `Vehicle`, `Circuit`, `RaceState`, collision loop, exact Harbor Ring scene, and authored local assets.
+
+```powershell
+npm run sandbox
+```
+
+Open `http://127.0.0.1:4174`. Press `1`–`5` (or click a timing row) to select and chase that AI; `V` cycles chase, free no-clip, and bonnet views. Click the scene to mouse-lock free flight, then use `WASD`, `Q/E`, and `Shift`. The host holds every car on the same grid/countdown, releases all five controllers on the common green flag, and ends when each has completed four laps. The debug overlay highlights the selected controller's published route while retaining all five routes, and the cockpit panel shows the selected AI's architecture, controller clock, plan source, actuation, targets, tires, and strategy state.
+
+The only compatibility code is the explicit host-state boundary required by the incompatible engine APIs. In particular, the untouched Cloud `Pilot → Racecraft → Lattice → Driver` stack receives its own track-coordinate convention and emits its original controls; no controller source, pace profile, or behavioural tuning is changed.
+
+Build and run the repeatable smoke race with:
+
+```powershell
+npm run sandbox:build
+npm run sandbox:smoke
+```
+
+For a full headless four-lap validation, run:
+
+```powershell
+$env:SANDBOX_TICKS = 70000
+$env:SANDBOX_REQUIRE_COMPLETE = 1
+npm run sandbox:smoke
+```

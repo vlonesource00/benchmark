@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { RESULTS_ROOT, ensureDir, isoRunId, loadManifest, subjectPath } from './lib.mjs';
+import { astraAdapter } from './astra-tactical-adapter.mjs';
 
 const manifest = loadManifest();
 const scenarioPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'benchmark', 'tactical-scenarios.json');
@@ -177,7 +178,8 @@ const ADAPTERS = [
   { id: 'gpt-racing', run: gptAdapter },
   { id: 'claude-racing', run: claudeAdapter },
   { id: 'gemini-nmpcc', run: geminiAdapter },
-  { id: 'gemini-grand-prix', run: geminiAdapter }
+  { id: 'gemini-grand-prix', run: geminiAdapter },
+  { id: 'astra', run: astraAdapter }
 ];
 
 function stable(a, b) {
@@ -188,7 +190,9 @@ function stable(a, b) {
 
 const subjectsById = new Map(manifest.subjects.map((subject) => [subject.id, subject]));
 const results = [];
-for (const adapter of ADAPTERS) {
+const selected=process.argv.find(a=>a.startsWith('--subject='))?.slice(10);
+if(selected&&!ADAPTERS.some(a=>a.id===selected))throw new Error(`Unknown subject: ${selected}`);
+for (const adapter of ADAPTERS.filter(a=>!selected||a.id===selected)) {
   const subject = subjectsById.get(adapter.id);
   const root = subjectPath(subject);
   const subjectResults = [];

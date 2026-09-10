@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#090704" />
+    <title>Claude Racing · Native 400 Hz Solo</title>
+    <link rel="stylesheet" href="./claude-solo.css" />
+  </head>
+  <body>
+    <main id="solo-app">
+      <canvas id="solo-canvas" aria-label="Claude Racing native 400 Hz solo run"></canvas>
+
+      <header class="solo-header glass">
+        <p>CONTROL EXPERIMENT / NATIVE RUNTIME</p>
+        <h1>Claude Racing <span>400 Hz Solo</span></h1>
+        <div class="status-row"><b id="solo-phase">INITIALISING</b><span id="solo-status">Loading original Harbor Ring systems…</span></div>
+      </header>
+
+      <aside class="solo-spec glass">
+        <p>NATIVE CONTRACT</p>
+        <dl>
+          <div><dt>Field</dt><dd>1 × Claude AI</dd></div>
+          <div><dt>Physics</dt><dd>Original Claude Vehicle</dd></div>
+          <div><dt>Clock</dt><dd>400 Hz fixed step</dd></div>
+          <div><dt>Controller</dt><dd>Pilot → Racecraft → Lattice → Driver</dd></div>
+          <div><dt>Track</dt><dd>Harbor Ring / native baked GT line</dd></div>
+          <div><dt>Distance</dt><dd>4 laps</dd></div>
+        </dl>
+      </aside>
+
+      <aside class="solo-telemetry glass">
+        <div class="title-row"><div><p>LIVE NATIVE TELEMETRY</p><h2>CLAUDE RACING</h2></div><strong id="solo-lap">LAP 1/4</strong></div>
+        <div class="metric-grid">
+          <div><span>Speed</span><b id="solo-speed">0 km/h</b></div>
+          <div><span>Target</span><b id="solo-target-speed">—</b></div>
+          <div><span>Track q</span><b id="solo-q">0.00 m</b></div>
+          <div><span>Off-track</span><b id="solo-offtrack">0.00 m</b></div>
+          <div><span>Mode</span><b id="solo-mode">PACE</b></div>
+          <div><span>Plan</span><b id="solo-plan">LinePlan</b></div>
+        </div>
+        <div class="controls">
+          <label>THR <i><em id="solo-throttle"></em></i><b id="solo-throttle-value">0%</b></label>
+          <label>BRK <i><em id="solo-brake"></em></i><b id="solo-brake-value">0%</b></label>
+          <label>STR <i class="steer"><em id="solo-steer"></em></i><b id="solo-steer-value">0%</b></label>
+        </div>
+        <p id="solo-reason" class="reason">Awaiting native planner…</p>
+        <small id="solo-clock">00:00.000 · 0 physics steps</small>
+      </aside>
+
+      <nav class="solo-actions glass">
+        <button id="solo-camera" type="button">Camera: Chase (C)</button>
+        <button id="solo-debug" type="button">Native Debug: On (J)</button>
+        <button id="solo-restart" type="button">Restart (R)</button>
+        <a href="./">Return to 4-AI benchmark</a>
+      </nav>
+
+      <footer class="solo-help glass">C: chase/cockpit/spectate · F: free camera · click for mouse lock · WASD/QE/Shift: fly · J: route debug · R: restart</footer>
+    </main>
+    <script type="module" src="./claude-solo.js"></script>
+  </body>
+</html>

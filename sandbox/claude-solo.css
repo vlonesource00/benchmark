@@ -1,0 +1,40 @@
+:root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; background: #080604; color: #fff4df; }
+* { box-sizing: border-box; }
+html, body, #solo-app { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+#solo-app { position: relative; background: #090704; }
+#solo-canvas { display: block; width: 100%; height: 100%; outline: none; cursor: crosshair; }
+.glass { position: absolute; z-index: 3; border: 1px solid rgba(255, 190, 102, .25); background: linear-gradient(145deg, rgba(19, 13, 7, .93), rgba(7, 8, 10, .82)); box-shadow: 0 14px 46px rgba(0,0,0,.48); backdrop-filter: blur(14px); border-radius: 8px; }
+.solo-header { top: 20px; left: 24px; padding: 14px 18px; border-left: 4px solid #ffb454; }
+.solo-header p, .solo-spec > p, .solo-telemetry p:first-child { margin: 0; color: #ffbd67; font: 800 .62rem ui-monospace, Consolas, monospace; letter-spacing: .12em; }
+.solo-header h1 { margin: 3px 0 7px; font-size: 1.65rem; line-height: 1; }
+.solo-header h1 span { color: #a79c8d; font-weight: 500; }
+.status-row { display: flex; align-items: center; gap: 9px; color: #d8c9b6; font-size: .72rem; }
+.status-row b { padding: 3px 7px; border-radius: 3px; background: #ffb454; color: #1b1003; font: 900 .6rem ui-monospace, monospace; }
+.solo-spec { top: 132px; left: 24px; width: 285px; padding: 12px 14px; }
+.solo-spec dl { display: grid; gap: 6px; margin: 9px 0 0; }
+.solo-spec dl div { display: flex; justify-content: space-between; gap: 10px; }
+dt { color: #9d8e7c; font-size: .65rem; } dd { margin: 0; text-align: right; color: #fff1dc; font: 700 .65rem/1.35 ui-monospace, monospace; }
+.solo-telemetry { right: 24px; top: 20px; width: 345px; padding: 14px; }
+.title-row { display: flex; justify-content: space-between; align-items: start; }
+.title-row h2 { margin: 3px 0 9px; color: #ffbd67; font-size: 1.05rem; }
+.title-row > strong { color: #ffdc96; font: 800 .72rem ui-monospace, monospace; }
+.metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.metric-grid div { padding: 7px 8px; border: 1px solid rgba(255,190,102,.1); border-radius: 5px; background: rgba(255,190,102,.055); }
+.metric-grid span { display: block; color: #9d8e7c; font-size: .57rem; }
+.metric-grid b { display: block; margin-top: 2px; color: #fff4e2; font: 750 .72rem ui-monospace, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.controls { display: grid; gap: 6px; margin-top: 9px; }
+.controls label { display: grid; grid-template-columns: 28px 1fr 36px; gap: 7px; align-items: center; color: #a89783; font: 700 .59rem ui-monospace, monospace; }
+.controls i { height: 7px; overflow: hidden; border-radius: 3px; background: rgba(255,255,255,.08); }
+.controls em { display: block; width: 0; height: 100%; background: #4beca8; box-shadow: 0 0 8px #4beca8; }
+.controls label:nth-child(2) em { background: #ff5577; box-shadow: 0 0 8px #ff5577; }
+.controls i.steer { position: relative; overflow: visible; }
+.controls i.steer::after { position: absolute; left: 50%; top: -2px; width: 1px; height: 11px; content: ''; background: #877a6d; }
+.controls i.steer em { position: absolute; left: 50%; top: -1px; width: 6px; height: 9px; border-radius: 2px; transform: translateX(-50%); background: #ffcc73; }
+.controls label b { text-align: right; color: #fff; }
+.reason { min-height: 30px; margin: 10px 0 6px !important; padding: 8px; border-left: 2px solid #ffb454; background: rgba(255,180,84,.07); color: #e9d8c1 !important; font: .67rem/1.35 ui-monospace, monospace !important; letter-spacing: 0 !important; }
+.solo-telemetry > small { color: #9c8c78; font: .58rem ui-monospace, monospace; }
+.solo-actions { left: 24px; bottom: 62px; display: flex; gap: 7px; padding: 8px; }
+.solo-actions button, .solo-actions a { padding: 6px 9px; border: 1px solid rgba(255,190,102,.25); border-radius: 4px; background: rgba(255,180,84,.08); color: #ffe5bc; text-decoration: none; cursor: pointer; font: 700 .62rem ui-monospace, monospace; }
+.solo-actions button:hover, .solo-actions a:hover { border-color: #ffb454; background: rgba(255,180,84,.18); }
+.solo-help { left: 50%; bottom: 18px; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 48px); padding: 8px 13px; color: #c4b49f; font: .62rem ui-monospace, monospace; }
+@media (max-width: 800px) { .solo-spec { display: none; } .solo-telemetry { width: min(345px, calc(100vw - 48px)); } .solo-actions { flex-wrap: wrap; right: 24px; } }

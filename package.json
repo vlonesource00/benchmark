@@ -1,18 +1,29 @@
 {
   "name": "racing-ai-benchmark",
-  "version": "0.1.0",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
-  "description": "Isolated, pinned benchmark harness for the four racing AI architectures.",
+  "description": "Isolated, pinned benchmark harness for the five racing AI architectures.",
   "scripts": {
+    "sandbox:astra-smoke": "node scripts/astra-integration-smoke.mjs",
+    "verify:astra": "node scripts/verify-pins.mjs --subject astra",
     "prepare": "node scripts/prepare-subjects.mjs",
     "verify": "node scripts/verify-pins.mjs",
     "install:subjects": "node scripts/install-subject-deps.mjs",
     "benchmark": "node scripts/run-benchmark.mjs",
     "benchmark:full": "node scripts/full-benchmark.mjs",
+    "race:generate": "node scripts/common-race.mjs",
+    "viewer": "node viewer/server.mjs",
+    "race:watch": "node scripts/common-race.mjs && node viewer/server.mjs",
+    "sandbox": "node subjects/gpt-racing/node_modules/vite/bin/vite.js --config sandbox/vite.config.mjs",
+    "sandbox:build": "node subjects/gpt-racing/node_modules/vite/bin/vite.js build --config sandbox/vite.config.mjs",
+    "sandbox:smoke": "node scripts/sandbox-smoke.mjs",
+    "sandbox:claude-native-smoke": "node scripts/claude-native-smoke.mjs",
+    "sandbox:native-engine-smoke": "node scripts/native-engine-smoke.mjs",
     "audit:architecture": "node scripts/architecture-audit.mjs",
     "replay:tactics": "node scripts/tactical-replay.mjs",
     "compare": "node scripts/score-benchmark.mjs",
+    "analyze": "node scripts/deep-compare.mjs",
     "report": "node scripts/report-results.mjs"
   }
 }

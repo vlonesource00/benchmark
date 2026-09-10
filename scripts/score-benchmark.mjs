@@ -145,7 +145,7 @@ for (const subject of subjects) {
   }
 }
 
-lines.push('', '## Interpretation guardrails', '', '- Technical scores are evidence coverage plus integration-closure penalties, not a learned measure of controller quality.', '- Same-input replay compares tactical intent selection on identical abstract states; it does not integrate all four controllers in one shared physics world.', '- Native simulation metrics are architecture-native. Use them for robustness and failure analysis, not as a universal lap-time leaderboard.', '');
+lines.push('', '## Interpretation guardrails', '', '- Technical scores are evidence coverage plus integration-closure penalties, not a learned measure of controller quality.', '- Same-input replay compares tactical intent selection on identical abstract states; it does not integrate all five controllers in one shared physics world.', '- Native simulation metrics are architecture-native. Use them for robustness and failure analysis, not as a universal lap-time leaderboard.', '');
 
 await fs.mkdir(path.dirname(outputBase), { recursive: true });
 await fs.writeFile(outputBase, `${JSON.stringify(comparison, null, 2)}\n`, 'utf8');

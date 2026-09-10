@@ -8,6 +8,10 @@ subjects/*/.npm/
 results/*
 !results/.gitkeep
 
+# Local web build/runtime output.
+node_modules/
+dist/
+
 # Local editor and OS files.
 .DS_Store
 Thumbs.db

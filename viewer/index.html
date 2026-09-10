@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#05090d" />
+    <title>Harbor Ring · Shared Physics Sandbox</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main id="sandbox-root" class="sandbox-shell">
+      <canvas id="raceCanvas" role="img" aria-label="3D Harbor Ring shared-physics race with three AI-controlled GT cars."></canvas>
+      <div class="scene-vignette" aria-hidden="true"></div>
+
+      <header class="topbar">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <div>
+            <p class="eyebrow">BENCHMARK SANDBOX / LIVE 3D</p>
+            <h1>Harbor Ring <span>shared physics</span></h1>
+          </div>
+        </div>
+        <div class="topbar-controls" aria-label="Sandbox view controls">
+          <label class="compact-field"><span>Camera</span><select id="cameraSelect"><option value="tv">Race TV</option><option value="chase">Chase selected</option><option value="cockpit">Driver cam</option><option value="orbit">Orbit selected</option></select></label>
+          <label class="compact-field"><span>Car</span><select id="carSelect"></select></label>
+          <button id="fullscreenButton" class="icon-button" type="button" aria-label="Enter fullscreen">⛶</button>
+        </div>
+      </header>
+
+      <section class="race-title" aria-live="polite">
+        <p class="track-label">HARBOR RING / 2,704 M / 2 LAPS</p>
+        <h2>Three architectures. Three GT cars. One physics loop.</h2>
+        <div class="spec-line"><span class="live-dot" aria-hidden="true"></span><strong id="runStatus">LIVE REPLAY</strong><span>same track</span><span>same category</span><span>same starting rules</span></div>
+      </section>
+
+      <aside class="race-hud right-hud" aria-label="Live leaderboard">
+        <div class="hud-heading"><div><p class="hud-kicker">LIVE ORDER</p><h2>Race control</h2></div><span id="lapReadout" class="mono">LAP 0/2</span></div>
+        <div id="leaderboard" class="leaderboard" aria-live="polite"></div>
+        <div class="hud-divider"></div>
+        <div class="hud-heading compact-heading"><div><p class="hud-kicker">SHARED MODEL</p><h2>GT / Harbor Ring</h2></div><span class="mono">LOCKED</span></div>
+        <dl class="model-specs"><div><dt>Physics</dt><dd>common reference</dd></div><div><dt>Decision</dt><dd>native tactical layer</dd></div><div><dt>Seed</dt><dd id="seedReadout">—</dd></div></dl>
+      </aside>
+
+      <aside class="race-hud left-hud" aria-label="Selected car telemetry">
+        <p class="hud-kicker">SELECTED ARCHITECTURE</p>
+        <div class="selected-driver"><span id="selectedColor" class="driver-color"></span><h2 id="selectedName">—</h2></div>
+        <p id="selectedBranch" class="branch-line">—</p>
+        <div class="selected-decision"><span id="selectedDecision">PACE</span><small id="selectedPhase">OPTIMAL LINE</small></div>
+        <div class="selected-readouts"><div><span>Speed</span><strong id="selectedSpeed">—</strong><small>m/s</small></div><div><span>Gap</span><strong id="selectedGap">—</strong><small>m</small></div><div><span>Rank</span><strong id="selectedRank">—</strong><small id="selectedLap">lap —</small></div></div>
+        <p id="selectedReason" class="selected-reason">Select a car to inspect its tactical state.</p>
+      </aside>
+
+      <section class="bottom-hud" aria-label="Current decisions">
+        <div class="decision-heading"><p class="hud-kicker">AI DECISION LAYER</p><span class="mono" id="timeReadout">00:00.00 / 00:00.00</span></div>
+        <div id="decisionStrip" class="decision-strip" aria-live="polite"></div>
+      </section>
+
+      <section class="event-hud" aria-label="Race events">
+        <span class="event-title">RACE RADIO</span><div id="eventLog" class="event-log" aria-live="polite"></div>
+      </section>
+
+      <footer class="transport-bar" aria-label="Replay controls">
+        <button id="playButton" class="transport-button primary" type="button">Pause</button>
+        <button id="restartButton" class="transport-button" type="button">Restart</button>
+        <label class="speed-field"><span>Replay</span><select id="speedSelect"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select></label>
+        <label class="timeline-field"><span class="sr-only">Race timeline</span><input id="timeline" type="range" min="0" max="1" step="0.25" value="0" /></label>
+        <span id="finishedLabel" class="finish-label">RUNNING</span>
+      </footer>
+
+      <div id="loadError" class="load-error" role="alert" hidden></div>
+      <p class="sandbox-disclaimer">Benchmark-owned shared reference physics · source checkouts are read-only · only the host runner translates the common state into each unchanged controller’s input shape.</p>
+    </main>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

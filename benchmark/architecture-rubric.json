@@ -8,10 +8,10 @@
       "label": "Global planning and pace model",
       "maxPoints": 15,
       "signals": [
-        {"id": "offline-solver", "label": "Offline/global optimal solver", "points": 5, "patterns": ["class\\s+GlobalTimeOptimalEngine", "new\\s+GlobalTimeOptimalEngine", "class\\s+TrackGrid", "new\\s+TrackGrid"]},
-        {"id": "speed-profile", "label": "Forward/backward or reachable speed profile", "points": 3, "patterns": ["speedProfiles\\s*=", "computeSpeedEnvelope\\s*\\(", "forwardBackward", "integrateSpeedProfile"]},
-        {"id": "cost-to-go", "label": "Value function or cost-to-go representation", "points": 4, "patterns": ["costToGo", "valueFunction", "this\\.J\\b", "LineCache\\s*\\."]},
-        {"id": "continuous-refinement", "label": "Continuous line refinement or smoothing", "points": 3, "patterns": ["coordinateDescent", "refine[A-Z]", "smoothLine", "raisedCosine"]}
+        {"id": "offline-solver", "label": "Offline/global optimal solver", "points": 5, "patterns": ["class\\s+GlobalTimeOptimalEngine", "new\\s+GlobalTimeOptimalEngine", "class\\s+TrackGrid", "new\\s+TrackGrid", "class\\s+RacingLine", "solvePaceProfile", "computeLine"]},
+        {"id": "speed-profile", "label": "Forward/backward or reachable speed profile", "points": 3, "patterns": ["speedProfiles\\s*=", "computeSpeedEnvelope\\s*\\(", "forwardBackward", "integrateSpeedProfile", "profileSpeed", "cornerSpeed"]},
+        {"id": "cost-to-go", "label": "Value function or cost-to-go representation", "points": 4, "patterns": ["costToGo", "valueFunction", "this\\.J\\b", "LineCache\\s*\\.", "responseRisk", "trajectoryCost"]},
+        {"id": "continuous-refinement", "label": "Continuous line refinement or smoothing", "points": 3, "patterns": ["coordinateDescent", "refine[A-Z]", "smoothLine", "raisedCosine", "smoothTrack", "catmullRom"]}
       ]
     },
     {
@@ -19,10 +19,10 @@
       "label": "Runtime planning and control separation",
       "maxPoints": 15,
       "signals": [
-        {"id": "trajectory-search", "label": "Candidate trajectory/lattice search", "points": 5, "patterns": ["class\\s+TrajectoryPlanner", "class\\s+FrenetLatticePlanner", "class\\s+Lattice", "proposalsFor\\s*\\(", "trajectoryPlanner\\.plan\\s*\\("]},
-        {"id": "control-layer", "label": "Dedicated steering/pedal control layer", "points": 4, "patterns": ["class\\s+VehicleController", "class\\s+Driver", "class\\s+PaceOptimizer", "computeSteering\\s*\\(", "computePedals\\s*\\("]},
-        {"id": "multi-rate", "label": "Explicit multi-rate or budgeted replanning", "points": 3, "patterns": ["class\\s+PlanBudget", "planHz\\s*=", "combatHz\\s*=", "planTimer\\s*\\+=", "trajectoryIntervalTicks"]},
-        {"id": "commitment-state", "label": "Persistent plan or maneuver commitment state", "points": 3, "patterns": ["committed\\s*[:=]", "currentPlan\\s*=", "planPhaseAge", "oneMoveLocked", "phaseChanged"]}
+        {"id": "trajectory-search", "label": "Candidate trajectory/lattice search", "points": 5, "patterns": ["class\\s+TrajectoryPlanner", "class\\s+FrenetLatticePlanner", "class\\s+Lattice", "proposalsFor\\s*\\(", "trajectoryPlanner\\.plan\\s*\\(", "class\\s+TacticalPlanner", "trackMPC", "predictChassis"]},
+        {"id": "control-layer", "label": "Dedicated steering/pedal control layer", "points": 4, "patterns": ["class\\s+VehicleController", "class\\s+Driver", "class\\s+PaceOptimizer", "class\\s+AdaptiveDriver", "computeSteering\\s*\\(", "computePedals\\s*\\("]},
+        {"id": "multi-rate", "label": "Explicit multi-rate or budgeted replanning", "points": 3, "patterns": ["class\\s+PlanBudget", "planHz\\s*=", "combatHz\\s*=", "planTimer\\s*\\+=", "trajectoryIntervalTicks", "step\\s*\\(dt"]},
+        {"id": "commitment-state", "label": "Persistent plan or maneuver commitment state", "points": 3, "patterns": ["committed\\s*[:=]", "currentPlan\\s*=", "planPhaseAge", "oneMoveLocked", "phaseChanged", "commit\\s*="]}
       ]
     },
     {
@@ -30,10 +30,10 @@
       "label": "Racecraft and traffic reasoning",
       "maxPoints": 15,
       "signals": [
-        {"id": "tactical-vocabulary", "label": "Attack, defense, and overtaking tactics", "points": 5, "patterns": ["_attack\\s*\\(", "attackTargetId", "mode\\s*:\\s*['\\x27]?PASS", "DIVEBOMB", "SWITCHBACK", "SLINGSHOT"]},
-        {"id": "opponent-prediction", "label": "Opponent prediction, occupancy, or TTC", "points": 4, "patterns": ["_predictOpponent", "traffic\\.entries", "occupancy", "minimumClearance", "\\bttc\\s*=", "timeToCollision"]},
-        {"id": "defense-rules", "label": "Defensive commitment or anti-weave rules", "points": 3, "patterns": ["oneMoveLocked", "commitCorner", "defenseMode", "BREAK_TOW", "defensiveDirection"]},
-        {"id": "recovery-tactics", "label": "Recovery and rejoin behavior", "points": 3, "patterns": ["marshalRecoverTo", "offTrack\\s*=", "RECOVER", "PHYSICAL_REJOIN"]}
+        {"id": "tactical-vocabulary", "label": "Attack, defense, and overtaking tactics", "points": 5, "patterns": ["_attack\\s*\\(", "attackTargetId", "mode\\s*:\\s*['\\x27]?PASS", "DIVEBOMB", "SWITCHBACK", "SLINGSHOT", "responses\\s*\\(", "intent\\s*===\\s*['\"](?:DEFEND|OVERTAKE|PASS|HOLD)", "responseRisk"]},
+        {"id": "opponent-prediction", "label": "Opponent prediction, occupancy, or TTC", "points": 4, "patterns": ["_predictOpponent", "traffic\\.entries", "occupancy", "minimumClearance", "\\bttc\\s*=", "timeToCollision", "responses\\s*\\(", "brakeStrength"]},
+        {"id": "defense-rules", "label": "Defensive commitment or anti-weave rules", "points": 3, "patterns": ["oneMoveLocked", "commitCorner", "defenseMode", "BREAK_TOW", "defensiveDirection", "defendLane", "blockLine"]},
+        {"id": "recovery-tactics", "label": "Recovery and rejoin behavior", "points": 3, "patterns": ["marshalRecoverTo", "offTrack\\s*=", "RECOVER", "PHYSICAL_REJOIN", "wasRecovering"]}
       ]
     },
     {
@@ -41,9 +41,9 @@
       "label": "Vehicle dynamics and actuation coupling",
       "maxPoints": 15,
       "signals": [
-        {"id": "friction-coupling", "label": "Friction-circle, MPCC, or coupled slip handling", "points": 6, "patterns": ["class\\s+CoupledMPCCController", "frictionCircle", "frictionEllipse", "slipAngle\\s*[:=]", "slipSlope"]},
-        {"id": "longitudinal-lateral", "label": "Coupled steering and longitudinal control", "points": 4, "patterns": ["computePedals\\s*\\(", "yawRate\\s*[:=]", "lateralAccel\\s*[:=]", "steerAngle\\s*[:=]"]},
-        {"id": "contact-aero", "label": "Contact, collision, wake, or aero interaction model", "points": 5, "patterns": ["class\\s+CombatDynamicsEngine", "updateAerodynamicWakes\\s*\\(", "resolveVehicleCollisions\\s*\\(", "stepContacts\\s*\\("]}
+        {"id": "friction-coupling", "label": "Friction-circle, MPCC, or coupled slip handling", "points": 6, "patterns": ["class\\s+CoupledMPCCController", "frictionCircle", "frictionEllipse", "slipAngle\\s*[:=]", "slipSlope", "trackMPC", "slipPower"]},
+        {"id": "longitudinal-lateral", "label": "Coupled steering and longitudinal control", "points": 4, "patterns": ["computePedals\\s*\\(", "yawRate\\s*[:=]", "lateralAccel\\s*[:=]", "steerAngle\\s*[:=]", "steer\\s*="]},
+        {"id": "contact-aero", "label": "Contact, collision, wake, or aero interaction model", "points": 5, "patterns": ["class\\s+CombatDynamicsEngine", "updateAerodynamicWakes\\s*\\(", "resolveVehicleCollisions\\s*\\(", "stepContacts\\s*\\(", "wakes\\s*\\(", "collisions\\s*\\("]}
       ]
     },
     {
@@ -51,8 +51,8 @@
       "label": "Whole-field coordination",
       "maxPoints": 10,
       "signals": [
-        {"id": "central-arbitration", "label": "Central field arbitration or compatible plan allocation", "points": 6, "patterns": ["class\\s+AIRaceDirector", "_planField\\s*\\(", "trajectoriesConflict\\s*\\(", "allocatedTrajectories"]},
-        {"id": "shared-awareness-budget", "label": "Shared field awareness or planning budget", "points": 4, "patterns": ["class\\s+PlanBudget", "new\\s+TrafficAwareness", "this\\.agents", "field\\s*[:=]"]}
+        {"id": "central-arbitration", "label": "Central field arbitration or compatible plan allocation", "points": 6, "patterns": ["class\\s+AIRaceDirector", "_planField\\s*\\(", "trajectoriesConflict\\s*\\(", "allocatedTrajectories", "context\\.projections", "class\\s+Session", "new\\s+Session"]},
+        {"id": "shared-awareness-budget", "label": "Shared field awareness or planning budget", "points": 4, "patterns": ["class\\s+PlanBudget", "new\\s+TrafficAwareness", "this\\.agents", "field\\s*[:=]", "context\\.order"]}
       ]
     },
     {
@@ -60,9 +60,9 @@
       "label": "Feasibility, safety, and fallback behavior",
       "maxPoints": 10,
       "signals": [
-        {"id": "feasibility-gates", "label": "Road legality and collision/dynamic feasibility gates", "points": 5, "patterns": ["roadLegal\\s*:", "collisionFree\\s*:", "dynamicallyFeasible\\s*:", "minimumClearance\\s*:", "frictionCircle"]},
+        {"id": "feasibility-gates", "label": "Road legality and collision/dynamic feasibility gates", "points": 5, "patterns": ["roadLegal\\s*:", "collisionFree\\s*:", "dynamicallyFeasible\\s*:", "minimumClearance\\s*:", "frictionCircle", "halfCarInside"]},
         {"id": "fallbacks", "label": "Fallback plans and finite-value guards", "points": 3, "patterns": ["fallback\\s*=", "Number\\.isFinite", "finite\\s*=", "clamp\\s*\\("]},
-        {"id": "track-limit-recovery", "label": "Track-limit and off-track handling", "points": 2, "patterns": ["offTrack\\s*=", "marshalRecoverTo", "recoveryTimer"]}
+        {"id": "track-limit-recovery", "label": "Track-limit and off-track handling", "points": 2, "patterns": ["offTrack\\s*=", "marshalRecoverTo", "recoveryTimer", "offtrack"]}
       ]
     },
     {
@@ -70,9 +70,9 @@
       "label": "Architecture integration closure",
       "maxPoints": 10,
       "signals": [
-        {"id": "planner-wired", "label": "Planner is called from an active controller path", "points": 4, "patterns": ["trajectoryPlanner\\.plan\\s*\\(", "planner\\.plan\\s*\\(", "proposalsFor\\s*\\(", "lattice\\.search\\s*\\("]},
-        {"id": "tactics-wired", "label": "Racecraft/tactical layer is called from the controller path", "points": 3, "patterns": ["combatEngine\\.evaluate\\s*\\(", "racecraft\\.update\\s*\\(", "tacticalIntents\\s*\\("]},
-        {"id": "actuation-wired", "label": "Actuation output is handed to vehicle controls", "points": 3, "patterns": ["computeSteering\\s*\\(", "computePedals\\s*\\(", "controller\\.compute\\s*\\(", "setControls\\s*\\("]}
+        {"id": "planner-wired", "label": "Planner is called from an active controller path", "points": 4, "patterns": ["trajectoryPlanner\\.plan\\s*\\(", "planner\\.plan\\s*\\(", "proposalsFor\\s*\\(", "lattice\\.search\\s*\\(", "planner\\.update\\s*\\(", "driver\\.planner"]},
+        {"id": "tactics-wired", "label": "Racecraft/tactical layer is called from the controller path", "points": 3, "patterns": ["combatEngine\\.evaluate\\s*\\(", "racecraft\\.update\\s*\\(", "tacticalIntents\\s*\\(", "responses\\s*\\(", "driver\\.update\\s*\\("]},
+        {"id": "actuation-wired", "label": "Actuation output is handed to vehicle controls", "points": 3, "patterns": ["computeSteering\\s*\\(", "computePedals\\s*\\(", "controller\\.compute\\s*\\(", "setControls\\s*\\(", "car\\.controls\\s*="]}
       ]
     },
     {

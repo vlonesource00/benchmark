@@ -13,6 +13,10 @@ import {
 } from './lib.mjs';
 
 const manifest = loadManifest();
+const subjectIndex=process.argv.indexOf('--subject');
+const selected=process.argv.find(a=>a.startsWith('--subject='))?.slice(10)??(subjectIndex>=0?process.argv[subjectIndex+1]:undefined);
+const subjects=selected?manifest.subjects.filter(s=>s.id===selected):manifest.subjects;
+if(!subjects.length)throw new Error(`Unknown subject: ${selected}`);
 await ensureDir(SUBJECTS_ROOT);
 
 function directoryExists(dir) {
@@ -41,7 +45,7 @@ function clone(repoUrl, destination) {
   }
 }
 
-for (const subject of manifest.subjects) {
+for (const subject of subjects) {
   assertCommit(subject.commit, `${subject.id}.commit`);
   const destination = subjectPath(subject);
   const exists = await directoryExists(destination);
@@ -73,5 +77,5 @@ for (const subject of manifest.subjects) {
   console.log(`PIN    ${subject.label}: ${actual.slice(0, 12)} (${subject.branch})`);
 }
 
-console.log(`\nPrepared ${manifest.subjects.length} isolated benchmark subjects under ${path.relative(ROOT, SUBJECTS_ROOT)}.`);
+console.log(`\nPrepared ${subjects.length} isolated benchmark subjects under ${path.relative(ROOT, SUBJECTS_ROOT)}.`);
 console.log('Original development folders were not used as working directories.');

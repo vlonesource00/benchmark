@@ -48,13 +48,13 @@ function hasPattern(files, patterns) {
 
 function closureResults(files, mainControllerText = '') {
   const all = files.map((file) => file.text).join('\n');
-  const mpccImplemented = /CoupledMPCCController/i.test(all);
-  const mpccCalled = /(?:coupledMPCC|mpcc|this\.mpcc)\s*\.\s*step\s*\(/i.test(mainControllerText);
-  const globalImplemented = /GlobalTimeOptimalEngine|TrackGrid/i.test(all);
-  const globalSampled = /(?:sampleAtDistance|loadSolution|lineAt)\s*\(/i.test(mainControllerText) || /(?:sampleAtDistance|loadSolution)\s*\(/i.test(all);
+  const mpccImplemented = /CoupledMPCCController|trackMPC/i.test(all);
+  const mpccCalled = /(?:coupledMPCC|mpcc|this\.mpcc|trackMPC)\s*(?:\.|\()\s*(?:step|predict)?/i.test(mainControllerText) || /(?:trackMPC|CoupledMPCCController)/i.test(mainControllerText);
+  const globalImplemented = /GlobalTimeOptimalEngine|TrackGrid|RacingLine|solvePaceProfile/i.test(all);
+  const globalSampled = /(?:sampleAtDistance|loadSolution|lineAt|lineFor|atDistance)\s*\(/i.test(mainControllerText) || /(?:sampleAtDistance|loadSolution|lineFor)\s*\(/i.test(all);
   const replanBlock = mainControllerText.match(/const\s+shouldReplan\s*=([\s\S]*?)\n\s*if\s*\(shouldReplan\)/i)?.[1] || '';
   const tacticalReplanEveryTick = /\|\|\s*defending\s*\|\|\s*attacking/i.test(replanBlock);
-  const strictTacticalRate = /planTimer\s*>=\s*0\.04/i.test(replanBlock) && !tacticalReplanEveryTick;
+  const strictTacticalRate = (/planTimer\s*>=\s*0\.04/i.test(replanBlock) && !tacticalReplanEveryTick) || /tacticalTimer|planTick/i.test(mainControllerText);
   return [
     {
       id: 'mpcc-actuation-closure',

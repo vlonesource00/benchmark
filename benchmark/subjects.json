@@ -4,6 +4,16 @@
   "description": "Pinned benchmark subjects. Each checkout is created under this benchmark repo and is never read from or written to the original development folders.",
   "subjects": [
     {
+      "id":"astra","label":"Astra","repoUrl":"https://github.com/vlonesource00/astra.git","branch":"benchamrk-made","commit":"709ed88d4aa0bb5f58b8ec8e655a40d016d23cbb",
+      "testNotes":"Class-aware physical control, exact Harbor Ring and terminal exit recovery cost; native tests remain separate from shared-physics host integration.",
+      "tests":[
+        {"id":"harbor-classes","label":"Harbor Ring three-class solo validity","command":["node","tests/harbor-quality.mjs","--check"],"scenarioIds":["solo-pace","stability"],"suites":["quick","full"],"timeoutSeconds":180},
+        {"id":"harbor-mixed","label":"Harbor Ring mixed-class pack","command":["node","tests/harbor-quality.mjs","--mixed","--check"],"scenarioIds":["pack-race","collision-safety"],"suites":["quick","full"],"timeoutSeconds":240},
+        {"id":"lost-momentum","label":"Lost-momentum passing","command":["node","tests/flow-benchmark.mjs","--check"],"scenarioIds":["obstacle-bypass","slower-pass"],"suites":["quick","full"],"timeoutSeconds":120},
+        {"id":"showcase-stint","label":"Three-lap showcase regression","command":["node","tests/showcase-quality.mjs","--check"],"scenarioIds":["endurance"],"suites":["full"],"timeoutSeconds":240}
+      ]
+    },
+    {
       "id": "gpt-racing",
       "label": "GPT Racing",
       "repoUrl": "https://github.com/vlonesource00/apex-sim-racing.git",

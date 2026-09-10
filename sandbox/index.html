@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#05090d" />
+    <title>Harbor Ring · Five Architecture Live Benchmark</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main id="app" aria-label="Harbor Ring five architecture racing benchmark">
+      <canvas id="race-canvas" aria-label="Mouse-locked no-clip spectator view of a five car Harbor Ring race"></canvas>
+
+      <!-- Top Header & Race Director -->
+      <section class="masthead" aria-live="polite">
+        <div class="masthead-top">
+          <p class="eyebrow">BENCHMARK / LIVE 120HZ SHARED PHYSICS</p>
+          <div class="masthead-actions">
+            <button id="btn-camera-mode" class="action-btn" type="button" title="Cycle Camera: Chase / Bonnet / Free [V]">🎥 Cam: CHASE (V)</button>
+            <button id="btn-toggle-compare" class="action-btn" type="button" title="Toggle 5-Car Comparison Grid [C / Tab]">📊 Compare All (C)</button>
+            <button id="btn-toggle-telemetry" class="action-btn" type="button" title="Toggle Detailed Telemetry [T]">📈 Telemetry (T)</button>
+            <button id="btn-restart" class="action-btn restart" type="button" title="Restart Benchmark Race [R]">🔄 Restart (R)</button>
+            <button id="btn-export" class="action-btn export" type="button" title="Export Race Telemetry JSON">💾 Export JSON</button>
+          </div>
+        </div>
+        <h1>Harbor Ring <span>5-Architecture Grand Prix</span></h1>
+        <div class="status-badge-row">
+          <span id="race-phase-badge" class="phase-badge">GRID STAGING</span>
+          <span id="status-line" class="status-line">Loading canonical 3D assets…</span>
+        </div>
+      </section>
+
+      <!-- Protocol & Track Spec -->
+      <aside class="panel protocol-panel">
+        <p class="eyebrow">BENCHMARK SPEC</p>
+        <dl>
+          <div><dt>Track</dt><dd>Harbor Ring (2,704.6 m)</dd></div>
+          <div><dt>Cars</dt><dd>5 × GT Class</dd></div>
+          <div><dt>Physics</dt><dd>Shared 120 Hz Dynamic Loop</dd></div>
+          <div><dt>Distance</dt><dd>4 Laps (10.82 km)</dd></div>
+          <div><dt>Session Best</dt><dd id="session-best-lap" class="purple">—</dd></div>
+        </dl>
+      </aside>
+
+      <!-- Right Panel: Live Timing, Scoring & Sector Splits -->
+      <aside class="panel leaderboard-panel" aria-label="Live timing and scoring">
+        <div class="panel-title">
+          <div>
+            <p class="eyebrow">LIVE TIMING & SCORING</p>
+            <h2>Race Control</h2>
+          </div>
+          <strong id="lap-readout">LAP 0/4</strong>
+        </div>
+        <div class="leaderboard-header">
+          <span>POS</span>
+          <span>DRIVER / AI</span>
+          <span>GAP</span>
+          <span>BEST</span>
+          <span>LAST</span>
+        </div>
+        <ol id="leaderboard" class="leaderboard"></ol>
+
+        <!-- Live Sector Splits Matrix -->
+        <div class="sector-matrix-card">
+          <p class="eyebrow">SECTOR SPLITS (SELECTED CAR)</p>
+          <div id="sector-grid" class="sector-grid">
+            <div class="sector-cell" id="sec-1"><span>S1 Straight</span><strong>—</strong></div>
+            <div class="sector-cell" id="sec-2"><span>S2 Hairpin</span><strong>—</strong></div>
+            <div class="sector-cell" id="sec-3"><span>S3 Esses</span><strong>—</strong></div>
+            <div class="sector-cell" id="sec-4"><span>S4 Loop</span><strong>—</strong></div>
+            <div class="sector-cell" id="sec-5"><span>S5 Chicane</span><strong>—</strong></div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Left Panel: Deep Telemetry & AI Cockpit -->
+      <aside id="telemetry-panel" class="panel telemetry-panel" aria-label="Selected architecture telemetry">
+        <div class="panel-title">
+          <div>
+            <p class="eyebrow">TELEMETRY & AI COCKPIT</p>
+            <h2 id="selected-name">GPT Racing</h2>
+          </div>
+          <span id="selected-number-badge" class="car-badge">#1</span>
+        </div>
+        <p id="selected-branch" class="branch">Loading pinned source…</p>
+        <div class="controller-contract-card">
+          <span>Architecture</span><strong id="selected-stack">Loading controller stack…</strong>
+          <div>
+            <small>Controller clock</small><b id="selected-cadence">Native cadence</b>
+            <small>Displayed route</small><b id="selected-route-source">Awaiting plan</b>
+          </div>
+        </div>
+
+        <!-- Driver Actuation Pedals & Steer -->
+        <div class="actuation-card">
+          <div class="pedal-row">
+            <span class="pedal-label">THR</span>
+            <div class="pedal-bar-bg"><div id="bar-throttle" class="pedal-bar throttle" style="width: 0%"></div></div>
+            <strong id="val-throttle">0%</strong>
+          </div>
+          <div class="pedal-row">
+            <span class="pedal-label">BRK</span>
+            <div class="pedal-bar-bg"><div id="bar-brake" class="pedal-bar brake" style="width: 0%"></div></div>
+            <strong id="val-brake">0%</strong>
+          </div>
+          <div class="pedal-row">
+            <span class="pedal-label">STR</span>
+            <div class="steer-bar-bg">
+              <div class="steer-center"></div>
+              <div id="bar-steer" class="steer-indicator" style="left: 50%"></div>
+            </div>
+            <strong id="val-steer">0°</strong>
+          </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="metric-grid">
+          <div><span>Speed / Top</span><strong id="selected-speed">0 <small>km/h</small></strong><small id="selected-top-speed">Top: 0 km/h</small></div>
+          <div><span>G-Forces (Lat/Long)</span><strong id="selected-g-forces">0.0G / 0.0G</strong><small id="selected-peak-g">Peak: 0.0G</small></div>
+          <div><span>Slipstream / Wake</span><strong id="selected-wake">0% / 0%</strong><small id="selected-wake-desc">Clean Air</small></div>
+          <div><span>Strategy Mode</span><strong id="selected-mode" class="mode-tag">PACING</strong><small id="selected-tactic-phase">OPTIMAL LINE</small></div>
+        </div>
+
+        <!-- 4-Wheel Contact Patch Monitor -->
+        <div class="tires-card">
+          <p class="eyebrow">TIRE CONTACT PATCH & SLIP</p>
+          <div class="tires-grid">
+            <div class="tire-cell" id="tire-fl"><span>FL</span><strong id="fl-slip">0.0°</strong><small id="fl-grip">100%</small></div>
+            <div class="tire-cell" id="tire-fr"><span>FR</span><strong id="fr-slip">0.0°</strong><small id="fr-grip">100%</small></div>
+            <div class="tire-cell" id="tire-rl"><span>RL</span><strong id="rl-slip">0.0°</strong><small id="rl-grip">100%</small></div>
+            <div class="tire-cell" id="tire-rr"><span>RR</span><strong id="rr-slip">0.0°</strong><small id="rr-grip">100%</small></div>
+          </div>
+        </div>
+
+        <!-- AI Brain Reasoning -->
+        <div class="ai-reason-card">
+          <div class="reason-header">
+            <span class="eyebrow">AI STRATEGY REASONING</span>
+            <small id="selected-errors" class="error-counter">0 errors</small>
+          </div>
+          <p id="selected-reason" class="reason">Awaiting race start…</p>
+          <div class="ai-target-readouts">
+            <span>Target v: <strong id="val-target-v">—</strong></span>
+            <span>Target q: <strong id="val-target-q">—</strong></span>
+            <span>Clearance: <strong id="val-clearance">—</strong></span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Multi-Car Side-by-Side Comparison Overlay (Toggleable via C / Tab) -->
+      <div id="compare-modal" class="compare-modal hidden" aria-label="5-Car Real-Time Comparison Table">
+        <div class="compare-dialog">
+          <div class="compare-header">
+            <div>
+              <p class="eyebrow">MULTI-CAR LIVE HEAD-TO-HEAD COMPARISON</p>
+              <h2>5 Architectures on 120Hz Shared GT Physics</h2>
+            </div>
+            <button id="btn-close-compare" class="close-btn" type="button">✕</button>
+          </div>
+          <div class="compare-body">
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th>Metric / Dimension</th>
+                  <th style="color: #df482d">Astra</th>
+                  <th style="color: #44e1cc">GPT Racing</th>
+                  <th style="color: #ffb454">Claude Racing</th>
+                  <th style="color: #6d9cff">Gemini NMPCC</th>
+                  <th style="color: #e472d1">Gemini Grand Prix</th>
+                </tr>
+              </thead>
+              <tbody id="compare-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Post-Race Analytics & Victory Debrief Modal -->
+      <div id="debrief-modal" class="debrief-modal hidden" aria-label="Post-Race Engineering Debrief">
+        <div class="debrief-dialog">
+          <div class="debrief-header">
+            <div class="trophy-badge">🏆</div>
+            <div>
+              <p class="eyebrow">CHECKERED FLAG · 4-LAP BENCHMARK COMPLETE</p>
+              <h2 id="debrief-winner-title">Winner: —</h2>
+            </div>
+            <button id="btn-close-debrief" class="close-btn" type="button">✕</button>
+          </div>
+          <div class="debrief-body">
+            <div class="debrief-summary-cards">
+              <div class="debrief-card">
+                <span>Fastest Lap Award</span>
+                <strong id="debrief-fastest-lap">—</strong>
+                <small id="debrief-fastest-driver">—</small>
+              </div>
+              <div class="debrief-card">
+                <span>Highest Top Speed</span>
+                <strong id="debrief-top-speed">—</strong>
+                <small id="debrief-top-driver">—</small>
+              </div>
+              <div class="debrief-card">
+                <span>Peak Lateral Grip</span>
+                <strong id="debrief-peak-g">—</strong>
+                <small id="debrief-peak-driver">—</small>
+              </div>
+              <div class="debrief-card">
+                <span>Total Race Time</span>
+                <strong id="debrief-total-time">—</strong>
+                <small>4 Laps / 10.82 km</small>
+              </div>
+            </div>
+
+            <h3>Final Classification & Lap Analysis</h3>
+            <table class="debrief-table">
+              <thead>
+                <tr>
+                  <th>Pos</th>
+                  <th>Architecture</th>
+                  <th>Total Time</th>
+                  <th>Gap</th>
+                  <th>Best Lap</th>
+                  <th>Lap 1</th>
+                  <th>Lap 2</th>
+                  <th>Lap 3</th>
+                  <th>Lap 4</th>
+                  <th>Top Speed</th>
+                  <th>Peak Lat G</th>
+                  <th>Combat %</th>
+                </tr>
+              </thead>
+              <tbody id="debrief-table-body"></tbody>
+            </table>
+
+            <div class="debrief-footer-actions">
+              <button id="btn-download-telemetry" class="action-btn export large" type="button">💾 Download Complete JSON Telemetry</button>
+              <button id="btn-debrief-restart" class="action-btn restart large" type="button">🔄 Restart Benchmark Race</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Spectator Guide & Footer -->
+      <section class="spectator-tip" aria-live="polite">
+        <strong id="cam-tip-mode">CAMERA: CHASE</strong>
+        <span>1–5: Chase & focus car · V: Cycle Camera (Chase / Bonnet / Free) · Click track for mouse lock · WASD / QE / Shift in Free mode · C/Tab: Compare · T: Telemetry · R: Restart</span>
+      </section>
+
+      <footer class="footer-readout">
+        <span id="clock-readout">00:00.000</span>
+        <span id="debug-readout">NATIVE ROUTES + 120HZ TELEMETRY ACTIVE</span>
+      </footer>
+    </main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
