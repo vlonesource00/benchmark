@@ -176,7 +176,8 @@ function initField(order = CANDIDATE_IDS) {
   session.start({ freshTrack: true });
   field.attach();
 
-  models = session.cars.map((car, index) => {
+  // Only instantiate visual 3D models for active racing cars in the field
+  models = session.activeCars.map((car, index) => {
     const model = new CarModel(car);
     const candidateId = field.bridges[index]?.candidateId;
     const candidate = CANDIDATES.find((c) => c.id === candidateId) ?? CANDIDATES[index];
@@ -184,6 +185,13 @@ function initField(order = CANDIDATE_IDS) {
     scene.add(model.root);
     return model;
   });
+
+  // Ensure inactive cars in the session roster are moved far off-track so they never appear or collide
+  for (let i = session.field; i < session.cars.length; i += 1) {
+    const inactive = session.cars[i];
+    inactive.place(track, -9999, -9999);
+    inactive.speed = 0;
+  }
 
   // Load detailed wheel asset from public/assets
   new GLTFLoader().load(
