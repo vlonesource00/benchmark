@@ -51,6 +51,18 @@ export function createAstraBridge({ line, index, aggression = 0.72, skill = 0.95
         targetSpeed: driver.targetSpeed,
         ...stats
       };
+    },
+    visualDebug() {
+      // Expose genuine existing read-only trajectory data without fabricating candidate trees
+      const targetPoint = driver.aim;
+      return {
+        selectedTrajectory: driver.line ? {
+          points: [], // Astra uses pure pursuit on global line rather than an explicit discretized polyline
+          color: '#df482d',
+          mode: driver.planner?.intent ?? 'PACE'
+        } : null,
+        trackingPoint: targetPoint ? { x: targetPoint.x, y: targetPoint.y ?? 0, z: targetPoint.z } : null
+      };
     }
   };
 }

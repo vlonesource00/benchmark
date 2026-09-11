@@ -85,6 +85,24 @@ export function createGptBridge({ cars, hostTrack, shadowTrack, index }) {
         controllerCadence: '15 Hz planning on 120 Hz physics',
         ...state
       };
+    },
+    visualDebug() {
+      const agent = director.agents?.get(self.id);
+      const trajectory = agent?.trajectory ?? agent?.plan?.trajectory;
+      const target = agent?.targetPoint ?? agent?.aim;
+      return {
+        selectedTrajectory: trajectory?.points ? {
+          points: trajectory.points.map((p) => ({
+            x: p.x,
+            y: p.y ?? 0,
+            z: p.z,
+            speed: p.speed ?? self.speed
+          })),
+          color: '#44e1cc',
+          mode: agent?.mode ?? 'PACE'
+        } : null,
+        trackingPoint: target ? { x: target.x, y: target.y ?? 0, z: target.z } : null
+      };
     }
   };
 }

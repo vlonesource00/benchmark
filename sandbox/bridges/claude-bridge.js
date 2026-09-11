@@ -221,6 +221,23 @@ export function createCloudBridge({ cars, hostTrack, index, onStatus = () => {} 
         controllerCadence: '12–22 Hz budgeted lattice on 120 Hz physics',
         ...base
       };
+    },
+    visualDebug() {
+      const plan = pilot.driver?.plan;
+      const targetPoint = pilot.driver?.targetPoint;
+      return {
+        selectedTrajectory: plan?.points ? {
+          points: plan.points.map((p) => ({
+            x: p.x,
+            y: 0,
+            z: p.z,
+            speed: p.targetSpeed ?? 0
+          })),
+          color: '#ffb454',
+          mode: pilot.mode ?? 'PACE'
+        } : null,
+        trackingPoint: targetPoint ? { x: targetPoint.x, y: 0, z: targetPoint.z } : null
+      };
     }
   };
 }
