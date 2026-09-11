@@ -8,6 +8,7 @@ import { CarEffects } from '../host/astra/src/render/effects.js';
 import { VisualFinish } from '../host/astra/src/render/finish.js';
 import { CANDIDATES, CANDIDATE_IDS, createField, rotations } from './bridges/index.js';
 import { SpectatorCamera } from './spectator.js';
+import { VisualAIDebugger } from './visual-debugger.js';
 
 const FIXED_DT = 1 / 120;
 const MAX_STEPS_PER_FRAME = 16;
@@ -113,6 +114,9 @@ world.setLighting('golden');
 const finish = new VisualFinish(renderer, scene, camera);
 finish.setQuality('high');
 const effects = new CarEffects(scene);
+const visualDebugger = new VisualAIDebugger(scene, track);
+let simPaused = false;
+let stepOnce = false;
 
 const session = new Session(track, { classId: 'gt', mixed: false });
 session.laps = RACE_LAPS;
@@ -715,14 +719,89 @@ function updateCameraHud() {
   const candIndex = CANDIDATES.findIndex((c) => c.id === selectedId);
   const target = CANDIDATES[candIndex];
   const targetLabel = spectator.mode === 'free' || !target ? '' : ` #${candIndex + 1} · ${target.label}`;
-  if (btnCameraMode) btnCameraMode.textContent = `🎥 Cam: ${modeStr}${spectator.mode === 'free' ? '' : ` #${candIndex + 1}`} (V)`;
+  if (btnCameraMode) btnCameraMode.textContent = `🎥 Cam: ${modeStr}${spectator.mode === 'free' ? '' : ` #${candIndex + 1}`} (C)`;
   if (camTipMode) camTipMode.textContent = `CAMERA: ${modeStr}${targetLabel}`;
+  document.querySelectorAll('.cam-pill').forEach((pill) => {
+    pill.classList.toggle('active', pill.getAttribute('data-cam') === spectator.mode);
+  });
+}
+
+function updateVisualDebugHud() {
+  const btnToggle = byId('btn-toggle-visual-debug');
+  const badge = byId('debug-master-badge');
+  const panel = byId('visual-debug-panel');
+
+  if (visualDebugger.enabled) {
+    if (btnToggle) {
+      btnToggle.classList.add('active');
+      btnToggle.textContent = '👁️ AI Debug (V)';
+    }
+    if (badge) {
+      badge.textContent = 'ONLINE [V]';
+      badge.classList.remove('off');
+      badge.classList.add('active');
+    }
+    if (panel) panel.classList.remove('hidden');
+  } else {
+    if (btnToggle) {
+      btnToggle.classList.remove('active');
+      btnToggle.textContent = '👁️ AI Debug: OFF (V)';
+    }
+    if (badge) {
+      badge.textContent = 'OFF [V]';
+      badge.classList.add('off');
+      badge.classList.remove('active');
+    }
+    if (panel) panel.classList.add('hidden');
+  }
+
+  for (let i = 1; i <= 7; i++) {
+    const chip = byId(`layer-btn-${i}`);
+    if (chip) {
+      chip.classList.toggle('active', Boolean(visualDebugger.layers[i]));
+    }
+  }
 }
 
 btnCameraMode?.addEventListener('click', () => {
   spectator.toggleMode();
   updateCameraHud();
 });
+
+byId('btn-toggle-visual-debug')?.addEventListener('click', () => {
+  visualDebugger.toggleMaster();
+  updateVisualDebugHud();
+});
+
+byId('btn-sim-pause')?.addEventListener('click', () => {
+  simPaused = !simPaused;
+  const btnPause = byId('btn-sim-pause');
+  if (btnPause) btnPause.textContent = simPaused ? '▶️ Resume (Space)' : '⏸️ Freeze (Space)';
+});
+
+byId('btn-sim-step')?.addEventListener('click', () => {
+  simPaused = true;
+  stepOnce = true;
+  const btnPause = byId('btn-sim-pause');
+  if (btnPause) btnPause.textContent = '▶️ Resume (Space)';
+});
+
+document.querySelectorAll('.cam-pill').forEach((pill) => {
+  pill.addEventListener('click', () => {
+    const mode = pill.getAttribute('data-cam');
+    if (mode) {
+      spectator.setMode(mode);
+      updateCameraHud();
+    }
+  });
+});
+
+for (let i = 1; i <= 7; i++) {
+  byId(`layer-btn-${i}`)?.addEventListener('click', () => {
+    visualDebugger.toggleLayer(i);
+    updateVisualDebugHud();
+  });
+}
 
 byId('btn-toggle-compare')?.addEventListener('click', () => {
   compareModal.classList.toggle('hidden');
@@ -750,32 +829,67 @@ byId('btn-download-telemetry')?.addEventListener('click', exportTelemetryJson);
 byId('btn-close-debrief')?.addEventListener('click', () => debriefModal.classList.add('hidden'));
 
 window.addEventListener('keydown', (event) => {
-  if (event.code.startsWith('Digit')) {
-    const index = Number(event.code.slice(-1)) - 1;
-    if (CANDIDATES[index]) {
-      selectVehicle(CANDIDATES[index].id, true);
-    }
-  }
   if (event.code === 'KeyV') {
+    event.preventDefault();
+    visualDebugger.toggleMaster();
+    updateVisualDebugHud();
+    return;
+  }
+  if (event.code === 'Space') {
+    event.preventDefault();
+    simPaused = !simPaused;
+    const btnPause = byId('btn-sim-pause');
+    if (btnPause) btnPause.textContent = simPaused ? '▶️ Resume (Space)' : '⏸️ Freeze (Space)';
+    return;
+  }
+  if (event.code === 'Period') {
+    event.preventDefault();
+    simPaused = true;
+    stepOnce = true;
+    const btnPause = byId('btn-sim-pause');
+    if (btnPause) btnPause.textContent = '▶️ Resume (Space)';
+    return;
+  }
+  if (event.code === 'KeyC') {
+    event.preventDefault();
     spectator.toggleMode();
     updateCameraHud();
+    return;
   }
-  if (event.code === 'KeyC' || event.code === 'Tab') {
+  if (event.code.startsWith('Digit')) {
+    const digit = Number(event.code.slice(-1));
+    if (event.shiftKey || !visualDebugger.enabled) {
+      const index = digit - 1;
+      if (CANDIDATES[index]) {
+        selectVehicle(CANDIDATES[index].id, true);
+      }
+    } else if (digit >= 1 && digit <= 7) {
+      event.preventDefault();
+      visualDebugger.toggleLayer(digit);
+      updateVisualDebugHud();
+    }
+    return;
+  }
+  if (event.code === 'Tab') {
     event.preventDefault();
     compareModal.classList.toggle('hidden');
     if (!compareModal.classList.contains('hidden')) updateCompareTable();
+    return;
   }
   if (event.code === 'KeyT') {
     telemetryPanel.classList.toggle('hidden');
+    return;
   }
   if (event.code === 'KeyR') {
     debriefModal.classList.add('hidden');
     compareModal.classList.add('hidden');
     initField(CANDIDATE_IDS);
+    return;
   }
   if (event.code === 'Escape') {
     compareModal.classList.add('hidden');
     debriefModal.classList.add('hidden');
+    return;
   }
 });
 
@@ -790,7 +904,10 @@ function frame(nowMs) {
 
   let steps = 0;
   while (accumulator >= FIXED_DT && steps < MAX_STEPS_PER_FRAME) {
-    fixedStep();
+    if (!simPaused || stepOnce) {
+      fixedStep();
+      if (stepOnce) stepOnce = false;
+    }
     accumulator -= FIXED_DT;
     steps += 1;
   }
@@ -803,6 +920,11 @@ function frame(nowMs) {
     effects.update(session.activeCars, delta, track, window.innerHeight);
     spectator.update(delta);
     updateHud();
+
+    // 3D Visual AI Introspection update
+    const activeBridge = field?.byId(selectedId);
+    const visualData = activeBridge?.visualDebug?.() ?? null;
+    visualDebugger.update(visualData, true);
   }
 
   if (canvas.width > 0 && canvas.height > 0) {

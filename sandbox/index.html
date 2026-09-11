@@ -16,8 +16,11 @@
         <div class="masthead-top">
           <p class="eyebrow">BENCHMARK / LIVE 120HZ SHARED PHYSICS</p>
           <div class="masthead-actions">
-            <button id="btn-camera-mode" class="action-btn" type="button" title="Cycle Camera: Chase / Bonnet / Free [V]">🎥 Cam: CHASE (V)</button>
-            <button id="btn-toggle-compare" class="action-btn" type="button" title="Toggle 5-Car Comparison Grid [C / Tab]">📊 Compare All (C)</button>
+            <button id="btn-toggle-visual-debug" class="action-btn active" type="button" title="Toggle 3D Visual AI Introspection [V]">👁️ AI Debug (V)</button>
+            <button id="btn-sim-pause" class="action-btn" type="button" title="Freeze / Resume Simulation [Space]">⏸️ Freeze (Space)</button>
+            <button id="btn-sim-step" class="action-btn" type="button" title="Advance Simulation Single Step [.]">⏯️ Step (.)</button>
+            <button id="btn-camera-mode" class="action-btn" type="button" title="Cycle Camera: Chase / Elevated / Tactical / Bonnet / Free [C]">🎥 Cam: CHASE (C)</button>
+            <button id="btn-toggle-compare" class="action-btn" type="button" title="Toggle 5-Car Comparison Grid [Tab]">📊 Compare (Tab)</button>
             <button id="btn-toggle-telemetry" class="action-btn" type="button" title="Toggle Detailed Telemetry [T]">📈 Telemetry (T)</button>
             <button id="btn-restart" class="action-btn restart" type="button" title="Restart Benchmark Race [R]">🔄 Restart (R)</button>
             <button id="btn-export" class="action-btn export" type="button" title="Export Race Telemetry JSON">💾 Export JSON</button>
@@ -239,10 +242,50 @@
         </div>
       </div>
 
+      <!-- 3D Visual AI Debugger Toolbar & Candidate Reason Legend -->
+      <section id="visual-debug-panel" class="visual-debug-toolbar" aria-label="3D Visual AI Introspection Controls">
+        <div class="debug-toolbar-header">
+          <div class="debug-toolbar-title">
+            <span class="pulse-dot"></span>
+            <strong>3D AI INTROSPECTION</strong>
+            <span id="debug-master-badge" class="debug-status-badge active">ONLINE [V]</span>
+          </div>
+          <div class="camera-pill-group">
+            <span class="group-label">CAM:</span>
+            <button class="cam-pill active" data-cam="chase" type="button">Chase</button>
+            <button class="cam-pill" data-cam="elevated" type="button">Elevated</button>
+            <button class="cam-pill" data-cam="tactical" type="button">Tactical</button>
+            <button class="cam-pill" data-cam="bonnet" type="button">Bonnet</button>
+            <button class="cam-pill" data-cam="free" type="button">Free</button>
+          </div>
+        </div>
+
+        <div class="debug-layers-row">
+          <button id="layer-btn-1" class="layer-chip active" data-layer="1" type="button" title="Toggle Selected Trajectory Ribbon [1]"><span class="key-hint">1</span> Selected Ribbon</button>
+          <button id="layer-btn-2" class="layer-chip active" data-layer="2" type="button" title="Toggle Previous Active Trajectory Ghost [2]"><span class="key-hint">2</span> Ghost (0.8s)</button>
+          <button id="layer-btn-3" class="layer-chip active" data-layer="3" type="button" title="Toggle 24-32 Candidate Lattice [3]"><span class="key-hint">3</span> Candidate Lattice</button>
+          <button id="layer-btn-4" class="layer-chip active" data-layer="4" type="button" title="Toggle Tactical Corridor Envelope [4]"><span class="key-hint">4</span> Corridor</button>
+          <button id="layer-btn-5" class="layer-chip active" data-layer="5" type="button" title="Toggle Opponent Future Predictions [5]"><span class="key-hint">5</span> Predictions (3s)</button>
+          <button id="layer-btn-6" class="layer-chip active" data-layer="6" type="button" title="Toggle Target Vehicle Highlight & Laser [6]"><span class="key-hint">6</span> Target Laser</button>
+          <button id="layer-btn-7" class="layer-chip active" data-layer="7" type="button" title="Toggle Aim Point & Dynamic Markers [7]"><span class="key-hint">7</span> Aim & Markers</button>
+        </div>
+
+        <div class="debug-legend-row">
+          <span class="legend-title">CANDIDATES:</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:#00ff88"></span> Selected</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:#00d2ff"></span> Viable Alt</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:#ff2222"></span> Collision</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:#ff8800"></span> Road Limit</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:#ffdd00"></span> Dyn Limit</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:#c033ff"></span> Switching</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:#777777"></span> High Cost</span>
+        </div>
+      </section>
+
       <!-- Bottom Spectator Guide & Footer -->
       <section class="spectator-tip" aria-live="polite">
         <strong id="cam-tip-mode">CAMERA: CHASE</strong>
-        <span>1–5: Chase & focus car · V: Cycle Camera (Chase / Bonnet / Free) · Click track for mouse lock · WASD / QE / Shift in Free mode · C/Tab: Compare · T: Telemetry · R: Restart</span>
+        <span>V: AI Debug · 1–7: Visual Layers · Space: Freeze · .: Step · C: Cycle Cam (Chase/Elevated/Tactical/Bonnet/Free) · Tab: Compare · T: Telemetry · R: Restart</span>
       </section>
 
       <footer class="footer-readout">

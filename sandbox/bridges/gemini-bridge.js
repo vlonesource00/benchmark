@@ -141,6 +141,9 @@ export function createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, in
         controllerCadence: '25 Hz tactical replan on 120 Hz physics',
         ...state
       };
+    },
+    visualDebug() {
+      return controller.getDebugVisuals?.(track) ?? null;
     }
   };
 }
