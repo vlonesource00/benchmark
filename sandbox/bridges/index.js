@@ -1,8 +1,9 @@
 import { createShadowTrack } from './shadow.js';
 import { createAstraBridge, ASTRA_CANDIDATE } from './astra-bridge.js';
 import { createGptBridge, GPT_CANDIDATE } from './gpt-bridge.js';
-import { createGeminiBridge, GEMINI_NMPCC, GEMINI_GRAND_PRIX } from './gemini-bridge.js';
+import { createGeminiBridge, GEMINI_SUPREME, GEMINI_NMPCC, GEMINI_GRAND_PRIX } from './gemini-bridge.js';
 import { createCloudBridge, CLOUD_CANDIDATE } from './claude-bridge.js';
+import { NextGenAIController as SupremeController } from '../../subjects/gemini-supreme/src/ai/v2/NextGenAIController.js';
 import { NextGenAIController as NmpccController } from '../../subjects/gemini-nmpcc/src/ai/v2/NextGenAIController.js';
 import { NextGenAIController as GrandPrixController } from '../../subjects/gemini-grand-prix/src/ai/v2/NextGenAIController.js';
 
@@ -10,7 +11,7 @@ export const CANDIDATES = Object.freeze([
   ASTRA_CANDIDATE,
   GPT_CANDIDATE,
   CLOUD_CANDIDATE,
-  GEMINI_NMPCC,
+  GEMINI_SUPREME,
   GEMINI_GRAND_PRIX
 ]);
 
@@ -33,7 +34,8 @@ export function createField({ session, hostTrack, order = CANDIDATE_IDS, onStatu
 
   field.forEach((id, index) => {
     const car = cars[index];
-    const candidate = CANDIDATES.find((entry) => entry.id === id);
+    const candidate = CANDIDATES.find((entry) => entry.id === id)
+      ?? [GEMINI_NMPCC, GEMINI_GRAND_PRIX, GEMINI_SUPREME].find((e) => e.id === id);
     car.name = candidate.label.toUpperCase();
     car.color = candidate.color;
 
@@ -44,6 +46,9 @@ export function createField({ session, hostTrack, order = CANDIDATE_IDS, onStatu
       bridges[index] = createGptBridge({ cars, hostTrack, shadowTrack, index });
     } else if (id === 'claude-racing') {
       bridges[index] = createCloudBridge({ cars, hostTrack, index, onStatus });
+    } else if (id === 'gemini-supreme') {
+      onStatus('Binding the pinned Gemini Supreme controller…');
+      bridges[index] = createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, index, Controller: SupremeController });
     } else if (id === 'gemini-nmpcc') {
       onStatus('Binding the pinned Gemini NMPCC controller…');
       bridges[index] = createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, index, Controller: NmpccController });

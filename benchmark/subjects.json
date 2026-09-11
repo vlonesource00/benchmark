@@ -108,6 +108,40 @@
       ]
     },
     {
+      "id": "gemini-supreme",
+      "label": "Gemini Supreme",
+      "repoUrl": "https://github.com/vlonesource00/gemini-gauntlet.git",
+      "branch": "feat/supreme-combat-ai",
+      "commit": "2c394f0ba06a31a6d7e19bb446e392df6dd1d8ba",
+      "testNotes": "Supreme combat AI with coupled MPCC, full-plant Astra GT modeling, and organic lap adaptation.",
+      "tests": [
+        {
+          "id": "pace-benchmark",
+          "label": "Multi-class pace benchmark",
+          "command": ["node", "tests/pace-benchmark-test.mjs"],
+          "scenarioIds": ["solo-pace", "stability", "track-complexity"],
+          "suites": ["quick", "full"],
+          "timeoutSeconds": 420
+        },
+        {
+          "id": "full-grid",
+          "label": "Twelve-car full grid",
+          "command": ["node", "tests/twelve-car-race-test.mjs"],
+          "scenarioIds": ["pack-race", "collision-safety", "wake-awareness"],
+          "suites": ["quick", "full"],
+          "timeoutSeconds": 240
+        },
+        {
+          "id": "generation-head-to-head",
+          "label": "V1 versus V2 head-to-head",
+          "command": ["node", "tests/head-to-head-generations-test.mjs"],
+          "scenarioIds": ["generation-head-to-head", "tactical-combat"],
+          "suites": ["full"],
+          "timeoutSeconds": 600
+        }
+      ]
+    },
+    {
       "id": "gemini-grand-prix",
       "label": "Gemini Grand Prix",
       "repoUrl": "https://github.com/vlonesource00/gemini-gauntlet.git",

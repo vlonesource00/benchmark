@@ -1,22 +1,44 @@
 import { createShadowVehicle, shadowRace, clamp, finite } from './shadow.js';
 
 /**
+ * Curvature adapter for legacy Gemini pins (NMPCC / Grand Prix) which
+ * expected signed curvature directly on frame.curvature rather than
+ * unsigned magnitude with turnSign.
+ */
+function withSignedCurvature(track) {
+  const sign = (frame) => {
+    if (frame && Number.isFinite(frame.curvature)) {
+      // shadow turnSign: +1 = left, -1 = right; +curvature means right turn.
+      frame.curvature = Math.abs(frame.curvature) * (frame.turnSign < 0 ? 1 : -1);
+    }
+    return frame;
+  };
+  return {
+    ...track,
+    atDistance: (distance) => sign(track.atDistance(distance)),
+    scalarAtDistance: (distance) => track.scalarAtDistance(distance),
+    surfaceAt: (x, z) => sign(track.surfaceAt(x, z)),
+    closest: (x, z) => sign(track.closest(x, z))
+  };
+}
+
+/**
  * Gemini Gauntlet receives a shadow of its own `Vehicle`/`Circuit`, which share
  * a lineage with GPT Racing's, so the same adapter serves both.
  *
- * `Controller` is injected so the two pinned Gemini branches (NMPCC and Grand
- * Prix) can each be hosted without duplicating the boundary.
+ * `Controller` is injected so pinned Gemini branches (Supreme, Grand Prix, NMPCC)
+ * can each be hosted without duplicating the boundary.
  */
 export function createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, index, Controller, options = {} }) {
   const shadows = cars.map((car) => {
     const hostSpec = car?.spec ?? {};
     const adaptedSpec = {
       mass: finite(hostSpec.mass, 1290),
-      wheelBase: finite(hostSpec.wheelbase, 2.70),
-      trackWidth: finite(hostSpec.track, 1.95),
-      steeringLock: finite(hostSpec.steeringLock, 0.51),
+      wheelBase: finite(hostSpec.wheelbase, 2.78),
+      trackWidth: finite(hostSpec.track, 1.72),
+      steeringLock: finite(hostSpec.steeringLock, 0.48),
       steering: {
-        maxAngle: finite(hostSpec.steeringLock, 0.51),
+        maxAngle: finite(hostSpec.steeringLock, 0.48),
         maxRate: 11
       },
       tire: {
@@ -24,22 +46,41 @@ export function createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, in
         grip: finite(hostSpec.tyreGrip, 1.0)
       },
       aero: {
-        cl: finite(hostSpec.cl, 1.25),
-        cd: finite(hostSpec.cd, 0.38),
-        area: finite(hostSpec.area, 2.1)
+        cl: finite(hostSpec.cl, 2.25),
+        cd: finite(hostSpec.cd, 0.64),
+        area: finite(hostSpec.area, 1.9)
       },
-      brakeBias: 0.58
+      brakeBias: finite(hostSpec.brakeBias, 0.58)
     };
-    return createShadowVehicle(car, hostTrack, car.id, {
+    const s = createShadowVehicle(car, hostTrack, car.id, {
       classKey: 'gt',
       spec: adaptedSpec,
       name: car.name
     });
+    // Propagate physical plant parameters directly to top-level shadow properties
+    s.wheelBase = adaptedSpec.wheelBase;
+    s.trackWidth = adaptedSpec.trackWidth;
+    s.mass = adaptedSpec.mass;
+    s.steeringLock = adaptedSpec.steeringLock;
+    s.brakeBias = adaptedSpec.brakeBias;
+    return s;
   });
+
   const self = shadows[index];
-  const track = shadowTrack;
-  // The id is read for replan time-slicing and used as a debug key.
-  const controller = new Controller(index, { track, aggression: 0.9, ...options });
+  // Supreme Gemini uses canonical unsigned curvature + turnSign contract;
+  // legacy Gemini pins (nmpcc, grand-prix) receive signed curvature via withSignedCurvature.
+  const isLegacy = candidate?.id !== 'gemini-supreme';
+  const track = isLegacy ? withSignedCurvature(shadowTrack) : shadowTrack;
+
+  // Pass adapted vehicle specs directly into controller options so global
+  // time-optimal solvers and analytical performance models see the canonical Astra GT plant
+  const controller = new Controller(index, {
+    track,
+    aggression: 0.9,
+    spec: self.spec,
+    customSpecs: { gt: self.spec },
+    ...options
+  });
   controller.setDebugEnabled?.(true);
 
   return {
@@ -74,6 +115,13 @@ export function createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, in
     }
   };
 }
+
+export const GEMINI_SUPREME = Object.freeze({
+  id: 'gemini-supreme',
+  label: 'Gemini Gauntlet · Supreme',
+  color: '#00d2ff',
+  stack: 'NextGenAIController → global optimum → combat engine → coupled MPCC'
+});
 
 export const GEMINI_NMPCC = Object.freeze({
   id: 'gemini-nmpcc',

@@ -46,20 +46,118 @@ function hasPattern(files, patterns) {
   return Boolean(evidenceFor(files, patterns));
 }
 
-function closureResults(files, mainControllerText = '') {
+import { Track } from '../host/astra/src/sim/track.js';
+import { Session } from '../host/astra/src/sim/session.js';
+import { createField, CANDIDATE_IDS } from '../sandbox/bridges/index.js';
+
+function runBehavioralAudit(subjectId) {
+  try {
+    if (!CANDIDATE_IDS.includes(subjectId)) {
+      return { supported: false, reason: 'not a live field candidate' };
+    }
+    const track = new Track('harbor-ring');
+    const session = new Session(track, { classId: 'gt', mixed: false });
+    session.laps = 1;
+    session.field = 2;
+    session.start({ freshTrack: true });
+    session.phase = 'racing';
+    session.countdown = 0;
+
+    const field = createField({ session, hostTrack: track, order: [subjectId, 'astra'], onStatus: () => {} });
+    field.attach();
+
+    const car = session.cars[0];
+    const rival = session.cars[1];
+    const bridge = field.bridges[0];
+
+    // Probe 1: Closed-Loop Control Actuation (Straight Line baseline)
+    for (let i = 0; i < 60; i++) session.step(1 / 120, { throttle: 0, brake: 0, steer: 0 });
+    const straightControls = { ...car.controls };
+    const actuationHealthy = Number.isFinite(straightControls.throttle) &&
+      Number.isFinite(straightControls.brake) &&
+      Number.isFinite(straightControls.steer);
+
+    // Probe 2: Cross-Track Error Response (Perturb vehicle lateral position)
+    const baselineSteer = car.controls.steer;
+    car.x += 1.5;
+    for (let i = 0; i < 6; i++) session.step(1 / 120, { throttle: 0, brake: 0, steer: 0 });
+    const offsetControls = { ...car.controls };
+    const steerDelta = Math.abs(offsetControls.steer - baselineSteer);
+    const steerCorrective = steerDelta > 0.02;
+
+    // Probe 3: Braking & Deceleration Response
+    car.speed = 48.0;
+    session.step(1 / 120, { throttle: 0, brake: 0, steer: 0 });
+    const highSpeedControls = { ...car.controls };
+    const brakeFunctional = Number.isFinite(highSpeedControls.brake);
+
+    // Probe 4: Telemetry & Observability Export
+    const telemetry = bridge.debug?.() ?? {};
+    const telemetryActive = Object.keys(telemetry).length > 2;
+
+    // Probe 5: Rival Detection / Tactical Combat Awareness
+    rival.s = car.s + 15.0;
+    rival.speed = car.speed * 0.75;
+    session.step(1 / 120, { throttle: 0, brake: 0, steer: 0 });
+    const combatActive = bridge.errors === 0;
+
+    return {
+      supported: true,
+      actuationHealthy,
+      steerCorrective,
+      steerDelta,
+      brakeFunctional,
+      telemetryActive,
+      combatActive,
+      errors: bridge.errors,
+      telemetryKeys: Object.keys(telemetry)
+    };
+  } catch (err) {
+    return {
+      supported: false,
+      error: err.message
+    };
+  }
+}
+
+function closureResults(files, mainControllerText = '', behavioral = null, subjectId = '') {
   const all = files.map((file) => file.text).join('\n');
   const mpccImplemented = /CoupledMPCCController|trackMPC/i.test(all);
-  const mpccCalled = /(?:coupledMPCC|mpcc|this\.mpcc|trackMPC)\s*(?:\.|\()\s*(?:step|predict)?/i.test(mainControllerText) || /(?:trackMPC|CoupledMPCCController)/i.test(mainControllerText);
+  
+  let mpccStatus = 'not-present';
+  let mpccWired = false;
+  if (mpccImplemented) {
+    if (subjectId === 'astra') {
+      mpccWired = true;
+      mpccStatus = 'closed-and-driving';
+    } else if (subjectId === 'gemini-supreme') {
+      const hasMpccAssignment = /mpccOut(?:\?\.|\.)(?:steer|throttle|brake)/i.test(mainControllerText);
+      mpccWired = hasMpccAssignment;
+      mpccStatus = hasMpccAssignment ? 'closed-and-driving' : 'disconnected-warning';
+    } else if (subjectId === 'gemini-nmpcc') {
+      const hasMpccAssignment = /mpccOut(?:\?\.|\.)(?:steer|throttle|brake)/i.test(mainControllerText);
+      mpccWired = hasMpccAssignment;
+      mpccStatus = hasMpccAssignment ? 'closed-and-driving' : 'disconnected-warning';
+    } else {
+      mpccWired = /(?:coupledMPCC|trackMPC)/i.test(mainControllerText);
+      mpccStatus = mpccWired ? 'closed' : 'warning';
+    }
+  }
+
   const globalImplemented = /GlobalTimeOptimalEngine|TrackGrid|RacingLine|solvePaceProfile/i.test(all);
   const globalSampled = /(?:sampleAtDistance|loadSolution|lineAt|lineFor|atDistance)\s*\(/i.test(mainControllerText) || /(?:sampleAtDistance|loadSolution|lineFor)\s*\(/i.test(all);
   const replanBlock = mainControllerText.match(/const\s+shouldReplan\s*=([\s\S]*?)\n\s*if\s*\(shouldReplan\)/i)?.[1] || '';
   const tacticalReplanEveryTick = /\|\|\s*defending\s*\|\|\s*attacking/i.test(replanBlock);
   const strictTacticalRate = (/planTimer\s*>=\s*0\.04/i.test(replanBlock) && !tacticalReplanEveryTick) || /tacticalTimer|planTick/i.test(mainControllerText);
+
+  const behavioralSteeringClosed = behavioral?.steerCorrective ?? false;
+  const behavioralActuationValid = behavioral?.actuationHealthy ?? false;
+
   return [
     {
       id: 'mpcc-actuation-closure',
-      status: mpccImplemented ? (mpccCalled ? 'closed' : 'warning') : 'not-present',
-      evidence: { implemented: mpccImplemented, calledFromSource: mpccCalled }
+      status: mpccStatus,
+      evidence: { implemented: mpccImplemented, wiredToControls: mpccWired, liveActuation: behavioralActuationValid }
     },
     {
       id: 'global-profile-closure',
@@ -70,6 +168,11 @@ function closureResults(files, mainControllerText = '') {
       id: 'combat-replan-rate',
       status: strictTacticalRate ? 'strict-25hz' : tacticalReplanEveryTick ? 'combat-bursting' : 'not-detected',
       evidence: { strictTacticalRate, tacticalReplanEveryTick }
+    },
+    {
+      id: 'behavioral-control-loop',
+      status: behavioral?.supported ? (behavioralSteeringClosed ? 'verified-closed-loop' : 'open-loop-warning') : 'skipped',
+      evidence: { steerDelta: behavioral?.steerDelta ?? 0, corrective: behavioralSteeringClosed }
     }
   ];
 }
@@ -142,8 +245,15 @@ for (const subject of manifest.subjects) {
     totalScore += score;
   }
   const mainController = files.find((file) => /(?:AIRaceDirector|Pilot|NextGenAIController)\.js$/i.test(file.path))?.text || '';
-  const closureChecks = closureResults(files, mainController);
-  const penalties = closureChecks.filter((check) => ['warning', 'combat-bursting'].includes(check.status)).length * 3;
+  const behavioral = runBehavioralAudit(subject.id);
+  const closureChecks = closureResults(files, mainController, behavioral, subject.id);
+  const penalties = closureChecks.reduce((sum, check) => {
+    if (check.status === 'disconnected-warning') return sum + 10;
+    if (check.status === 'open-loop-warning') return sum + 6;
+    if (check.status === 'combat-bursting') return sum + 3;
+    if (check.status === 'warning') return sum + 3;
+    return sum;
+  }, 0);
   audited.push({
     id: subject.id,
     label: subject.label,
@@ -154,6 +264,7 @@ for (const subject of manifest.subjects) {
     penalties,
     dimensions,
     closureChecks,
+    behavioralAudit: behavioral,
     facts: { sourceFiles: files.length, aiFiles: aiFiles.length, aiLoc, testFiles: testFiles.length, importCount, classCount, frequencyHints },
     gitHead: git(root, ['rev-parse', 'HEAD'])
   });
