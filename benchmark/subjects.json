@@ -112,7 +112,7 @@
       "label": "Gemini Supreme",
       "repoUrl": "https://github.com/vlonesource00/gemini-gauntlet.git",
       "branch": "feat/supreme-combat-ai",
-      "commit": "f5713c6ff53ab47be6a06c7f8916c069e6bf06de",
+      "commit": "d0b7f60b6441742b1d3af9255ac476e41f404a2d",
       "testNotes": "Supreme combat AI with coupled MPCC, full-plant Astra GT modeling, multirate decoupling, and anti-indecision hysteresis.",
       "tests": [
         {

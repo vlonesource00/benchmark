@@ -211,15 +211,25 @@ export function createShadowVehicle(hostCar, hostTrack, id, { classKey = 'gt', s
     shadow.velocity.z = car.vz;
     shadow.localVelocity.x = finite(car.v); // astra v = right-positive
     shadow.localVelocity.z = finite(car.u); // astra u = forward
-    shadow.acceleration.x = finite(car.ax);
-    shadow.acceleration.z = finite(car.ay);
-    shadow.localAcceleration.x = shadow.acceleration.x;
-    shadow.localAcceleration.z = shadow.acceleration.z;
     shadow.speed = Math.max(0, finite(car.speed));
     shadow.yaw = finite(car.yaw);
     shadow.yawRate = finite(car.yawRate);
     shadow.forward = { x: Math.sin(shadow.yaw), z: Math.cos(shadow.yaw) };
     shadow.right = { x: Math.cos(shadow.yaw), z: -Math.sin(shadow.yaw) };
+
+    const aForward = finite(car.ax);
+    const aRight = finite(car.ay);
+
+    shadow.localAcceleration.x = aRight;
+    shadow.localAcceleration.z = aForward;
+
+    shadow.acceleration.x =
+      shadow.right.x * aRight +
+      shadow.forward.x * aForward;
+
+    shadow.acceleration.z =
+      shadow.right.z * aRight +
+      shadow.forward.z * aForward;
     shadow.distance = finite(p.s);
     shadow.surface.lateral = -finite(p.lateral); // host right-positive -> shadow left-positive
     shadow.surface.zone = ZONE_MAP[p.zone ?? 'asphalt'] ?? 'road';
