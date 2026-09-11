@@ -1,4 +1,4 @@
-import { AdaptiveDriver } from '../../host/astra/src/sim/controller.js';
+import { AdaptiveDriver } from '../../subjects/astra/src/sim/controller.js';
 
 export const ASTRA_CANDIDATE = Object.freeze({
   id: 'astra',

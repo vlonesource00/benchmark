@@ -1,47 +1,6 @@
 import { createShadowVehicle, shadowRace, clamp, finite } from './shadow.js';
 
 /**
- * Gemini's own `Circuit` reports an unsigned `curvature` (Track.js:108 builds it
- * from `Math.acos`, so it is always >= 0) and carries the corner direction
- * separately in `turnSign`. `NextGenAIController` nevertheless feeds
- * `atDistance(distance).curvature` straight into
- * `PaceOptimizer.computeSteering({ currentCurvature })` under the name
- * `signedCurv` (NextGenAIController.js:435/558). There the term is used as a
- * feed-forward road-wheel angle, `atan(wheelBase * effCurv)`, in a command where
- * positive steers right — so that call site needs a *signed, right-positive*
- * curvature.
- *
- * PaceOptimizer recovers the missing sign from the pursuit heading error
- * (PaceOptimizer.js:328-332), but only when |headingError| > 0.03 rad. Below
- * that — i.e. exactly while the car is tracking its line — it falls back to the
- * raw (positive) value, so on a left-hander `rDes = effCurv * v` becomes a
- * right-hand yaw demand. The integral understeer learner then integrates
- * `eYaw = rDes - yawRate` (a large positive number) up to its +0.16 rad clamp,
- * and that bias cancels most of the path-tracking term for the whole corner.
- *
- * The host track knows the sign (Astra: curvature > 0 is a right-hand turn), so
- * supplying it is accurate perception rather than tuning. It is done here and
- * not in shadow.js because GPT's VehicleController.js:46-47 treats a negative
- * curvature as "straight" and would lose its corner speed limit on left-handers.
- */
-function withSignedCurvature(track) {
-  const sign = (frame) => {
-    if (frame && Number.isFinite(frame.curvature)) {
-      // shadow turnSign: +1 = left, -1 = right; +curvature must mean right.
-      frame.curvature = Math.abs(frame.curvature) * (frame.turnSign < 0 ? 1 : -1);
-    }
-    return frame;
-  };
-  return {
-    ...track,
-    atDistance: (distance) => sign(track.atDistance(distance)),
-    scalarAtDistance: (distance) => track.scalarAtDistance(distance),
-    surfaceAt: (x, z) => sign(track.surfaceAt(x, z)),
-    closest: (x, z) => sign(track.closest(x, z))
-  };
-}
-
-/**
  * Gemini Gauntlet receives a shadow of its own `Vehicle`/`Circuit`, which share
  * a lineage with GPT Racing's, so the same adapter serves both.
  *
@@ -49,12 +8,36 @@ function withSignedCurvature(track) {
  * Prix) can each be hosted without duplicating the boundary.
  */
 export function createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, index, Controller, options = {} }) {
-  const shadows = cars.map((car) => createShadowVehicle(car, hostTrack, car.id, {
-    classKey: 'gt',
-    name: car.name
-  }));
+  const shadows = cars.map((car) => {
+    const hostSpec = car?.spec ?? {};
+    const adaptedSpec = {
+      mass: finite(hostSpec.mass, 1290),
+      wheelBase: finite(hostSpec.wheelbase, 2.70),
+      trackWidth: finite(hostSpec.track, 1.95),
+      steeringLock: finite(hostSpec.steeringLock, 0.51),
+      steering: {
+        maxAngle: finite(hostSpec.steeringLock, 0.51),
+        maxRate: 11
+      },
+      tire: {
+        alphaPeak: 0.140,
+        grip: finite(hostSpec.tyreGrip, 1.0)
+      },
+      aero: {
+        cl: finite(hostSpec.cl, 1.25),
+        cd: finite(hostSpec.cd, 0.38),
+        area: finite(hostSpec.area, 2.1)
+      },
+      brakeBias: 0.58
+    };
+    return createShadowVehicle(car, hostTrack, car.id, {
+      classKey: 'gt',
+      spec: adaptedSpec,
+      name: car.name
+    });
+  });
   const self = shadows[index];
-  const track = withSignedCurvature(shadowTrack);
+  const track = shadowTrack;
   // The id is read for replan time-slicing and used as a debug key.
   const controller = new Controller(index, { track, aggression: 0.9, ...options });
   controller.setDebugEnabled?.(true);
