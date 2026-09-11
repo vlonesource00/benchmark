@@ -925,6 +925,9 @@ function frame(nowMs) {
     const activeBridge = field?.byId(selectedId);
     const visualData = activeBridge?.visualDebug?.() ?? null;
     visualDebugger.update(visualData, true);
+    if (visualDebugger.enabled && badge) {
+      badge.textContent = visualDebugger.isStale ? 'ONLINE [V] (STALE)' : 'ONLINE [V]';
+    }
   }
 
   if (canvas.width > 0 && canvas.height > 0) {

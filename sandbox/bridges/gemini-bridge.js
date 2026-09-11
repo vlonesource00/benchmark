@@ -143,7 +143,7 @@ export function createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, in
       };
     },
     visualDebug() {
-      return controller.getDebugVisuals?.(track) ?? controller.getDebugState?.() ?? null;
+      return controller.getDebugVisuals?.(track) ?? null;
     }
   };
 }

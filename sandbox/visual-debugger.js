@@ -1,4 +1,4 @@
-﻿import * as THREE from 'three';
+import * as THREE from 'three';
 
 const MAX_CANDIDATES = 36;
 const MAX_POINTS_PER_TRAJ = 32;
@@ -48,6 +48,17 @@ export class VisualAIDebugger {
     this._initLayer6();
     this._initLayer7();
     this._initRoadLimits();
+
+    this.lastValidVisualSnapshot = null;
+    this.lastValidVisualTime = 0;
+    this.isStale = false;
+
+    // Phase 13 & Three.js dynamic bounding box fix: disable frustum culling on all debugger meshes
+    this.root.traverse((obj) => {
+      if (obj.isMesh || obj.isLine || obj.isLineSegments) {
+        obj.frustumCulled = false;
+      }
+    });
   }
 
   toggleMaster() {
@@ -432,6 +443,18 @@ export class VisualAIDebugger {
    * @param {boolean} [isSelected=true] - Whether the subject car is currently selected
    */
   update(debugData, isSelected = true) {
+    const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    if (debugData && (debugData.selectedTrajectory || (Array.isArray(debugData.candidates) && debugData.candidates.length > 0))) {
+      this.lastValidVisualSnapshot = debugData;
+      this.lastValidVisualTime = now;
+      this.isStale = false;
+    } else if (this.lastValidVisualSnapshot && (now - this.lastValidVisualTime < 250)) {
+      debugData = this.lastValidVisualSnapshot;
+      this.isStale = true;
+    } else {
+      this.isStale = false;
+    }
+
     if (!this.enabled || !debugData || !isSelected) {
       this.root.visible = false;
       return;
@@ -562,7 +585,11 @@ export class VisualAIDebugger {
             line.geometry.setDrawRange(0, N);
 
             if (cand.color) line.material.color.set(cand.color);
-            line.material.opacity = cand.selected ? 0.9 : (cand.rejectionReason === 'VIABLE_ALTERNATIVE' ? 0.75 : 0.45);
+            if (cand.isDiagnostic) {
+              line.material.opacity = 0.25;
+            } else {
+              line.material.opacity = cand.selected ? 0.9 : (cand.rejectionReason === 'VIABLE_ALTERNATIVE' ? 0.75 : 0.45);
+            }
             line.visible = true;
 
             if (cand.conflictPoint && conflictIdx < this.conflictMarkers.length) {

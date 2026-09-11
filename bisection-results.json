@@ -1,0 +1,458 @@
+[
+  {
+    "elapsedSeconds": 168.0166666666782,
+    "lapsCompleted": 2,
+    "lapTimes": [
+      {
+        "lap": 1,
+        "time": 87.96666666668274,
+        "valid": true
+      },
+      {
+        "lap": 2,
+        "time": 80.04999999999545,
+        "valid": true
+      }
+    ],
+    "flyingLap": 80.04999999999545,
+    "flyingLapValid": true,
+    "bestCleanLap": 80.04999999999545,
+    "offTrackSeconds": 0,
+    "offTrackEvents": 0,
+    "spins": 0,
+    "p95BodySlipDeg": 9.098995341807576,
+    "maxBodySlipDeg": 15.402942668693166,
+    "p95YawRateRadS": 0.6365574668147845,
+    "maxYawRateRadS": 1.1289259599928454,
+    "steerReversalsPerSec": 0.5773236782064876,
+    "trajectorySwitchesPerSec": 0.24997520087291214,
+    "avgCandidateCount": 19.57707568693582,
+    "dynamicLimitSelectedCount": 0,
+    "roadLimitSelectedCount": 0,
+    "selectedRejectionClasses": {
+      "FEASIBLE": 20162
+    },
+    "maxPredictedLatAccel": 595.8071040147707,
+    "actualPeakLatAccel": 25.684269546039886,
+    "avgStabilityRisk": 0,
+    "timeHighStabilityRisk": 0,
+    "spinDetails": [],
+    "commit": "aa0eb65",
+    "commitName": "aa0eb650 (Temporal Decoupled Baseline)",
+    "hash": "aa0eb65072e6fd96867fe072aec5250cf1f85572"
+  },
+  {
+    "elapsedSeconds": 192.1583333333229,
+    "lapsCompleted": 2,
+    "lapTimes": [
+      {
+        "lap": 1,
+        "time": 97.19166666669008,
+        "valid": true
+      },
+      {
+        "lap": 2,
+        "time": 94.96666666663282,
+        "valid": true
+      }
+    ],
+    "flyingLap": 94.96666666663282,
+    "flyingLapValid": true,
+    "bestCleanLap": 94.96666666663282,
+    "offTrackSeconds": 26.558333333332467,
+    "offTrackEvents": 3,
+    "spins": 7,
+    "p95BodySlipDeg": 31.896578892449288,
+    "maxBodySlipDeg": 89.6917087029738,
+    "p95YawRateRadS": 1.136698174038048,
+    "maxYawRateRadS": 2.25701159586665,
+    "steerReversalsPerSec": 0.640097142113743,
+    "trajectorySwitchesPerSec": 0.6244850166963347,
+    "avgCandidateCount": 19.753892189600588,
+    "dynamicLimitSelectedCount": 0,
+    "roadLimitSelectedCount": 0,
+    "selectedRejectionClasses": {
+      "FEASIBLE": 23059
+    },
+    "maxPredictedLatAccel": 1073.4857198873735,
+    "actualPeakLatAccel": 35.40104840566702,
+    "avgStabilityRisk": 0,
+    "timeHighStabilityRisk": 0,
+    "spinDetails": [
+      {
+        "time": 39.79166666666505,
+        "s": 1418.494455938273,
+        "speed": 24.15467030643123,
+        "betaDeg": -24.884688460910958,
+        "yawRate": 1.2522864510985579,
+        "steer": -0.49010689346685893,
+        "throttle": 0,
+        "brake": 0.14660746911395747,
+        "trajId": "none"
+      },
+      {
+        "time": 69.3166666666679,
+        "s": 2285.1816379502598,
+        "speed": 9.699948225860298,
+        "betaDeg": 56.86393694576036,
+        "yawRate": -1.2500997192699308,
+        "steer": 0.7201527074611219,
+        "throttle": 0,
+        "brake": 0,
+        "trajId": "none"
+      },
+      {
+        "time": 128.53333333338077,
+        "s": 1418.558349803824,
+        "speed": 24.2804167333178,
+        "betaDeg": -25.868449904130774,
+        "yawRate": 1.2506786533962266,
+        "steer": -0.4891768591893844,
+        "throttle": 0,
+        "brake": 0.14660746911395747,
+        "trajId": "none"
+      },
+      {
+        "time": 156.44166666668872,
+        "s": 2256.089011532672,
+        "speed": 25.358071207617254,
+        "betaDeg": 33.46933172302364,
+        "yawRate": -1.250719896651242,
+        "steer": 0.48192753404730276,
+        "throttle": 0,
+        "brake": 0.14660746911395747,
+        "trajId": "none"
+      },
+      {
+        "time": 158.2166666666871,
+        "s": 2280.390614764736,
+        "speed": 9.934039356423682,
+        "betaDeg": -20.316531880111686,
+        "yawRate": -1.6512807010445552,
+        "steer": 0.3652797982333258,
+        "throttle": 0.277181306045207,
+        "brake": 0,
+        "trajId": "none"
+      },
+      {
+        "time": 174.40833333333904,
+        "s": 2518.8279753180386,
+        "speed": 25.890130286528272,
+        "betaDeg": 39.335868570137336,
+        "yawRate": -1.2589298820557,
+        "steer": 0.47997989717378975,
+        "throttle": 0,
+        "brake": 0.14660746911395747,
+        "trajId": "none"
+      },
+      {
+        "time": 176.40833333333723,
+        "s": 2550.980834007766,
+        "speed": 7.849572495729322,
+        "betaDeg": -20.451774438251014,
+        "yawRate": -1.25450734256593,
+        "steer": 0.85,
+        "throttle": 0.04999999999999999,
+        "brake": 0,
+        "trajId": "none"
+      }
+    ],
+    "commit": "444e16f",
+    "commitName": "444e16fe (Pace Model Pass)",
+    "hash": "444e16fe76d0f9cdba2d8fcfcb22280f15599e3e"
+  },
+  {
+    "elapsedSeconds": 192.1583333333229,
+    "lapsCompleted": 2,
+    "lapTimes": [
+      {
+        "lap": 1,
+        "time": 97.19166666669008,
+        "valid": true
+      },
+      {
+        "lap": 2,
+        "time": 94.96666666663282,
+        "valid": true
+      }
+    ],
+    "flyingLap": 94.96666666663282,
+    "flyingLapValid": true,
+    "bestCleanLap": 94.96666666663282,
+    "offTrackSeconds": 26.558333333332467,
+    "offTrackEvents": 3,
+    "spins": 7,
+    "p95BodySlipDeg": 31.896578892449288,
+    "maxBodySlipDeg": 89.6917087029738,
+    "p95YawRateRadS": 1.136698174038048,
+    "maxYawRateRadS": 2.25701159586665,
+    "steerReversalsPerSec": 0.640097142113743,
+    "trajectorySwitchesPerSec": 0.6244850166963347,
+    "avgCandidateCount": 19.753892189600588,
+    "dynamicLimitSelectedCount": 0,
+    "roadLimitSelectedCount": 0,
+    "selectedRejectionClasses": {
+      "FEASIBLE": 23059
+    },
+    "maxPredictedLatAccel": 1073.4857198873735,
+    "actualPeakLatAccel": 35.40104840566702,
+    "avgStabilityRisk": 0,
+    "timeHighStabilityRisk": 0,
+    "spinDetails": [
+      {
+        "time": 39.79166666666505,
+        "s": 1418.494455938273,
+        "speed": 24.15467030643123,
+        "betaDeg": -24.884688460910958,
+        "yawRate": 1.2522864510985579,
+        "steer": -0.49010689346685893,
+        "throttle": 0,
+        "brake": 0.14660746911395747,
+        "trajId": "none"
+      },
+      {
+        "time": 69.3166666666679,
+        "s": 2285.1816379502598,
+        "speed": 9.699948225860298,
+        "betaDeg": 56.86393694576036,
+        "yawRate": -1.2500997192699308,
+        "steer": 0.7201527074611219,
+        "throttle": 0,
+        "brake": 0,
+        "trajId": "none"
+      },
+      {
+        "time": 128.53333333338077,
+        "s": 1418.558349803824,
+        "speed": 24.2804167333178,
+        "betaDeg": -25.868449904130774,
+        "yawRate": 1.2506786533962266,
+        "steer": -0.4891768591893844,
+        "throttle": 0,
+        "brake": 0.14660746911395747,
+        "trajId": "none"
+      },
+      {
+        "time": 156.44166666668872,
+        "s": 2256.089011532672,
+        "speed": 25.358071207617254,
+        "betaDeg": 33.46933172302364,
+        "yawRate": -1.250719896651242,
+        "steer": 0.48192753404730276,
+        "throttle": 0,
+        "brake": 0.14660746911395747,
+        "trajId": "none"
+      },
+      {
+        "time": 158.2166666666871,
+        "s": 2280.390614764736,
+        "speed": 9.934039356423682,
+        "betaDeg": -20.316531880111686,
+        "yawRate": -1.6512807010445552,
+        "steer": 0.3652797982333258,
+        "throttle": 0.277181306045207,
+        "brake": 0,
+        "trajId": "none"
+      },
+      {
+        "time": 174.40833333333904,
+        "s": 2518.8279753180386,
+        "speed": 25.890130286528272,
+        "betaDeg": 39.335868570137336,
+        "yawRate": -1.2589298820557,
+        "steer": 0.47997989717378975,
+        "throttle": 0,
+        "brake": 0.14660746911395747,
+        "trajId": "none"
+      },
+      {
+        "time": 176.40833333333723,
+        "s": 2550.980834007766,
+        "speed": 7.849572495729322,
+        "betaDeg": -20.451774438251014,
+        "yawRate": -1.25450734256593,
+        "steer": 0.85,
+        "throttle": 0.04999999999999999,
+        "brake": 0,
+        "trajId": "none"
+      }
+    ],
+    "commit": "02986e0",
+    "commitName": "02986e07 (Initial 3D Visual Debug)",
+    "hash": "02986e0754568cd81f89d94ce451138d161c02f5"
+  },
+  {
+    "elapsedSeconds": 183.89999999999708,
+    "lapsCompleted": 2,
+    "lapTimes": [
+      {
+        "lap": 1,
+        "time": 95.29166666668857,
+        "valid": true
+      },
+      {
+        "lap": 2,
+        "time": 88.60833333330851,
+        "valid": true
+      }
+    ],
+    "flyingLap": 88.60833333330851,
+    "flyingLapValid": true,
+    "bestCleanLap": 88.60833333330851,
+    "offTrackSeconds": 18.924999999999567,
+    "offTrackEvents": 2,
+    "spins": 4,
+    "p95BodySlipDeg": 25.495878639520004,
+    "maxBodySlipDeg": 89.67897619053687,
+    "p95YawRateRadS": 1.0925564668572767,
+    "maxYawRateRadS": 2.1505110591722527,
+    "steerReversalsPerSec": 0.614464382816758,
+    "trajectorySwitchesPerSec": 0.7612833061446559,
+    "avgCandidateCount": 58.5326264274062,
+    "dynamicLimitSelectedCount": 0,
+    "roadLimitSelectedCount": 0,
+    "selectedRejectionClasses": {
+      "FEASIBLE": 22068
+    },
+    "maxPredictedLatAccel": 1014.2552424955942,
+    "actualPeakLatAccel": 35.460783982347195,
+    "avgStabilityRisk": 0,
+    "timeHighStabilityRisk": 0,
+    "spinDetails": [
+      {
+        "time": 39.69166666666506,
+        "s": 1418.3529978528459,
+        "speed": 24.2397399050384,
+        "betaDeg": -24.846960975335012,
+        "yawRate": 1.2504510834174825,
+        "steer": -0.4893340702560451,
+        "throttle": 0,
+        "brake": 0.14660746911395747,
+        "trajId": "none"
+      },
+      {
+        "time": 126.4916666667134,
+        "s": 1418.2498418096293,
+        "speed": 24.31558163732036,
+        "betaDeg": -25.245467078102227,
+        "yawRate": 1.2558138753531425,
+        "steer": -0.5963725875947722,
+        "throttle": 0,
+        "brake": 0.14660746911395747,
+        "trajId": "none"
+      },
+      {
+        "time": 153.95000000002432,
+        "s": 2256.1430674817548,
+        "speed": 25.739890191481916,
+        "betaDeg": 34.056256036704106,
+        "yawRate": -1.2609680363793552,
+        "steer": 0.4809594639701829,
+        "throttle": 0,
+        "brake": 0.14660746911395747,
+        "trajId": "none"
+      },
+      {
+        "time": 155.71666666668938,
+        "s": 2280.7412555930605,
+        "speed": 10.601415143074602,
+        "betaDeg": -20.10686815061943,
+        "yawRate": -1.617539542672068,
+        "steer": 0.3568525900118268,
+        "throttle": 0.2790784098603184,
+        "brake": 0,
+        "trajId": "none"
+      }
+    ],
+    "commit": "04368fc",
+    "commitName": "04368fcc (Corridor Discretization)",
+    "hash": "04368fcca9d7bb63d615394ea300a5dd546be9f1"
+  },
+  {
+    "elapsedSeconds": 183.89999999999708,
+    "lapsCompleted": 2,
+    "lapTimes": [
+      {
+        "lap": 1,
+        "time": 95.29166666668857,
+        "valid": true
+      },
+      {
+        "lap": 2,
+        "time": 88.60833333330851,
+        "valid": true
+      }
+    ],
+    "flyingLap": 88.60833333330851,
+    "flyingLapValid": true,
+    "bestCleanLap": 88.60833333330851,
+    "offTrackSeconds": 18.924999999999567,
+    "offTrackEvents": 2,
+    "spins": 4,
+    "p95BodySlipDeg": 25.495878639520004,
+    "maxBodySlipDeg": 89.67897619053687,
+    "p95YawRateRadS": 1.0925564668572767,
+    "maxYawRateRadS": 2.1505110591722527,
+    "steerReversalsPerSec": 0.614464382816758,
+    "trajectorySwitchesPerSec": 0.7612833061446559,
+    "avgCandidateCount": 58.5326264274062,
+    "dynamicLimitSelectedCount": 0,
+    "roadLimitSelectedCount": 0,
+    "selectedRejectionClasses": {
+      "FEASIBLE": 22068
+    },
+    "maxPredictedLatAccel": 1014.2552424955942,
+    "actualPeakLatAccel": 35.460783982347195,
+    "avgStabilityRisk": 0,
+    "timeHighStabilityRisk": 0,
+    "spinDetails": [
+      {
+        "time": 39.69166666666506,
+        "s": 1418.3529978528459,
+        "speed": 24.2397399050384,
+        "betaDeg": -24.846960975335012,
+        "yawRate": 1.2504510834174825,
+        "steer": -0.4893340702560451,
+        "throttle": 0,
+        "brake": 0.14660746911395747,
+        "trajId": "none"
+      },
+      {
+        "time": 126.4916666667134,
+        "s": 1418.2498418096293,
+        "speed": 24.31558163732036,
+        "betaDeg": -25.245467078102227,
+        "yawRate": 1.2558138753531425,
+        "steer": -0.5963725875947722,
+        "throttle": 0,
+        "brake": 0.14660746911395747,
+        "trajId": "none"
+      },
+      {
+        "time": 153.95000000002432,
+        "s": 2256.1430674817548,
+        "speed": 25.739890191481916,
+        "betaDeg": 34.056256036704106,
+        "yawRate": -1.2609680363793552,
+        "steer": 0.4809594639701829,
+        "throttle": 0,
+        "brake": 0.14660746911395747,
+        "trajId": "none"
+      },
+      {
+        "time": 155.71666666668938,
+        "s": 2280.7412555930605,
+        "speed": 10.601415143074602,
+        "betaDeg": -20.10686815061943,
+        "yawRate": -1.617539542672068,
+        "steer": 0.3568525900118268,
+        "throttle": 0.2790784098603184,
+        "brake": 0,
+        "trajId": "none"
+      }
+    ],
+    "commit": "d9e4969",
+    "commitName": "d9e49693 (Current Head)",
+    "hash": "d9e49693081113570ac9c09f00f8a368c27a7a67"
+  }
+]
