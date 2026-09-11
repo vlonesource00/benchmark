@@ -1,0 +1,34 @@
+{
+  "astraBaseline": {
+    "subjectId": "astra",
+    "bestLap": 84.72500000002078,
+    "lapTimes": [
+      98.04166666669076,
+      85.61666666663987
+    ],
+    "finishTime": 179.65000000000094,
+    "offTrackSeconds": 0,
+    "damage": 0,
+    "spins": 0,
+    "p95SideslipDeg": 8.413603202220642,
+    "maxSideslipDeg": 21.73789330450516,
+    "maxYawRateRadS": 1.4056367316926504,
+    "controllerErrors": 0
+  },
+  "supremeBaseline": {
+    "subjectId": "gemini-supreme",
+    "bestLap": 80.48333333334945,
+    "lapTimes": [
+      92.25000000001948,
+      84.26666666665098
+    ],
+    "finishTime": 172.50833333334077,
+    "offTrackSeconds": 3.191666666666658,
+    "damage": 0,
+    "spins": 3,
+    "p95SideslipDeg": 17.580385347549825,
+    "maxSideslipDeg": 79.21991098218369,
+    "maxYawRateRadS": 1.4647741712422435,
+    "controllerErrors": 0
+  }
+}

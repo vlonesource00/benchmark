@@ -35,22 +35,46 @@ export function createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, in
     const adaptedSpec = {
       mass: finite(hostSpec.mass, 1290),
       wheelBase: finite(hostSpec.wheelbase, 2.78),
+      wheelbase: finite(hostSpec.wheelbase, 2.78),
       trackWidth: finite(hostSpec.track, 1.72),
+      track: finite(hostSpec.track, 1.72),
       steeringLock: finite(hostSpec.steeringLock, 0.48),
+      cgHeight: finite(hostSpec.cgHeight, 0.43),
+      frontWeight: finite(hostSpec.weightFront ?? hostSpec.frontWeight, 0.47),
+      weightFront: finite(hostSpec.weightFront ?? hostSpec.frontWeight, 0.47),
+      wheelRadius: finite(hostSpec.wheelRadius ?? hostSpec.radius, 0.335),
+      radius: finite(hostSpec.wheelRadius ?? hostSpec.radius, 0.335),
+      wheelInertia: finite(hostSpec.wheelInertia, 1.9),
+      yawInertia: finite(hostSpec.yawInertia, 2030),
+      drive: hostSpec.drive ?? 'rear',
+      maxTorque: finite(hostSpec.maxTorque ?? hostSpec.maxTorqueNm, 575),
+      maxTorqueNm: finite(hostSpec.maxTorque ?? hostSpec.maxTorqueNm, 575),
+      maxBrakeTorque: finite(hostSpec.maxBrakeTorque ?? hostSpec.brakeTorque, 6200),
+      brakeTorque: finite(hostSpec.maxBrakeTorque ?? hostSpec.brakeTorque, 6200),
+      brakeBias: finite(hostSpec.brakeBias, 0.58),
+      finalDrive: finite(hostSpec.finalDrive, 3.8),
+      gears: hostSpec.gears ?? [0, 3.82, 2.36, 1.69, 1.31, 1.00],
+      gearRatios: hostSpec.gears ?? [0, 3.82, 2.36, 1.69, 1.31, 1.00],
+      loadSensitivity: finite(hostSpec.loadSensitivity, 0.13),
+      tyreGrip: finite(hostSpec.tyreGrip, 1.0),
+      tireMu: finite(hostSpec.tyreGrip != null ? hostSpec.tyreGrip * 1.48 : 1.48, 1.48),
       steering: {
         maxAngle: finite(hostSpec.steeringLock, 0.48),
         maxRate: 11
       },
       tire: {
         alphaPeak: 0.140,
-        grip: finite(hostSpec.tyreGrip, 1.0)
+        grip: finite(hostSpec.tyreGrip, 1.0),
+        frictionCoeff: finite(hostSpec.tyreGrip != null ? hostSpec.tyreGrip * 1.48 : 1.48, 1.48),
+        loadSensitivity: finite(hostSpec.loadSensitivity, 0.13)
       },
       aero: {
         cl: finite(hostSpec.cl, 2.25),
         cd: finite(hostSpec.cd, 0.64),
-        area: finite(hostSpec.area, 1.9)
+        area: finite(hostSpec.area, 1.9),
+        frontAero: finite(hostSpec.frontAero, 0.43)
       },
-      brakeBias: finite(hostSpec.brakeBias, 0.58)
+      frontAero: finite(hostSpec.frontAero, 0.43)
     };
     const s = createShadowVehicle(car, hostTrack, car.id, {
       classKey: 'gt',
@@ -63,6 +87,11 @@ export function createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, in
     s.mass = adaptedSpec.mass;
     s.steeringLock = adaptedSpec.steeringLock;
     s.brakeBias = adaptedSpec.brakeBias;
+    s.wheelRadius = adaptedSpec.wheelRadius;
+    s.wheelInertia = adaptedSpec.wheelInertia;
+    s.yawInertia = adaptedSpec.yawInertia;
+    s.cgHeight = adaptedSpec.cgHeight;
+    s.weightFront = adaptedSpec.weightFront;
     return s;
   });
 

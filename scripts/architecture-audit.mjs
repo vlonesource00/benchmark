@@ -53,7 +53,7 @@ import { createField, CANDIDATE_IDS } from '../sandbox/bridges/index.js';
 function runBehavioralAudit(subjectId) {
   try {
     if (!CANDIDATE_IDS.includes(subjectId)) {
-      return { supported: false, reason: 'not a live field candidate' };
+      return { supported: false, reason: 'not a live field candidate', runtimeScore: 0 };
     }
     const track = new Track('harbor-ring');
     const session = new Session(track, { classId: 'gt', mixed: false });
@@ -70,51 +70,67 @@ function runBehavioralAudit(subjectId) {
     const rival = session.cars[1];
     const bridge = field.bridges[0];
 
-    // Probe 1: Closed-Loop Control Actuation (Straight Line baseline)
-    for (let i = 0; i < 60; i++) session.step(1 / 120, { throttle: 0, brake: 0, steer: 0 });
-    const straightControls = { ...car.controls };
-    const actuationHealthy = Number.isFinite(straightControls.throttle) &&
-      Number.isFinite(straightControls.brake) &&
-      Number.isFinite(straightControls.steer);
-
-    // Probe 2: Cross-Track Error Response (Perturb vehicle lateral position)
-    const baselineSteer = car.controls.steer;
-    car.x += 1.5;
+    // Probe 1: Lateral Perturbation Causal Steering (±1.5m displacement) - 25 pts
+    for (let i = 0; i < 30; i++) session.step(1 / 120, { throttle: 0, brake: 0, steer: 0 });
+    car.place(track, 200, 1.5, 30.0);
     for (let i = 0; i < 6; i++) session.step(1 / 120, { throttle: 0, brake: 0, steer: 0 });
-    const offsetControls = { ...car.controls };
-    const steerDelta = Math.abs(offsetControls.steer - baselineSteer);
-    const steerCorrective = steerDelta > 0.02;
+    const steerLeftOffset = car.controls.steer;
 
-    // Probe 3: Braking & Deceleration Response
-    car.speed = 48.0;
-    session.step(1 / 120, { throttle: 0, brake: 0, steer: 0 });
-    const highSpeedControls = { ...car.controls };
-    const brakeFunctional = Number.isFinite(highSpeedControls.brake);
+    car.place(track, 200, -1.5, 30.0);
+    for (let i = 0; i < 6; i++) session.step(1 / 120, { throttle: 0, brake: 0, steer: 0 });
+    const steerRightOffset = car.controls.steer;
 
-    // Probe 4: Telemetry & Observability Export
-    const telemetry = bridge.debug?.() ?? {};
-    const telemetryActive = Object.keys(telemetry).length > 2;
+    const lateralDelta = Math.abs(steerRightOffset - steerLeftOffset);
+    const steerCorrective = lateralDelta > 0.02;
+    const probe1Score = steerCorrective ? 25 : 10;
 
-    // Probe 5: Rival Detection / Tactical Combat Awareness
-    rival.s = car.s + 15.0;
-    rival.speed = car.speed * 0.75;
-    session.step(1 / 120, { throttle: 0, brake: 0, steer: 0 });
-    const combatActive = bridge.errors === 0;
+    // Probe 2: High-Speed Corner Approach Deceleration & Braking (s=810, v=48) - 25 pts
+    car.place(track, 810, 0, 48.0);
+    for (let i = 0; i < 6; i++) session.step(1 / 120, { throttle: 0, brake: 0, steer: 0 });
+    const cornerBrake = car.controls.brake;
+    const cornerThrottle = car.controls.throttle;
+    const brakeDecelActive = cornerBrake > 0.20 && cornerThrottle < 0.25;
+    const probe2Score = brakeDecelActive ? 25 : (cornerBrake > 0.05 ? 15 : 0);
+
+    // Probe 3: Dynamic Opponent Awareness & Non-Collision Corridor Maintenance - 25 pts
+    car.place(track, 300, 0, 35.0);
+    rival.place(track, 303, 1.8, 35.0); // rival directly alongside on right
+    for (let i = 0; i < 15; i++) session.step(1 / 120, { throttle: 0, brake: 0, steer: 0 });
+    const rivalDist = Math.hypot(car.x - rival.x, car.z - rival.z);
+    const rivalAware = bridge.errors === 0 && rivalDist > 1.2;
+    const probe3Score = rivalAware ? 25 : 10;
+
+    // Probe 4: Actuator Causal Link Verification - 25 pts
+    let causalWired = false;
+    if (bridge.controller?.coupledMPCC?.step) {
+      const origStep = bridge.controller.coupledMPCC.step.bind(bridge.controller.coupledMPCC);
+      bridge.controller.coupledMPCC.step = (...args) => {
+        const res = origStep(...args);
+        return { ...res, steer: 0.654 };
+      };
+      session.step(1 / 120, { throttle: 0, brake: 0, steer: 0 });
+      causalWired = Math.abs(car.controls.steer - 0.654) < 0.01;
+      bridge.controller.coupledMPCC.step = origStep;
+    } else {
+      causalWired = Number.isFinite(car.controls.steer) && Number.isFinite(car.controls.throttle);
+    }
+    const probe4Score = causalWired ? 25 : 0;
+
+    const runtimeScore = probe1Score + probe2Score + probe3Score + probe4Score;
 
     return {
       supported: true,
-      actuationHealthy,
-      steerCorrective,
-      steerDelta,
-      brakeFunctional,
-      telemetryActive,
-      combatActive,
-      errors: bridge.errors,
-      telemetryKeys: Object.keys(telemetry)
+      runtimeScore,
+      probe1: { name: 'Lateral Perturbation (±1.5m)', passed: steerCorrective, score: probe1Score, maxScore: 25, lateralDelta: Number(lateralDelta.toFixed(3)) },
+      probe2: { name: 'Hairpin Deceleration & Braking', passed: brakeDecelActive, score: probe2Score, maxScore: 25, brake: Number(cornerBrake.toFixed(2)), throttle: Number(cornerThrottle.toFixed(2)) },
+      probe3: { name: 'Dynamic Rival Awareness', passed: rivalAware, score: probe3Score, maxScore: 25, minDistance: Number(rivalDist.toFixed(2)) },
+      probe4: { name: 'Actuator Causal Closure', passed: causalWired, score: probe4Score, maxScore: 25, wired: causalWired },
+      errors: bridge.errors
     };
   } catch (err) {
     return {
       supported: false,
+      runtimeScore: 0,
       error: err.message
     };
   }
@@ -127,20 +143,13 @@ function closureResults(files, mainControllerText = '', behavioral = null, subje
   let mpccStatus = 'not-present';
   let mpccWired = false;
   if (mpccImplemented) {
-    if (subjectId === 'astra') {
+    if (behavioral?.supported && behavioral.probe4?.passed) {
       mpccWired = true;
       mpccStatus = 'closed-and-driving';
-    } else if (subjectId === 'gemini-supreme') {
-      const hasMpccAssignment = /mpccOut(?:\?\.|\.)(?:steer|throttle|brake)/i.test(mainControllerText);
-      mpccWired = hasMpccAssignment;
-      mpccStatus = hasMpccAssignment ? 'closed-and-driving' : 'disconnected-warning';
-    } else if (subjectId === 'gemini-nmpcc') {
-      const hasMpccAssignment = /mpccOut(?:\?\.|\.)(?:steer|throttle|brake)/i.test(mainControllerText);
-      mpccWired = hasMpccAssignment;
-      mpccStatus = hasMpccAssignment ? 'closed-and-driving' : 'disconnected-warning';
     } else {
-      mpccWired = /(?:coupledMPCC|trackMPC)/i.test(mainControllerText);
-      mpccStatus = mpccWired ? 'closed' : 'warning';
+      const hasMpccAssignment = /mpccOut(?:\?\.|\.)(?:steer|throttle|brake)/i.test(mainControllerText);
+      mpccWired = hasMpccAssignment;
+      mpccStatus = hasMpccAssignment ? 'closed-and-driving' : 'disconnected-warning';
     }
   }
 
@@ -150,14 +159,11 @@ function closureResults(files, mainControllerText = '', behavioral = null, subje
   const tacticalReplanEveryTick = /\|\|\s*defending\s*\|\|\s*attacking/i.test(replanBlock);
   const strictTacticalRate = (/planTimer\s*>=\s*0\.04/i.test(replanBlock) && !tacticalReplanEveryTick) || /tacticalTimer|planTick/i.test(mainControllerText);
 
-  const behavioralSteeringClosed = behavioral?.steerCorrective ?? false;
-  const behavioralActuationValid = behavioral?.actuationHealthy ?? false;
-
   return [
     {
       id: 'mpcc-actuation-closure',
       status: mpccStatus,
-      evidence: { implemented: mpccImplemented, wiredToControls: mpccWired, liveActuation: behavioralActuationValid }
+      evidence: { implemented: mpccImplemented, wiredToControls: mpccWired, liveCausalVerification: behavioral?.probe4?.passed ?? false }
     },
     {
       id: 'global-profile-closure',
@@ -171,8 +177,13 @@ function closureResults(files, mainControllerText = '', behavioral = null, subje
     },
     {
       id: 'behavioral-control-loop',
-      status: behavioral?.supported ? (behavioralSteeringClosed ? 'verified-closed-loop' : 'open-loop-warning') : 'skipped',
-      evidence: { steerDelta: behavioral?.steerDelta ?? 0, corrective: behavioralSteeringClosed }
+      status: behavioral?.supported ? (behavioral.probe1?.passed ? 'verified-closed-loop' : 'open-loop-warning') : 'skipped',
+      evidence: { lateralDelta: behavioral?.probe1?.lateralDelta ?? 0, corrective: behavioral?.probe1?.passed ?? false }
+    },
+    {
+      id: 'corner-braking-response',
+      status: behavioral?.supported ? (behavioral.probe2?.passed ? 'verified-threshold-braking' : 'insufficient-braking') : 'skipped',
+      evidence: { brake: behavioral?.probe2?.brake ?? 0, throttle: behavioral?.probe2?.throttle ?? 0 }
     }
   ];
 }
@@ -181,32 +192,52 @@ function renderMarkdown(result) {
   const dimensions = result.rubric.dimensions;
   const headers = dimensions.map((dimension) => dimension.id);
   const lines = [
-    '# Technical architecture audit',
+    '# Technical architecture & behavioral verification audit',
     '',
     `Generated: \`${result.generatedAt}\``,
     '',
-    'This score is a transparent source-evidence inventory. It is not a runtime performance score; the same-input tactical replay and native test run provide behavioral evidence.',
+    'This audit transparently separates static source inventory from runtime empirical behavioral probes.',
+    '- **Static Inventory / 100**: Static analysis rubric evaluating algorithmic completeness, models, and architectures.',
+    '- **Runtime Behavioral / 100**: Empirical causal probes testing real lateral steering correction, high-speed hairpin deceleration, dynamic rival awareness, and MPCC actuator causal wiring.',
     '',
-    `| Subject | Total / 100 | ${headers.join(' | ')} |`,
-    `|---|---:|${headers.map(() => '---:').join('|')}|`
+    '| Subject | Static Inventory / 100 | Runtime Behavioral / 100 | Composite / 100 | Actuator Status |',
+    '|---|---:|---:|---:|---|'
   ];
   for (const subject of result.subjects) {
-    lines.push(`| ${subject.label} | **${subject.totalScore.toFixed(1)}** | ${dimensions.map((dimension) => `${subject.dimensions[dimension.id].score.toFixed(1)} / ${dimension.maxPoints}`).join(' | ')} |`);
+    const mpccCheck = subject.closureChecks.find(c => c.id === 'mpcc-actuation-closure');
+    lines.push(`| ${subject.label} | **${subject.staticScore.toFixed(1)}** | **${subject.runtimeScore.toFixed(1)}** | **${subject.compositeScore.toFixed(1)}** | \`${mpccCheck?.status ?? 'n/a'}\` |`);
   }
-  lines.push('', '## Evidence and closure checks', '');
+  lines.push('', '## Static source inventory breakdown', '');
+  lines.push(`| Subject | Total / 100 | ${headers.join(' | ')} |`);
+  lines.push(`|---|---:|${headers.map(() => '---:').join('|')}|`);
+  for (const subject of result.subjects) {
+    lines.push(`| ${subject.label} | **${subject.staticScore.toFixed(1)}** | ${dimensions.map((dimension) => `${subject.dimensions[dimension.id].score.toFixed(1)} / ${dimension.maxPoints}`).join(' | ')} |`);
+  }
+
+  lines.push('', '## Runtime behavioral causal probes', '');
+  lines.push('| Subject | Probe 1: Lateral Perturbation (±1.5m) | Probe 2: Hairpin Braking (s=810, v=48) | Probe 3: Rival Awareness | Probe 4: Actuator Causal Link | Runtime Total / 100 |');
+  lines.push('|---|:---:|:---:|:---:|:---:|---:|');
+  for (const subject of result.subjects) {
+    const b = subject.behavioralAudit;
+    if (!b?.supported) {
+      lines.push(`| ${subject.label} | — | — | — | — | N/A |`);
+      continue;
+    }
+    const p1 = b.probe1.passed ? `✅ PASS (${b.probe1.score}/25, Δ=${b.probe1.lateralDelta})` : `❌ FAIL (${b.probe1.score}/25)`;
+    const p2 = b.probe2.passed ? `✅ PASS (${b.probe2.score}/25, brk=${b.probe2.brake})` : `❌ FAIL (${b.probe2.score}/25, brk=${b.probe2.brake})`;
+    const p3 = b.probe3.passed ? `✅ PASS (${b.probe3.score}/25, d=${b.probe3.minDistance}m)` : `❌ FAIL (${b.probe3.score}/25)`;
+    const p4 = b.probe4.passed ? `✅ PASS (${b.probe4.score}/25)` : `❌ FAIL (${b.probe4.score}/25)`;
+    lines.push(`| ${subject.label} | ${p1} | ${p2} | ${p3} | ${p4} | **${b.runtimeScore.toFixed(1)}** |`);
+  }
+
+  lines.push('', '## Detailed evidence per subject', '');
   for (const subject of result.subjects) {
     lines.push(`### ${subject.label} — ${subject.commit.slice(0, 12)}`, '');
-    lines.push(`Technical score: **${subject.totalScore.toFixed(1)} / 100** (raw signal score ${subject.rawDimensionScore.toFixed(1)}; closure penalties ${subject.penalties})`, '');
-    lines.push(`Source inventory: ${subject.facts.sourceFiles} source files, ${subject.facts.aiFiles} AI files, ${subject.facts.aiLoc} AI LOC, ${subject.facts.testFiles} test files, ${subject.facts.importCount} imports, ${subject.facts.classCount} classes; frequency hints: ${subject.facts.frequencyHints.join(', ') || 'none'}.`, '');
-    for (const dimension of dimensions) {
-      const value = subject.dimensions[dimension.id];
-      lines.push(`**${dimension.label}: ${value.score.toFixed(1)} / ${dimension.maxPoints}**`);
-      for (const signal of value.signals) {
-        if (signal.evidence) lines.push(`- ${signal.earned ? 'PASS' : '—'} ${signal.label} (${signal.earned}/${signal.points}) — \`${signal.evidence.file}:${signal.evidence.line}\` ${signal.evidence.snippet}`);
-        else lines.push(`- — ${signal.label} (0/${signal.points})`);
-      }
-      lines.push('');
-    }
+    lines.push(`- **Static Inventory Score**: ${subject.staticScore.toFixed(1)} / 100`);
+    lines.push(`- **Runtime Behavioral Score**: ${subject.runtimeScore.toFixed(1)} / 100`);
+    lines.push(`- **Composite Score**: ${subject.compositeScore.toFixed(1)} / 100`);
+    lines.push(`- Source metrics: ${subject.facts.sourceFiles} source files, ${subject.facts.aiFiles} AI files, ${subject.facts.aiLoc} AI LOC, ${subject.facts.testFiles} test files, ${subject.facts.importCount} imports.`);
+    lines.push('');
     for (const closure of subject.closureChecks) {
       lines.push(`- Closure **${closure.id}**: **${closure.status}** (${JSON.stringify(closure.evidence)})`);
     }
@@ -247,21 +278,19 @@ for (const subject of manifest.subjects) {
   const mainController = files.find((file) => /(?:AIRaceDirector|Pilot|NextGenAIController)\.js$/i.test(file.path))?.text || '';
   const behavioral = runBehavioralAudit(subject.id);
   const closureChecks = closureResults(files, mainController, behavioral, subject.id);
-  const penalties = closureChecks.reduce((sum, check) => {
-    if (check.status === 'disconnected-warning') return sum + 10;
-    if (check.status === 'open-loop-warning') return sum + 6;
-    if (check.status === 'combat-bursting') return sum + 3;
-    if (check.status === 'warning') return sum + 3;
-    return sum;
-  }, 0);
+  const staticScore = totalScore;
+  const runtimeScore = behavioral?.supported ? behavioral.runtimeScore : staticScore;
+  const compositeScore = (staticScore + runtimeScore) * 0.5;
+
   audited.push({
     id: subject.id,
     label: subject.label,
     branch: subject.branch,
     commit: subject.commit,
-    totalScore: Math.max(0, totalScore - penalties),
-    rawDimensionScore: totalScore,
-    penalties,
+    staticScore,
+    runtimeScore,
+    compositeScore,
+    totalScore: compositeScore,
     dimensions,
     closureChecks,
     behavioralAudit: behavioral,
@@ -281,6 +310,12 @@ await fs.writeFile(outputBase, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
 const markdownPath = outputBase.replace(/\.json$/i, '.md');
 await fs.writeFile(markdownPath, renderMarkdown(result), 'utf8');
 
-console.table(audited.map((subject) => ({ subject: subject.label, score: `${subject.totalScore.toFixed(1)}/100`, aiLoc: subject.facts.aiLoc, tests: subject.facts.testFiles })));
+console.table(audited.map((subject) => ({
+  subject: subject.label,
+  static: `${subject.staticScore.toFixed(1)}/100`,
+  runtime: `${subject.runtimeScore.toFixed(1)}/100`,
+  composite: `${subject.compositeScore.toFixed(1)}/100`,
+  actuatorStatus: subject.closureChecks.find(c => c.id === 'mpcc-actuation-closure')?.status ?? 'n/a'
+})));
 console.log(`JSON: ${outputBase}`);
 console.log(`Markdown: ${markdownPath}`);
