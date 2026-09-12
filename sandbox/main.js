@@ -3,13 +3,24 @@ import { createSafeWebGLRenderer } from './safe-renderer.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Track } from '../host/astra/src/sim/track.js';
 import { Session } from '../host/astra/src/sim/session.js';
+import { Keyboard } from '../host/astra/src/sim/input.js';
 import { World } from '../host/astra/src/render/world.js';
 import { CarModel } from '../host/astra/src/render/car.js';
 import { CarEffects } from '../host/astra/src/render/effects.js';
 import { VisualFinish } from '../host/astra/src/render/finish.js';
-import { CANDIDATES, CANDIDATE_IDS, createField, rotations } from './bridges/index.js';
+import {
+  CANDIDATES_5ARCH,
+  SUPREME_CANDIDATES,
+  PLAYER_CANDIDATE,
+  SUPREME_WITH_PLAYER,
+  ALL_KNOWN_CANDIDATES,
+  CANDIDATES,
+  CANDIDATE_IDS,
+  createField,
+  rotations
+} from './bridges/index.js';
 import { SpectatorCamera } from './spectator.js';
-import { VisualAIDebugger } from './visual-debugger.js';
+import { MultiCarVisualDebugger } from './visual-debugger.js';
 
 const FIXED_DT = 1 / 120;
 const MAX_STEPS_PER_FRAME = 16;
@@ -123,9 +134,44 @@ world.setLighting('golden');
 const finish = new VisualFinish(renderer, scene, camera);
 finish.setQuality('high');
 const effects = new CarEffects(scene);
-const visualDebugger = new VisualAIDebugger(scene, track);
+const visualDebugger = new MultiCarVisualDebugger(scene, track, 8);
+const keyboard = new Keyboard(() => {});
 let simPaused = false;
 let stepOnce = false;
+
+// --- Benchmark Architecture Modes & Presets ---
+export const MODES = {
+  '5-arch': {
+    id: '5-arch',
+    title: '5-Architecture Grand Prix',
+    subtitle: 'Astra, GPT Racing, Claude Racing, Gemini Supreme, Gemini Grand Prix',
+    specText: '5 × GT Class (5 Architectures)',
+    candidates: CANDIDATES_5ARCH,
+    order: CANDIDATES_5ARCH.map((c) => c.id),
+    defaultAutopilot: true
+  },
+  '5-supreme': {
+    id: '5-supreme',
+    title: 'Gemini Supreme 5-Car Cup',
+    subtitle: '5 × Pinned Gemini Supreme GT Cars (Coupled MPCC)',
+    specText: '5 × GT Class (All Gemini Supreme)',
+    candidates: SUPREME_CANDIDATES,
+    order: SUPREME_CANDIDATES.map((c) => c.id),
+    defaultAutopilot: true
+  },
+  '5-supreme-player': {
+    id: '5-supreme-player',
+    title: 'Gemini Supreme 5 + Player',
+    subtitle: '5 × Gemini Supreme AI Bots + Human Driver (WASD/Arrows)',
+    specText: '6 × GT Class (5 Supreme AI + You)',
+    candidates: SUPREME_WITH_PLAYER,
+    order: SUPREME_WITH_PLAYER.map((c) => c.id),
+    defaultAutopilot: false
+  }
+};
+
+let currentModeId = '5-arch';
+let activeCandidates = CANDIDATES_5ARCH;
 
 const session = new Session(track, { classId: 'gt', mixed: false });
 session.laps = RACE_LAPS;
@@ -145,30 +191,21 @@ let globalBestSectorTimes = [Infinity, Infinity, Infinity, Infinity, Infinity];
 
 // Telemetry State Registry per candidate
 const carTelemetry = new Map();
-CANDIDATE_IDS.forEach((id) => {
-  carTelemetry.set(id, {
-    id,
-    topSpeedKmh: 0,
-    peakLatG: 0,
-    peakLongG: 0,
-    lapTimes: [],
-    lapStartTime: 0,
-    currentLapTime: 0,
-    lastLapTime: null,
-    bestLapTime: null,
-    currentSector: 0,
-    sectorEntryTime: 0,
-    sectorTimes: [null, null, null, null, null],
-    bestSectorTimes: [null, null, null, null, null],
-    combatSeconds: 0,
-    totalPacingSeconds: 0,
-    offTracks: 0,
-    samples: []
-  });
-});
 
-function initField(order = CANDIDATE_IDS) {
-  statusLine.textContent = 'Binding 5 architectures to Harbor Ring 120 Hz host…';
+function initField(order = MODES[currentModeId].order, candidates = MODES[currentModeId].candidates) {
+  activeCandidates = candidates;
+  const modeDef = MODES[currentModeId] || MODES['5-arch'];
+
+  const titleEl = byId('masthead-title');
+  if (titleEl) {
+    titleEl.innerHTML = `Harbor Ring <span>${modeDef.title}</span>`;
+  }
+  const specEl = document.querySelector('.protocol-panel dl div:nth-child(2) dd');
+  if (specEl) {
+    specEl.textContent = modeDef.specText;
+  }
+
+  statusLine.textContent = `Binding ${order.length} cars to Harbor Ring 120 Hz host…`;
 
   // Clean up any existing 3D models
   models.forEach((m) => scene.remove(m.root));
@@ -177,23 +214,51 @@ function initField(order = CANDIDATE_IDS) {
   session.laps = RACE_LAPS;
   session.field = order.length;
   session.aggression = 0.72;
-  session.autopilot = true;
+  session.autopilot = modeDef.defaultAutopilot;
+
+  // Initialize car telemetry map for all active candidates
+  carTelemetry.clear();
+  candidates.forEach((cand) => {
+    carTelemetry.set(cand.id, {
+      id: cand.id,
+      topSpeedKmh: 0,
+      peakLatG: 0,
+      peakLongG: 0,
+      lapTimes: [],
+      lapStartTime: 0,
+      currentLapTime: 0,
+      lastLapTime: null,
+      bestLapTime: null,
+      currentSector: 0,
+      sectorEntryTime: 0,
+      sectorTimes: [null, null, null, null, null],
+      bestSectorTimes: [null, null, null, null, null],
+      combatSeconds: 0,
+      totalPacingSeconds: 0,
+      offTracks: 0,
+      samples: []
+    });
+  });
 
   field = createField({
     session,
     hostTrack: track,
     order,
+    candidatesList: candidates,
+    playerInput: keyboard,
     onStatus: (msg) => { statusLine.textContent = msg; }
   });
 
   session.start({ freshTrack: true });
   field.attach();
+  session.autopilot = modeDef.defaultAutopilot;
+  updatePilotHud();
 
   // Only instantiate visual 3D models for active racing cars in the field
   models = session.activeCars.map((car, index) => {
     const model = new CarModel(car);
     const candidateId = field.bridges[index]?.candidateId;
-    const candidate = CANDIDATES.find((c) => c.id === candidateId) ?? CANDIDATES[index];
+    const candidate = candidates.find((c) => c.id === candidateId) ?? candidates[index];
     if (candidate) model.setColor(candidate.color);
     scene.add(model.root);
     return model;
@@ -220,28 +285,9 @@ function initField(order = CANDIDATE_IDS) {
   globalBestSectorTimes = [Infinity, Infinity, Infinity, Infinity, Infinity];
   completed = false;
 
-  carTelemetry.forEach((stats) => {
-    stats.topSpeedKmh = 0;
-    stats.peakLatG = 0;
-    stats.peakLongG = 0;
-    stats.lapTimes = [];
-    stats.lapStartTime = 0;
-    stats.currentLapTime = 0;
-    stats.lastLapTime = null;
-    stats.bestLapTime = null;
-    stats.currentSector = 0;
-    stats.sectorEntryTime = 0;
-    stats.sectorTimes = [null, null, null, null, null];
-    stats.bestSectorTimes = [null, null, null, null, null];
-    stats.combatSeconds = 0;
-    stats.totalPacingSeconds = 0;
-    stats.offTracks = 0;
-    stats.samples = [];
-  });
-
   selectVehicle(order[0], true);
   ready = true;
-  statusLine.textContent = 'Harbor Ring race ready · 5 architectures on shared 120 Hz host physics.';
+  statusLine.textContent = `Harbor Ring ready · ${modeDef.title} (${order.length} cars on 120 Hz host physics).`;
   updateHud(true);
 }
 
@@ -360,7 +406,7 @@ function updateHud(force = false) {
   leaderboard.replaceChildren(...standings.map((car, position) => {
     const bridge = field?.byCarId(car.id);
     const candId = bridge?.candidateId;
-    const cand = CANDIDATES.find((c) => c.id === candId);
+    const cand = activeCandidates.find((c) => c.id === candId) ?? ALL_KNOWN_CANDIDATES.find((c) => c.id === candId);
     const stats = carTelemetry.get(candId);
     const element = document.createElement('li');
     element.style.setProperty('--car-color', cand?.color ?? car.color);
@@ -401,12 +447,12 @@ function updateHud(force = false) {
   const bridge = field?.byId(selectedId);
   const car = bridge ? session.cars[bridge.carId] : session.cars[0];
   const stats = carTelemetry.get(selectedId);
-  const cand = CANDIDATES.find((c) => c.id === selectedId);
-  const candIndex = CANDIDATES.findIndex((c) => c.id === selectedId);
+  const cand = activeCandidates.find((c) => c.id === selectedId) ?? ALL_KNOWN_CANDIDATES.find((c) => c.id === selectedId);
+  const candIndex = activeCandidates.findIndex((c) => c.id === selectedId);
 
   selectedName.textContent = cand?.label ?? car?.name ?? 'Candidate';
   selectedName.style.color = cand?.color ?? '#50e4d3';
-  selectedNumberBadge.textContent = `#${candIndex + 1}`;
+  selectedNumberBadge.textContent = `#${candIndex >= 0 ? candIndex + 1 : 1}`;
   selectedNumberBadge.style.color = cand?.color ?? '#50e4d3';
   selectedBranch.textContent = cand ? `${cand.stack}` : 'Harbor Ring 120 Hz';
 
@@ -500,6 +546,16 @@ function updateHud(force = false) {
 }
 
 function updateCompareTable() {
+  const thead = byId('compare-table-head');
+  if (thead) {
+    thead.innerHTML = `
+      <tr>
+        <th>Metric / Dimension</th>
+        ${activeCandidates.map((c) => `<th style="color: ${c.color}">${c.label}</th>`).join('')}
+      </tr>
+    `;
+  }
+
   const rows = [
     { label: 'Live Position', getter: (id) => {
       const bridge = field?.byId(id);
@@ -547,7 +603,7 @@ function updateCompareTable() {
   compareTableBody.innerHTML = rows.map((r) => `
     <tr>
       <td><strong>${r.label}</strong></td>
-      ${CANDIDATE_IDS.map((id) => `<td>${r.getter(id)}</td>`).join('')}
+      ${activeCandidates.map((c) => `<td>${r.getter(c.id)}</td>`).join('')}
     </tr>
   `).join('');
 }
@@ -556,7 +612,7 @@ function showDebriefModal() {
   const standings = getStandings();
   const winner = standings[0];
   const winnerBridge = field?.byCarId(winner.id);
-  const winnerCand = CANDIDATES.find((c) => c.id === winnerBridge?.candidateId);
+  const winnerCand = activeCandidates.find((c) => c.id === winnerBridge?.candidateId) ?? ALL_KNOWN_CANDIDATES.find((c) => c.id === winnerBridge?.candidateId);
 
   byId('debrief-winner-title').textContent = `Winner: ${winnerCand?.label ?? winner.name} (${formatTime(winner.race.finishTime ?? session.time)})`;
 
@@ -567,20 +623,19 @@ function showDebriefModal() {
   let peakG = 0;
   let peakGDriver = '—';
 
-  CANDIDATE_IDS.forEach((id) => {
-    const stats = carTelemetry.get(id);
-    const cand = CANDIDATES.find((c) => c.id === id);
-    if (stats.bestLapTime && stats.bestLapTime < fastestLap) {
+  activeCandidates.forEach((cand) => {
+    const stats = carTelemetry.get(cand.id);
+    if (stats?.bestLapTime && stats.bestLapTime < fastestLap) {
       fastestLap = stats.bestLapTime;
-      fastestDriver = cand?.label ?? id;
+      fastestDriver = cand.label;
     }
-    if (stats.topSpeedKmh > topSpeed) {
+    if (stats && stats.topSpeedKmh > topSpeed) {
       topSpeed = stats.topSpeedKmh;
-      topSpeedDriver = cand?.label ?? id;
+      topSpeedDriver = cand.label;
     }
-    if (stats.peakLatG > peakG) {
+    if (stats && stats.peakLatG > peakG) {
       peakG = stats.peakLatG;
-      peakGDriver = cand?.label ?? id;
+      peakGDriver = cand.label;
     }
   });
 
@@ -596,7 +651,7 @@ function showDebriefModal() {
   debriefTableBody.innerHTML = standings.map((car, idx) => {
     const bridge = field?.byCarId(car.id);
     const candId = bridge?.candidateId;
-    const cand = CANDIDATES.find((c) => c.id === candId);
+    const cand = activeCandidates.find((c) => c.id === candId) ?? ALL_KNOWN_CANDIDATES.find((c) => c.id === candId);
     const stats = carTelemetry.get(candId);
     const finishTime = car.race.finishTime ?? session.time;
     const gap = idx === 0 ? 'WINNER' : formatLapDelta(finishTime - winnerFinishTime);
@@ -631,8 +686,10 @@ function showDebriefModal() {
 }
 
 function exportTelemetryJson() {
+  const modeDef = MODES[currentModeId] || MODES['5-arch'];
   const exportData = {
-    benchmark: 'Harbor Ring 5-Architecture Grand Prix',
+    benchmark: modeDef.title,
+    modeId: currentModeId,
     visualEngine: 'Astra PBR & Harbor Scenery',
     generatedAt: new Date().toISOString(),
     circuit: { name: 'Harbor Ring', lengthM: track.length, laps: RACE_LAPS },
@@ -640,7 +697,7 @@ function exportTelemetryJson() {
     standings: getStandings().map((car, idx) => {
       const bridge = field?.byCarId(car.id);
       const candId = bridge?.candidateId;
-      const cand = CANDIDATES.find((c) => c.id === candId);
+      const cand = activeCandidates.find((c) => c.id === candId) ?? ALL_KNOWN_CANDIDATES.find((c) => c.id === candId);
       return {
         position: idx + 1,
         id: candId,
@@ -659,7 +716,7 @@ function exportTelemetryJson() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `harbor-ring-5arch-telemetry-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+  a.download = `harbor-ring-${currentModeId}-telemetry-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -678,7 +735,8 @@ function selectVehicle(id, switchChaseCam = true) {
 function fixedStep() {
   if (!ready || completed) return;
 
-  session.step(FIXED_DT, { throttle: 0, brake: 0, steer: 0 });
+  const playerControls = keyboard.update(session.player, FIXED_DT, true);
+  session.step(FIXED_DT, playerControls);
 
   const allFinished = session.activeCars.every((car) => car.race.finishTime != null);
   if (session.phase === 'finished' && !allFinished) {
@@ -722,17 +780,114 @@ function fixedStep() {
 // UI Event Listeners & Modals
 const btnCameraMode = byId('btn-camera-mode');
 const camTipMode = byId('cam-tip-mode');
+const raceMenuModal = byId('race-menu-modal');
 
 function updateCameraHud() {
   const modeStr = spectator.mode.toUpperCase();
-  const candIndex = CANDIDATES.findIndex((c) => c.id === selectedId);
-  const target = CANDIDATES[candIndex];
+  const candIndex = activeCandidates.findIndex((c) => c.id === selectedId);
+  const target = activeCandidates[candIndex] ?? ALL_KNOWN_CANDIDATES.find((c) => c.id === selectedId);
   const targetLabel = spectator.mode === 'free' || !target ? '' : ` #${candIndex + 1} · ${target.label}`;
   if (btnCameraMode) btnCameraMode.textContent = `🎥 Cam: ${modeStr}${spectator.mode === 'free' ? '' : ` #${candIndex + 1}`} (C)`;
   if (camTipMode) camTipMode.textContent = `CAMERA: ${modeStr}${targetLabel}`;
   document.querySelectorAll('.cam-pill').forEach((pill) => {
     pill.classList.toggle('active', pill.getAttribute('data-cam') === spectator.mode);
   });
+}
+
+function updatePilotHud() {
+  const btnPilot = byId('btn-toggle-pilot');
+  const pilotBadge = byId('pilot-badge');
+  const optWatch = byId('menu-opt-watch');
+  const optDrive = byId('menu-opt-drive');
+
+  if (session.autopilot) {
+    if (btnPilot) {
+      btnPilot.textContent = '👁️ Watch [P]';
+      btnPilot.classList.remove('drive');
+      btnPilot.title = 'Current Mode: WATCH (Autopilot AI driving car #1). Press P to Drive.';
+    }
+    if (pilotBadge) {
+      pilotBadge.textContent = 'AUTOPILOT';
+      pilotBadge.style.background = 'rgba(0, 210, 255, 0.2)';
+      pilotBadge.style.color = '#00d2ff';
+    }
+    optWatch?.classList.add('active');
+    optDrive?.classList.remove('active');
+  } else {
+    if (btnPilot) {
+      btnPilot.textContent = '🎮 Drive [P]';
+      btnPilot.classList.add('drive');
+      btnPilot.title = 'Current Mode: DRIVE (WASD / Arrows driving car #1). Press P to Watch.';
+    }
+    if (pilotBadge) {
+      pilotBadge.textContent = 'MANUAL PILOT';
+      pilotBadge.style.background = 'rgba(255, 140, 0, 0.25)';
+      pilotBadge.style.color = '#ff9d00';
+    }
+    optWatch?.classList.remove('active');
+    optDrive?.classList.add('active');
+  }
+}
+
+function setAutopilot(enabled) {
+  session.autopilot = Boolean(enabled);
+  updatePilotHud();
+  if (!session.autopilot) {
+    const firstCarId = activeCandidates[0]?.id;
+    if (firstCarId && selectedId !== firstCarId) {
+      selectVehicle(firstCarId, true);
+    }
+  }
+}
+
+function toggleAutopilot() {
+  setAutopilot(!session.autopilot);
+}
+
+function updateDebugScopeHud() {
+  const btnScope = byId('btn-debug-scope');
+  const optScopeSelected = byId('menu-opt-scope-selected');
+  const optScopeAll = byId('menu-opt-scope-all');
+
+  const isAll = visualDebugger.scope === 'all';
+  if (btnScope) {
+    btnScope.textContent = isAll ? 'SCOPE: ALL GRID [G]' : 'SCOPE: SELECTED [G]';
+    btnScope.classList.toggle('scope-all', isAll);
+  }
+  if (optScopeSelected) optScopeSelected.classList.toggle('active', !isAll);
+  if (optScopeAll) optScopeAll.classList.toggle('active', isAll);
+}
+
+function toggleDebugScope() {
+  visualDebugger.toggleScope();
+  updateDebugScopeHud();
+}
+
+function setDebugScope(scope) {
+  visualDebugger.setScope(scope);
+  updateDebugScopeHud();
+}
+
+function toggleRaceMenu(show) {
+  if (!raceMenuModal) return;
+  const isHidden = raceMenuModal.classList.contains('hidden');
+  const target = show !== undefined ? !show : !isHidden;
+  raceMenuModal.classList.toggle('hidden', target);
+}
+
+function selectModeCard(modeId) {
+  if (!MODES[modeId]) return;
+  currentModeId = modeId;
+  document.querySelectorAll('.mode-card').forEach((card) => {
+    card.classList.toggle('active', card.getAttribute('data-mode') === modeId);
+  });
+}
+
+function launchSelectedMode() {
+  toggleRaceMenu(false);
+  const mode = MODES[currentModeId];
+  if (!mode) return;
+  initField(mode.order, mode.candidates);
 }
 
 function updateVisualDebugHud() {
@@ -764,6 +919,8 @@ function updateVisualDebugHud() {
     if (panel) panel.classList.add('hidden');
   }
 
+  updateDebugScopeHud();
+
   for (let i = 1; i <= 7; i++) {
     const chip = byId(`layer-btn-${i}`);
     if (chip) {
@@ -780,6 +937,49 @@ btnCameraMode?.addEventListener('click', () => {
 byId('btn-toggle-visual-debug')?.addEventListener('click', () => {
   visualDebugger.toggleMaster();
   updateVisualDebugHud();
+});
+
+byId('btn-debug-scope')?.addEventListener('click', () => {
+  toggleDebugScope();
+});
+
+byId('btn-race-menu')?.addEventListener('click', () => {
+  toggleRaceMenu();
+});
+
+byId('btn-close-menu')?.addEventListener('click', () => {
+  toggleRaceMenu(false);
+});
+
+byId('btn-toggle-pilot')?.addEventListener('click', () => {
+  toggleAutopilot();
+});
+
+byId('menu-opt-watch')?.addEventListener('click', () => {
+  setAutopilot(true);
+});
+
+byId('menu-opt-drive')?.addEventListener('click', () => {
+  setAutopilot(false);
+});
+
+byId('menu-opt-scope-selected')?.addEventListener('click', () => {
+  setDebugScope('selected');
+});
+
+byId('menu-opt-scope-all')?.addEventListener('click', () => {
+  setDebugScope('all');
+});
+
+byId('btn-launch-mode')?.addEventListener('click', () => {
+  launchSelectedMode();
+});
+
+document.querySelectorAll('.mode-card').forEach((card) => {
+  card.addEventListener('click', () => {
+    const modeId = card.getAttribute('data-mode');
+    if (modeId) selectModeCard(modeId);
+  });
 });
 
 byId('btn-sim-pause')?.addEventListener('click', () => {
@@ -825,12 +1025,14 @@ byId('btn-toggle-telemetry')?.addEventListener('click', () => {
 byId('btn-restart')?.addEventListener('click', () => {
   debriefModal.classList.add('hidden');
   compareModal.classList.add('hidden');
-  initField(CANDIDATE_IDS);
+  raceMenuModal?.classList.add('hidden');
+  initField();
 });
 byId('btn-debrief-restart')?.addEventListener('click', () => {
   debriefModal.classList.add('hidden');
   compareModal.classList.add('hidden');
-  initField(CANDIDATE_IDS);
+  raceMenuModal?.classList.add('hidden');
+  initField();
 });
 
 byId('btn-export')?.addEventListener('click', exportTelemetryJson);
@@ -838,6 +1040,21 @@ byId('btn-download-telemetry')?.addEventListener('click', exportTelemetryJson);
 byId('btn-close-debrief')?.addEventListener('click', () => debriefModal.classList.add('hidden'));
 
 window.addEventListener('keydown', (event) => {
+  if (event.code === 'KeyM') {
+    event.preventDefault();
+    toggleRaceMenu();
+    return;
+  }
+  if (event.code === 'KeyP') {
+    event.preventDefault();
+    toggleAutopilot();
+    return;
+  }
+  if (event.code === 'KeyG') {
+    event.preventDefault();
+    toggleDebugScope();
+    return;
+  }
   if (event.code === 'KeyV') {
     event.preventDefault();
     visualDebugger.toggleMaster();
@@ -869,8 +1086,8 @@ window.addEventListener('keydown', (event) => {
     const digit = Number(event.code.slice(-1));
     if (event.shiftKey || !visualDebugger.enabled) {
       const index = digit - 1;
-      if (CANDIDATES[index]) {
-        selectVehicle(CANDIDATES[index].id, true);
+      if (activeCandidates[index]) {
+        selectVehicle(activeCandidates[index].id, true);
       }
     } else if (digit >= 1 && digit <= 7) {
       event.preventDefault();
@@ -890,12 +1107,14 @@ window.addEventListener('keydown', (event) => {
     return;
   }
   if (event.code === 'KeyR') {
+    raceMenuModal?.classList.add('hidden');
     debriefModal.classList.add('hidden');
     compareModal.classList.add('hidden');
-    initField(CANDIDATE_IDS);
+    initField();
     return;
   }
   if (event.code === 'Escape') {
+    raceMenuModal?.classList.add('hidden');
     compareModal.classList.add('hidden');
     debriefModal.classList.add('hidden');
     return;
@@ -931,9 +1150,7 @@ function frame(nowMs) {
     updateHud();
 
     // 3D Visual AI Introspection update
-    const activeBridge = field?.byId(selectedId);
-    const visualData = activeBridge?.visualDebug?.() ?? null;
-    visualDebugger.update(visualData, true);
+    visualDebugger.update(field, selectedId);
     if (visualDebugger.enabled && debugMasterBadge) {
       debugMasterBadge.textContent = visualDebugger.isStale ? 'ONLINE [V] (STALE)' : 'ONLINE [V]';
     }
@@ -946,4 +1163,6 @@ function frame(nowMs) {
 }
 
 requestAnimationFrame(frame);
-initField(CANDIDATE_IDS);
+updatePilotHud();
+updateDebugScopeHud();
+initField();

@@ -455,7 +455,7 @@ export class VisualAIDebugger {
       this.isStale = false;
     }
 
-    if (!this.enabled || !debugData || !isSelected) {
+    if (!this.enabled || !debugData) {
       this.root.visible = false;
       return;
     }
@@ -812,3 +812,115 @@ export class VisualAIDebugger {
     this.scene.remove(this.root);
   }
 }
+
+/**
+ * MultiCarVisualDebugger
+ * Manages a pool of VisualAIDebugger instances to support:
+ * - 'selected' scope: only current view car displays ribbons/candidate lattice/predictions
+ * - 'all' scope: all active cars with visual debug capability display simultaneously on track
+ */
+export class MultiCarVisualDebugger {
+  constructor(scene, track, maxCars = 8) {
+    this.scene = scene;
+    this.track = track;
+    this.scope = 'selected'; // 'selected' | 'all'
+    this.enabled = true;
+    this.debuggers = [];
+    for (let i = 0; i < maxCars; i++) {
+      const dbg = new VisualAIDebugger(scene, track);
+      dbg.root.name = `VisualAIDebugger_${i}`;
+      this.debuggers.push(dbg);
+    }
+  }
+
+  get primary() {
+    return this.debuggers[0];
+  }
+
+  get layers() {
+    return this.primary.layers;
+  }
+
+  get isStale() {
+    return this.primary.isStale;
+  }
+
+  toggleMaster() {
+    this.enabled = !this.enabled;
+    for (const d of this.debuggers) {
+      d.setMaster(this.enabled);
+    }
+    return this.enabled;
+  }
+
+  setMaster(enabled) {
+    this.enabled = Boolean(enabled);
+    for (const d of this.debuggers) {
+      d.setMaster(this.enabled);
+    }
+  }
+
+  toggleScope() {
+    this.scope = (this.scope === 'selected') ? 'all' : 'selected';
+    return this.scope;
+  }
+
+  setScope(scope) {
+    this.scope = (scope === 'all') ? 'all' : 'selected';
+    return this.scope;
+  }
+
+  toggleLayer(layerIndex) {
+    for (const d of this.debuggers) {
+      d.toggleLayer(layerIndex);
+    }
+  }
+
+  update(field, selectedId) {
+    if (!this.enabled) {
+      for (const d of this.debuggers) {
+        d.root.visible = false;
+      }
+      return;
+    }
+
+    if (this.scope === 'selected') {
+      const activeBridge = field?.byId(selectedId);
+      const visualData = activeBridge?.visualDebug?.() ?? null;
+      if (visualData) {
+        this.debuggers[0].root.visible = true;
+        this.debuggers[0].update(visualData, true);
+      } else {
+        this.debuggers[0].root.visible = false;
+      }
+      for (let i = 1; i < this.debuggers.length; i++) {
+        this.debuggers[i].root.visible = false;
+      }
+    } else {
+      // 'all': render visual debug for all cars in the field simultaneously
+      const bridges = field?.bridges ?? [];
+      for (let i = 0; i < this.debuggers.length; i++) {
+        const bridge = bridges[i];
+        if (bridge && typeof bridge.visualDebug === 'function') {
+          const visualData = bridge.visualDebug();
+          if (visualData) {
+            this.debuggers[i].root.visible = true;
+            this.debuggers[i].update(visualData, bridge.candidateId === selectedId);
+          } else {
+            this.debuggers[i].root.visible = false;
+          }
+        } else {
+          this.debuggers[i].root.visible = false;
+        }
+      }
+    }
+  }
+
+  dispose() {
+    for (const d of this.debuggers) {
+      d.dispose();
+    }
+    this.debuggers = [];
+  }
+}
+

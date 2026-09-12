@@ -98,7 +98,7 @@ export function createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, in
   const self = shadows[index];
   // Supreme Gemini uses canonical unsigned curvature + turnSign contract;
   // legacy Gemini pins (nmpcc, grand-prix) receive signed curvature via withSignedCurvature.
-  const isLegacy = candidate?.id !== 'gemini-supreme';
+  const isLegacy = !candidate?.id?.startsWith('gemini-supreme');
   const track = isLegacy ? withSignedCurvature(shadowTrack) : shadowTrack;
 
   // Pass adapted vehicle specs directly into controller options so global

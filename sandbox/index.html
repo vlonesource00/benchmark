@@ -15,20 +15,22 @@
       <section class="masthead" aria-live="polite">
         <div class="masthead-top">
           <p class="eyebrow">BENCHMARK / LIVE 120HZ SHARED PHYSICS</p>
-          <div class="masthead-actions">
+            <button id="btn-race-menu" class="action-btn menu" type="button" title="Open Race Mode & Setup Menu [M]">📋 Menu (M)</button>
+            <button id="btn-toggle-pilot" class="action-btn pilot" type="button" title="Toggle Watch / Drive Mode [P]">👁️ Watch [P]</button>
             <button id="btn-toggle-visual-debug" class="action-btn active" type="button" title="Toggle 3D Visual AI Introspection [V]">👁️ AI Debug (V)</button>
             <button id="btn-sim-pause" class="action-btn" type="button" title="Freeze / Resume Simulation [Space]">⏸️ Freeze (Space)</button>
             <button id="btn-sim-step" class="action-btn" type="button" title="Advance Simulation Single Step [.]">⏯️ Step (.)</button>
             <button id="btn-camera-mode" class="action-btn" type="button" title="Cycle Camera: Chase / Elevated / Tactical / Bonnet / Free [C]">🎥 Cam: CHASE (C)</button>
-            <button id="btn-toggle-compare" class="action-btn" type="button" title="Toggle 5-Car Comparison Grid [Tab]">📊 Compare (Tab)</button>
+            <button id="btn-toggle-compare" class="action-btn" type="button" title="Toggle Comparison Grid [Tab]">📊 Compare (Tab)</button>
             <button id="btn-toggle-telemetry" class="action-btn" type="button" title="Toggle Detailed Telemetry [T]">📈 Telemetry (T)</button>
             <button id="btn-restart" class="action-btn restart" type="button" title="Restart Benchmark Race [R]">🔄 Restart (R)</button>
             <button id="btn-export" class="action-btn export" type="button" title="Export Race Telemetry JSON">💾 Export JSON</button>
           </div>
         </div>
-        <h1>Harbor Ring <span>5-Architecture Grand Prix</span></h1>
+        <h1 id="masthead-title">Harbor Ring <span>5-Architecture Grand Prix</span></h1>
         <div class="status-badge-row">
           <span id="race-phase-badge" class="phase-badge">GRID STAGING</span>
+          <span id="pilot-badge" class="phase-badge pilot" style="background: rgba(0, 210, 255, 0.2); color: #00d2ff;">AUTOPILOT</span>
           <span id="status-line" class="status-line">Loading canonical 3D assets…</span>
         </div>
       </section>
@@ -162,7 +164,7 @@
           </div>
           <div class="compare-body">
             <table class="compare-table">
-              <thead>
+              <thead id="compare-table-head">
                 <tr>
                   <th>Metric / Dimension</th>
                   <th style="color: #df482d">Astra</th>
@@ -249,6 +251,7 @@
             <span class="pulse-dot"></span>
             <strong>3D AI INTROSPECTION</strong>
             <span id="debug-master-badge" class="debug-status-badge active">ONLINE [V]</span>
+            <button id="btn-debug-scope" class="scope-pill" type="button" title="Toggle Visual Introspection Scope: Current View Car vs All Grid [G]">SCOPE: SELECTED [G]</button>
           </div>
           <div class="camera-pill-group">
             <span class="group-label">CAM:</span>
@@ -285,8 +288,84 @@
       <!-- Bottom Spectator Guide & Footer -->
       <section class="spectator-tip" aria-live="polite">
         <strong id="cam-tip-mode">CAMERA: CHASE</strong>
-        <span>V: AI Debug · 1–7: Visual Layers · Space: Freeze · .: Step · C: Cycle Cam (Chase/Elevated/Tactical/Bonnet/Free) · Tab: Compare · T: Telemetry · R: Restart</span>
+        <span>M: Menu · P: Watch/Drive · V: AI Debug · G: Debug Scope (Selected/All) · 1–7: Layers · Space: Freeze · .: Step · C: Cam · Tab: Compare · T: Telemetry · R: Restart</span>
       </section>
+
+      <!-- Race Setup & Mode Selection Menu (Toggleable via M or Menu button) -->
+      <div id="race-menu-modal" class="compare-modal hidden" aria-label="Race Mode & Setup Menu">
+        <div class="compare-dialog menu-dialog">
+          <div class="compare-header">
+            <div>
+              <p class="eyebrow">HARBOR RING · RACE SETUP & MODE SELECTOR</p>
+              <h2>Select Race Configuration & Participation</h2>
+            </div>
+            <button id="btn-close-menu" class="close-btn" type="button">✕</button>
+          </div>
+          <div class="menu-body">
+            <!-- Mode Cards -->
+            <div class="menu-section-title">RACE ARCHITECTURE MODES</div>
+            <div class="mode-cards-grid">
+              <div class="mode-card active" data-mode="5-arch">
+                <div class="mode-card-badge">BENCHMARK CANONICAL</div>
+                <div class="mode-card-title">5-Architecture Grand Prix</div>
+                <div class="mode-card-desc">Head-to-head comparison between Astra, GPT Racing, Claude Racing, Gemini Supreme, and Gemini Grand Prix.</div>
+                <div class="mode-card-specs">5 × GT Class · 5 AI Architectures · 4 Laps</div>
+              </div>
+              <div class="mode-card" data-mode="5-supreme">
+                <div class="mode-card-badge highlight">SAME-SPEC FLEET BATTLE</div>
+                <div class="mode-card-title">Gemini Supreme 5-Car Cup</div>
+                <div class="mode-card-desc">5 identical Gemini Supreme cars with coupled MPCC and full Astra GT plant parity battling for victory.</div>
+                <div class="mode-card-specs">5 × Gemini Supreme GT · Autonomous Fleet · 4 Laps</div>
+              </div>
+              <div class="mode-card" data-mode="5-supreme-player">
+                <div class="mode-card-badge human">HUMAN VS AI COMBAT</div>
+                <div class="mode-card-title">Gemini Supreme 5 + Player</div>
+                <div class="mode-card-desc">Join the grid as a 6th car! Race your manual GT car directly against 5 Gemini Supreme AI bots.</div>
+                <div class="mode-card-specs">6 × GT Class · You + 5 Supreme AI · 4 Laps</div>
+              </div>
+            </div>
+
+            <!-- Participation & Driving Mode -->
+            <div class="menu-section-row">
+              <div class="menu-sub-section">
+                <div class="menu-section-title">SESSION PARTICIPATION</div>
+                <div class="option-pill-group">
+                  <button id="menu-opt-watch" class="option-pill active" type="button">👁️ Watch (Autopilot AI)</button>
+                  <button id="menu-opt-drive" class="option-pill" type="button">🎮 Drive (WASD / Arrows)</button>
+                </div>
+              </div>
+
+              <div class="menu-sub-section">
+                <div class="menu-section-title">3D AI INTROSPECTION SCOPE</div>
+                <div class="option-pill-group">
+                  <button id="menu-opt-scope-selected" class="option-pill active" type="button">🎯 Current View Car [G]</button>
+                  <button id="menu-opt-scope-all" class="option-pill" type="button">🌐 All Grid Simultaneously [G]</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Keybind Guide -->
+            <div class="menu-section-title">CONTROLS & SHORTCUTS</div>
+            <div class="keybinds-grid">
+              <div class="keybind-card"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>Steer / Gas / Brake</span></div>
+              <div class="keybind-card"><kbd>P</kbd><span>Toggle Watch / Drive</span></div>
+              <div class="keybind-card"><kbd>V</kbd><span>Toggle 3D AI Debug</span></div>
+              <div class="keybind-card"><kbd>G</kbd><span>Toggle Debug Scope</span></div>
+              <div class="keybind-card"><kbd>1–7</kbd><span>Debug Layers</span></div>
+              <div class="keybind-card"><kbd>C</kbd><span>Cycle Camera</span></div>
+              <div class="keybind-card"><kbd>Space</kbd><span>Pause / Freeze</span></div>
+              <div class="keybind-card"><kbd>Tab</kbd><span>Comparison Grid</span></div>
+              <div class="keybind-card"><kbd>T</kbd><span>Telemetry HUD</span></div>
+              <div class="keybind-card"><kbd>R</kbd><span>Restart Race</span></div>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="menu-footer-actions">
+              <button id="btn-launch-mode" class="action-btn large restart" type="button">🏁 Launch Selected Mode</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <footer class="footer-readout">
         <span id="clock-readout">00:00.000</span>

@@ -7,7 +7,7 @@ import { NextGenAIController as SupremeController } from '../../subjects/gemini-
 import { NextGenAIController as NmpccController } from '../../subjects/gemini-nmpcc/src/ai/v2/NextGenAIController.js';
 import { NextGenAIController as GrandPrixController } from '../../subjects/gemini-grand-prix/src/ai/v2/NextGenAIController.js';
 
-export const CANDIDATES = Object.freeze([
+export const CANDIDATES_5ARCH = Object.freeze([
   ASTRA_CANDIDATE,
   GPT_CANDIDATE,
   CLOUD_CANDIDATE,
@@ -15,6 +15,59 @@ export const CANDIDATES = Object.freeze([
   GEMINI_GRAND_PRIX
 ]);
 
+export const SUPREME_CANDIDATES = Object.freeze([
+  {
+    id: 'gemini-supreme-1',
+    label: 'Supreme Gemini #1',
+    color: '#00d2ff',
+    stack: 'NextGenAIController → coupled MPCC · Apex Cyan'
+  },
+  {
+    id: 'gemini-supreme-2',
+    label: 'Supreme Gemini #2',
+    color: '#ff9900',
+    stack: 'NextGenAIController → coupled MPCC · Blaze Amber'
+  },
+  {
+    id: 'gemini-supreme-3',
+    label: 'Supreme Gemini #3',
+    color: '#ff2255',
+    stack: 'NextGenAIController → coupled MPCC · Crimson Streak'
+  },
+  {
+    id: 'gemini-supreme-4',
+    label: 'Supreme Gemini #4',
+    color: '#d4ff00',
+    stack: 'NextGenAIController → coupled MPCC · Acid Phantom'
+  },
+  {
+    id: 'gemini-supreme-5',
+    label: 'Supreme Gemini #5',
+    color: '#a855f7',
+    stack: 'NextGenAIController → coupled MPCC · Ultra Violet'
+  }
+]);
+
+export const PLAYER_CANDIDATE = Object.freeze({
+  id: 'player-gt',
+  label: 'Player (You)',
+  color: '#ffffff',
+  stack: 'Human Pilot · 120 Hz Manual Controls (WASD / Arrows)'
+});
+
+export const SUPREME_WITH_PLAYER = Object.freeze([
+  PLAYER_CANDIDATE,
+  ...SUPREME_CANDIDATES
+]);
+
+export const ALL_KNOWN_CANDIDATES = Object.freeze([
+  ...CANDIDATES_5ARCH,
+  ...SUPREME_CANDIDATES,
+  PLAYER_CANDIDATE,
+  GEMINI_NMPCC
+]);
+
+export const CANDIDATES = CANDIDATES_5ARCH;
 export const CANDIDATE_IDS = Object.freeze(CANDIDATES.map((candidate) => candidate.id));
 
 /**
@@ -24,7 +77,14 @@ export const CANDIDATE_IDS = Object.freeze(CANDIDATES.map((candidate) => candida
  * The host supplies the canonical race state; each bridge translates only at its
  * own boundary. No controller source, pace profile or behavioural tuning changes.
  */
-export function createField({ session, hostTrack, order = CANDIDATE_IDS, onStatus = () => {} }) {
+export function createField({
+  session,
+  hostTrack,
+  order = CANDIDATE_IDS,
+  onStatus = () => {},
+  candidatesList = ALL_KNOWN_CANDIDATES,
+  playerInput = null
+}) {
   const cars = session.cars;
   const field = order.slice(0, cars.length);
   // One shared shadow track: Gemini's global solver caches per track identity,
@@ -34,21 +94,78 @@ export function createField({ session, hostTrack, order = CANDIDATE_IDS, onStatu
 
   field.forEach((id, index) => {
     const car = cars[index];
-    const candidate = CANDIDATES.find((entry) => entry.id === id)
-      ?? [GEMINI_NMPCC, GEMINI_GRAND_PRIX, GEMINI_SUPREME].find((e) => e.id === id);
+    const candidate = candidatesList.find((entry) => entry.id === id)
+      ?? ALL_KNOWN_CANDIDATES.find((entry) => entry.id === id)
+      ?? { id, label: `CAR #${index + 1}`, color: '#00d2ff', stack: 'Gemini Supreme Controller' };
     car.name = candidate.label.toUpperCase();
     car.color = candidate.color;
 
-    if (id === 'astra') {
+    if (id === 'player-gt') {
+      onStatus('Binding Human Player driver controls…');
+      const fallbackAIAstra = createAstraBridge({ line: session.lineFor(car), index, aggression: session.aggression });
+      bridges[index] = {
+        candidateId: id,
+        gridSlot: index,
+        carId: car.id,
+        isPlayer: true,
+        errors: 0,
+        update(c, cars, dt, context) {
+          if (session.autopilot) {
+            fallbackAIAstra.update(c, cars, dt, context);
+          } else if (playerInput) {
+            c.controls = playerInput.update(c, dt, true);
+          }
+        },
+        reset(state) {
+          playerInput?.clear?.();
+          fallbackAIAstra.reset?.(state);
+          this.errors = 0;
+        },
+        debug() {
+          if (session.autopilot) {
+            return {
+              architecture: 'Human Car (AI Assist)',
+              planSource: 'Astra Co-Driver Assist',
+              controllerCadence: '120 Hz Autonomous Copilot',
+              intent: 'AUTOPILOT PACING',
+              reason: 'Autonomous Co-Driver Active (Press P to Drive)',
+              action: 'COPILOT'
+            };
+          }
+          return {
+            architecture: 'Human Pilot',
+            planSource: 'Manual Keyboard Controls',
+            controllerCadence: '120 Hz Dynamic Human Control',
+            intent: 'PLAYER RACING',
+            reason: 'WASD / Arrow Keys Steering & Throttle',
+            action: 'PILOT'
+          };
+        },
+        visualDebug() {
+          return null;
+        }
+      };
+    } else if (id.startsWith('gemini-supreme')) {
+      onStatus(`Binding Gemini Supreme controller for ${candidate.label}…`);
+      bridges[index] = createGeminiBridge({
+        candidate,
+        cars,
+        hostTrack,
+        shadowTrack,
+        index,
+        Controller: SupremeController,
+        options: {
+          aggression: 0.88 + (index % 5) * 0.02,
+          skill: 0.94 + (index % 5) * 0.01
+        }
+      });
+    } else if (id === 'astra') {
       bridges[index] = createAstraBridge({ line: session.lineFor(car), index, aggression: session.aggression });
     } else if (id === 'gpt-racing') {
       onStatus('Binding GPT Racing’s original field director to the shared host…');
       bridges[index] = createGptBridge({ cars, hostTrack, shadowTrack, index });
     } else if (id === 'claude-racing') {
       bridges[index] = createCloudBridge({ cars, hostTrack, index, onStatus });
-    } else if (id === 'gemini-supreme') {
-      onStatus('Binding the pinned Gemini Supreme controller…');
-      bridges[index] = createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, index, Controller: SupremeController });
     } else if (id === 'gemini-nmpcc') {
       onStatus('Binding the pinned Gemini NMPCC controller…');
       bridges[index] = createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, index, Controller: NmpccController });
@@ -67,8 +184,8 @@ export function createField({ session, hostTrack, order = CANDIDATE_IDS, onStatu
     order: field,
     bridges,
     /** Installs the bridges as the session's driver stack. */
-    attach() {
-      session.autopilot = true;
+    attach(autopilot = true) {
+      session.autopilot = autopilot;
       for (let i = 0; i < session.drivers.length; i += 1) {
         session.drivers[i] = bridges[i] ?? session.drivers[i];
       }

@@ -355,3 +355,226 @@ dd.purple { color: #d094ff; font-weight: 800; }
   border-radius: 2px;
   display: inline-block;
 }
+
+/* Scope Pill Button */
+.scope-pill {
+  padding: 3px 8px;
+  font: 700 0.62rem ui-monospace, monospace;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 210, 255, 0.35);
+  background: rgba(0, 210, 255, 0.12);
+  color: #00e5ff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.scope-pill:hover {
+  background: rgba(0, 210, 255, 0.25);
+  border-color: #00f0ff;
+  color: #fff;
+}
+.scope-pill.all {
+  border-color: #00ff88;
+  background: rgba(0, 255, 136, 0.15);
+  color: #00ff88;
+}
+
+/* Masthead Buttons */
+.action-btn.menu {
+  background: rgba(80, 228, 211, 0.15);
+  border-color: rgba(80, 228, 211, 0.4);
+  color: #50e4d3;
+}
+.action-btn.menu:hover {
+  background: rgba(80, 228, 211, 0.3);
+  color: #fff;
+}
+.action-btn.pilot {
+  background: rgba(0, 210, 255, 0.12);
+  border-color: rgba(0, 210, 255, 0.35);
+  color: #00d2ff;
+}
+.action-btn.pilot.active {
+  background: rgba(255, 180, 50, 0.25);
+  border-color: #ffd674;
+  color: #ffd674;
+}
+
+/* Race Menu Modal Dialog & Elements */
+.menu-dialog {
+  max-width: 840px;
+  width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.menu-body {
+  padding: 16px 20px 24px;
+}
+
+.menu-section-title {
+  font: 800 0.68rem/1 ui-monospace, monospace;
+  color: #6ee9da;
+  letter-spacing: 0.12em;
+  margin: 12px 0 8px;
+}
+
+.mode-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.mode-card {
+  padding: 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(130, 200, 215, 0.2);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-card:hover {
+  background: rgba(0, 210, 255, 0.08);
+  border-color: #00d2ff;
+  transform: translateY(-2px);
+}
+
+.mode-card.active {
+  background: rgba(0, 210, 255, 0.14);
+  border-color: #50e4d3;
+  box-shadow: 0 0 20px rgba(80, 228, 211, 0.25);
+}
+
+.mode-card-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font: 800 0.58rem ui-monospace, monospace;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(0, 255, 136, 0.18);
+  color: #00ff88;
+  margin-bottom: 6px;
+  letter-spacing: 0.06em;
+}
+
+.mode-card-badge.highlight {
+  background: rgba(0, 210, 255, 0.22);
+  color: #00d2ff;
+}
+
+.mode-card-badge.human {
+  background: rgba(255, 180, 50, 0.22);
+  color: #ffd674;
+}
+
+.mode-card-title {
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: #fff;
+  margin-bottom: 5px;
+}
+
+.mode-card-desc {
+  font-size: 0.72rem;
+  color: #a2bcc2;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  flex: 1;
+}
+
+.mode-card-specs {
+  font: 700 0.65rem ui-monospace, monospace;
+  color: #729ba3;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 6px;
+}
+
+.menu-section-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+  .menu-section-row { grid-template-columns: 1fr; }
+}
+
+.menu-sub-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.option-pill-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.option-pill {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(130, 200, 215, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+  color: #c9d8db;
+  font: 600 0.72rem ui-monospace, monospace;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.option-pill:hover {
+  background: rgba(0, 210, 255, 0.12);
+  color: #fff;
+}
+
+.option-pill.active {
+  background: rgba(0, 210, 255, 0.25);
+  border-color: #50e4d3;
+  color: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+}
+
+.keybinds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.keybind-card {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.keybind-card kbd {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font: 800 0.65rem ui-monospace, monospace;
+  padding: 2px 5px;
+  border-radius: 3px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+}
+
+.keybind-card span {
+  font-size: 0.65rem;
+  color: #8da6ac;
+}
+
+.menu-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 14px;
+}
+
