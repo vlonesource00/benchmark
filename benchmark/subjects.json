@@ -111,9 +111,9 @@
       "id": "gemini-supreme",
       "label": "Gemini Supreme",
       "repoUrl": "https://github.com/vlonesource00/gemini-gauntlet.git",
-      "branch": "feat/supreme-combat-ai",
-      "commit": "e8b9bdc672e332621788850ee021e9817c7238c9",
-      "testNotes": "Supreme combat AI with coupled MPCC, full-plant Astra GT modeling, multirate decoupling, and anti-indecision hysteresis.",
+      "branch": "feat/supreme-racecraft-v3",
+      "commit": "0a97e974d5c71fbb6125dabea3f4efa992282fb2",
+      "testNotes": "Supreme combat AI with Racecraft V3.2: coupled MPCC, full-plant Astra GT modeling, causal behavioral prediction, terminal pass state correctness, and anti-twitch steering filter.",
       "tests": [
         {
           "id": "pace-benchmark",
