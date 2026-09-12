@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-11T13:51:01.202Z",
+  "timestamp": "2026-09-12T01:33:03.081Z",
   "baseline": {
     "subjectId": "gemini-supreme",
     "bestLap": 80.48333333334945,
@@ -18,17 +18,17 @@
   },
   "verified": {
     "subjectId": "gemini-supreme",
-    "bestLap": 80.04999999999545,
+    "bestLap": 79.45000000001521,
     "lapTimes": [
-      91.97500000001926,
-      80.04999999998861
+      91.10000000001857,
+      79.57499999999054
     ],
-    "finishTime": 168.0166666666782,
+    "finishTime": 166.66666666667942,
     "offTrackSeconds": 0,
     "damage": 0,
     "spins": 0,
-    "p95SideslipDeg": 9.07,
-    "maxSideslipDeg": 15.4,
+    "p95SideslipDeg": 7.9,
+    "maxSideslipDeg": 12.59,
     "maxYawRateRadS": 1.13,
     "controllerErrors": 0
   },
