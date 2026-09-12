@@ -1,4 +1,5 @@
 import * as THREE from '/vendor/three.module.js';
+import { createSafeWebGLRenderer } from './safe-renderer.js';
 
 const ui = {
   canvas: document.querySelector('#raceCanvas'),
@@ -293,7 +294,14 @@ function createScene() {
   state.camera = new THREE.PerspectiveCamera(47, 1, 0.1, 500);
   state.camera.position.set(0, 82, 108);
   state.cameraTarget.set(0, 0, 0);
-  state.renderer = new THREE.WebGLRenderer({ canvas: ui.canvas, antialias: true, powerPreference: 'high-performance' });
+  const { renderer } = createSafeWebGLRenderer(THREE, {
+    canvas: ui.canvas,
+    appName: 'HARBOR RING BENCHMARK VIEWER',
+    onCanvasReplaced: (newCanvas) => {
+      ui.canvas = newCanvas;
+    }
+  });
+  state.renderer = renderer;
   state.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   state.renderer.shadowMap.enabled = true;
   state.renderer.shadowMap.type = THREE.PCFSoftShadowMap;

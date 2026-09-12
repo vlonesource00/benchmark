@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createSafeWebGLRenderer } from './safe-renderer.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Track } from '../host/astra/src/sim/track.js';
 import { Session } from '../host/astra/src/sim/session.js';
@@ -23,6 +24,7 @@ const lapReadout = byId('lap-readout');
 const sessionBestReadout = byId('session-best-lap');
 const clockReadout = byId('clock-readout');
 const debugReadout = byId('debug-readout');
+const debugMasterBadge = byId('debug-master-badge');
 const canvas = byId('race-canvas');
 
 // Telemetry DOM handles
@@ -83,7 +85,14 @@ const formatLapDelta = (seconds) => {
 
 // --- Three.js & Astra Visual Pipeline Setup ---
 const scene = new THREE.Scene();
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+let activeCanvas = canvas;
+const { renderer } = createSafeWebGLRenderer(THREE, {
+  canvas,
+  appName: 'HARBOR RING 5-ARCHITECTURE BENCHMARK',
+  onCanvasReplaced: (newCanvas) => {
+    activeCanvas = newCanvas;
+  }
+});
 const initialWidth = Math.max(1, window.innerWidth || document.documentElement?.clientWidth || 1280);
 const initialHeight = Math.max(1, window.innerHeight || document.documentElement?.clientHeight || 720);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
@@ -95,7 +104,7 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.95;
 
 const camera = new THREE.PerspectiveCamera(52, initialWidth / initialHeight, 0.05, 10000);
-const spectator = new SpectatorCamera(camera, canvas);
+const spectator = new SpectatorCamera(camera, activeCanvas);
 
 function resize() {
   const width = Math.max(1, window.innerWidth || document.documentElement?.clientWidth || 1);
@@ -728,7 +737,7 @@ function updateCameraHud() {
 
 function updateVisualDebugHud() {
   const btnToggle = byId('btn-toggle-visual-debug');
-  const badge = byId('debug-master-badge');
+  const badge = debugMasterBadge || byId('debug-master-badge');
   const panel = byId('visual-debug-panel');
 
   if (visualDebugger.enabled) {
@@ -925,8 +934,8 @@ function frame(nowMs) {
     const activeBridge = field?.byId(selectedId);
     const visualData = activeBridge?.visualDebug?.() ?? null;
     visualDebugger.update(visualData, true);
-    if (visualDebugger.enabled && badge) {
-      badge.textContent = visualDebugger.isStale ? 'ONLINE [V] (STALE)' : 'ONLINE [V]';
+    if (visualDebugger.enabled && debugMasterBadge) {
+      debugMasterBadge.textContent = visualDebugger.isStale ? 'ONLINE [V] (STALE)' : 'ONLINE [V]';
     }
   }
 

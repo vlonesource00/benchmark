@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createSafeWebGLRenderer } from './safe-renderer.js';
 import { Circuit } from '../subjects/claude-racing/src/sim/Track.js';
 import { Race } from '../subjects/claude-racing/src/sim/Race.js';
 import { TrackGrid } from '../subjects/claude-racing/src/sim/TrackGrid.js';
@@ -19,7 +20,10 @@ const LAPS = 4;
 const byId = (id) => document.getElementById(id);
 const canvas = byId('solo-canvas');
 
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+const { renderer } = createSafeWebGLRenderer(THREE, {
+  canvas,
+  appName: 'CLAUDE SOLO BENCHMARK'
+});
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
