@@ -4,7 +4,7 @@
   "description": "Pinned benchmark subjects. Each checkout is created under this benchmark repo and is never read from or written to the original development folders.",
   "subjects": [
     {
-      "id":"astra","label":"Astra","repoUrl":"https://github.com/vlonesource00/astra.git","branch":"v1.2","commit":"b2e4895176e2c51e006395366dcbefaadaacf967",
+      "id":"astra","label":"Astra","repoUrl":"https://github.com/vlonesource00/astra.git","branch":"v1.2","commit":"379c3e628020eb921a62784bbf373d682884a17c",
       "testNotes":"Harbor GT live trajectory pace checkpoint: 80.183 s shared solo, five-rotation P2 with zero off-track time; mixed-race damage increases. See reports/verified/astra-pace-checkpoint.md. Attack/defense and wider chicane work remain incomplete.",
       "tests":[
         {"id":"harbor-classes","label":"Harbor Ring three-class solo validity","command":["node","tests/harbor-quality.mjs","--check"],"scenarioIds":["solo-pace","stability"],"suites":["quick","full"],"timeoutSeconds":180},

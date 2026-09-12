@@ -1,6 +1,10 @@
 # Astra pace checkpoint — 2026-09-12
 
-Pin Astra to `b2e4895176e2c51e006395366dcbefaadaacf967` on `v1.2`.
+Pin Astra to `379c3e628020eb921a62784bbf373d682884a17c` on `v1.2`.
+This adds a read-only tactical debugger and corrected driver-facing direction
+labels to the tested pace candidate `b2e4895176e2c51e006395366dcbefaadaacf967`.
+Its only simulation-module change is explanatory side-name text; the driving
+decisions retain the tested pace checkpoint. 101 unit tests and build pass.
 Previous pin: `709ed88d4aa0bb5f58b8ec8e655a40d016d23cbb`.
 Only Astra's subject changes; the common host and every opponent pin remain
 unchanged from benchmark `9aebaab57e523eecec6f92021145312f309a705d`.
