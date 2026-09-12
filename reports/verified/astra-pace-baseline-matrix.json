@@ -1,0 +1,1125 @@
+{
+  "localCandidate": false,
+  "provenance": {
+    "astra": "76e7ff308ade320c60ecd8ddae7db1a5bd402b3c",
+    "benchmark": "9aebaab57e523eecec6f92021145312f309a705d",
+    "manifest": {
+      "schemaVersion": 1,
+      "createdAt": "2026-08-25",
+      "description": "Pinned benchmark subjects. Each checkout is created under this benchmark repo and is never read from or written to the original development folders.",
+      "subjects": [
+        {
+          "id": "astra",
+          "label": "Astra",
+          "repoUrl": "https://github.com/vlonesource00/astra.git",
+          "branch": "benchamrk-made",
+          "commit": "709ed88d4aa0bb5f58b8ec8e655a40d016d23cbb",
+          "testNotes": "Class-aware physical control, exact Harbor Ring and terminal exit recovery cost; native tests remain separate from shared-physics host integration.",
+          "tests": [
+            {
+              "id": "harbor-classes",
+              "label": "Harbor Ring three-class solo validity",
+              "command": [
+                "node",
+                "tests/harbor-quality.mjs",
+                "--check"
+              ],
+              "scenarioIds": [
+                "solo-pace",
+                "stability"
+              ],
+              "suites": [
+                "quick",
+                "full"
+              ],
+              "timeoutSeconds": 180
+            },
+            {
+              "id": "harbor-mixed",
+              "label": "Harbor Ring mixed-class pack",
+              "command": [
+                "node",
+                "tests/harbor-quality.mjs",
+                "--mixed",
+                "--check"
+              ],
+              "scenarioIds": [
+                "pack-race",
+                "collision-safety"
+              ],
+              "suites": [
+                "quick",
+                "full"
+              ],
+              "timeoutSeconds": 240
+            },
+            {
+              "id": "lost-momentum",
+              "label": "Lost-momentum passing",
+              "command": [
+                "node",
+                "tests/flow-benchmark.mjs",
+                "--check"
+              ],
+              "scenarioIds": [
+                "obstacle-bypass",
+                "slower-pass"
+              ],
+              "suites": [
+                "quick",
+                "full"
+              ],
+              "timeoutSeconds": 120
+            },
+            {
+              "id": "showcase-stint",
+              "label": "Three-lap showcase regression",
+              "command": [
+                "node",
+                "tests/showcase-quality.mjs",
+                "--check"
+              ],
+              "scenarioIds": [
+                "endurance"
+              ],
+              "suites": [
+                "full"
+              ],
+              "timeoutSeconds": 240
+            }
+          ]
+        },
+        {
+          "id": "gpt-racing",
+          "label": "GPT Racing",
+          "repoUrl": "https://github.com/vlonesource00/apex-sim-racing.git",
+          "branch": "codex/flat-track-racecraft",
+          "commit": "0dcd4744d4e5f4036db0894a62ab9976d091e370",
+          "testNotes": "Field-arbitrated racecraft stack.",
+          "tests": [
+            {
+              "id": "solo-pace",
+              "label": "Solo pace and stability",
+              "command": [
+                "node",
+                "tests/ai-solo-pace.mjs"
+              ],
+              "scenarioIds": [
+                "solo-pace",
+                "stability"
+              ],
+              "suites": [
+                "quick",
+                "full"
+              ],
+              "timeoutSeconds": 180
+            },
+            {
+              "id": "field-race",
+              "label": "Eight-car field race",
+              "command": [
+                "node",
+                "tests/ai-field-race.mjs"
+              ],
+              "scenarioIds": [
+                "pack-race",
+                "collision-safety"
+              ],
+              "suites": [
+                "quick",
+                "full"
+              ],
+              "timeoutSeconds": 240
+            },
+            {
+              "id": "three-lap-soak",
+              "label": "Three-lap field soak",
+              "command": [
+                "node",
+                "tests/ai-three-lap-soak.mjs"
+              ],
+              "scenarioIds": [
+                "endurance"
+              ],
+              "suites": [
+                "full"
+              ],
+              "timeoutSeconds": 360
+            }
+          ]
+        },
+        {
+          "id": "claude-racing",
+          "label": "Claude Racing",
+          "repoUrl": "https://github.com/vlonesource00/claude-racing.git",
+          "branch": "main",
+          "commit": "96334bc195255ecccf47416894c9ab072c447aed",
+          "testNotes": "Offline TrackGrid/value-function plus runtime lattice and racecraft.",
+          "tests": [
+            {
+              "id": "solo-pace",
+              "label": "Solo pace versus offline optimum",
+              "command": [
+                "node",
+                "tests/ai-lap.mjs"
+              ],
+              "scenarioIds": [
+                "solo-pace",
+                "stability"
+              ],
+              "suites": [
+                "quick",
+                "full"
+              ],
+              "timeoutSeconds": 300
+            },
+            {
+              "id": "duel-racecraft",
+              "label": "Racecraft duel scenarios",
+              "command": [
+                "node",
+                "tests/duel.mjs"
+              ],
+              "scenarioIds": [
+                "obstacle-bypass",
+                "slower-pass",
+                "defense",
+                "planner-budget"
+              ],
+              "suites": [
+                "quick",
+                "full"
+              ],
+              "timeoutSeconds": 360
+            }
+          ]
+        },
+        {
+          "id": "gemini-nmpcc",
+          "label": "Gemini NMPCC",
+          "repoUrl": "https://github.com/vlonesource00/gemini-gauntlet.git",
+          "branch": "feat/apex-nmpcc-combat-ai",
+          "commit": "17ccafbd3a65a4b8cc0f4b3d32342c6a127c714a",
+          "testNotes": "Earlier V2/NMPCC branch; kept as a separate architecture as requested.",
+          "tests": [
+            {
+              "id": "pace-benchmark",
+              "label": "Multi-class pace benchmark",
+              "command": [
+                "node",
+                "tests/pace-benchmark-test.mjs"
+              ],
+              "scenarioIds": [
+                "solo-pace",
+                "stability",
+                "track-complexity"
+              ],
+              "suites": [
+                "quick",
+                "full"
+              ],
+              "timeoutSeconds": 420
+            },
+            {
+              "id": "full-grid",
+              "label": "Twelve-car full grid",
+              "command": [
+                "node",
+                "tests/twelve-car-race-test.mjs"
+              ],
+              "scenarioIds": [
+                "pack-race",
+                "collision-safety",
+                "wake-awareness"
+              ],
+              "suites": [
+                "quick",
+                "full"
+              ],
+              "timeoutSeconds": 240
+            },
+            {
+              "id": "generation-head-to-head",
+              "label": "V1 versus V2 head-to-head",
+              "command": [
+                "node",
+                "tests/head-to-head-generations-test.mjs"
+              ],
+              "scenarioIds": [
+                "generation-head-to-head",
+                "tactical-combat"
+              ],
+              "suites": [
+                "full"
+              ],
+              "timeoutSeconds": 600
+            }
+          ]
+        },
+        {
+          "id": "gemini-supreme",
+          "label": "Gemini Supreme",
+          "repoUrl": "https://github.com/vlonesource00/gemini-gauntlet.git",
+          "branch": "feat/supreme-combat-ai",
+          "commit": "e8b9bdc672e332621788850ee021e9817c7238c9",
+          "testNotes": "Supreme combat AI with coupled MPCC, full-plant Astra GT modeling, multirate decoupling, and anti-indecision hysteresis.",
+          "tests": [
+            {
+              "id": "pace-benchmark",
+              "label": "Multi-class pace benchmark",
+              "command": [
+                "node",
+                "tests/pace-benchmark-test.mjs"
+              ],
+              "scenarioIds": [
+                "solo-pace",
+                "stability",
+                "track-complexity"
+              ],
+              "suites": [
+                "quick",
+                "full"
+              ],
+              "timeoutSeconds": 420
+            },
+            {
+              "id": "decision-stability",
+              "label": "Decision stability and anti-indecision",
+              "command": [
+                "node",
+                "tests/decision-stability-test.mjs"
+              ],
+              "scenarioIds": [
+                "tactical-combat",
+                "stability"
+              ],
+              "suites": [
+                "quick",
+                "full"
+              ],
+              "timeoutSeconds": 120
+            },
+            {
+              "id": "full-grid",
+              "label": "Twelve-car full grid",
+              "command": [
+                "node",
+                "tests/twelve-car-race-test.mjs"
+              ],
+              "scenarioIds": [
+                "pack-race",
+                "collision-safety",
+                "wake-awareness"
+              ],
+              "suites": [
+                "quick",
+                "full"
+              ],
+              "timeoutSeconds": 240
+            },
+            {
+              "id": "generation-head-to-head",
+              "label": "V1 versus V2 head-to-head",
+              "command": [
+                "node",
+                "tests/head-to-head-generations-test.mjs"
+              ],
+              "scenarioIds": [
+                "generation-head-to-head",
+                "tactical-combat"
+              ],
+              "suites": [
+                "full"
+              ],
+              "timeoutSeconds": 600
+            }
+          ]
+        },
+        {
+          "id": "gemini-grand-prix",
+          "label": "Gemini Grand Prix",
+          "repoUrl": "https://github.com/vlonesource00/gemini-gauntlet.git",
+          "branch": "feat/grand-prix-sim-and-cockpit-hud",
+          "commit": "cbced43f5538bc72a497b17fbc74849f21955397",
+          "testNotes": "Later Gemini GP branch with strict 25 Hz tactical replanning and committed side-by-side maneuvers.",
+          "tests": [
+            {
+              "id": "pace-benchmark",
+              "label": "Multi-class pace benchmark",
+              "command": [
+                "node",
+                "tests/pace-benchmark-test.mjs"
+              ],
+              "scenarioIds": [
+                "solo-pace",
+                "stability",
+                "track-complexity"
+              ],
+              "suites": [
+                "quick",
+                "full"
+              ],
+              "timeoutSeconds": 420
+            },
+            {
+              "id": "full-grid",
+              "label": "Twelve-car full grid",
+              "command": [
+                "node",
+                "tests/twelve-car-race-test.mjs"
+              ],
+              "scenarioIds": [
+                "pack-race",
+                "collision-safety",
+                "wake-awareness"
+              ],
+              "suites": [
+                "quick",
+                "full"
+              ],
+              "timeoutSeconds": 240
+            },
+            {
+              "id": "generation-head-to-head",
+              "label": "V1 versus V2 head-to-head",
+              "command": [
+                "node",
+                "tests/head-to-head-generations-test.mjs"
+              ],
+              "scenarioIds": [
+                "generation-head-to-head",
+                "tactical-combat"
+              ],
+              "suites": [
+                "full"
+              ],
+              "timeoutSeconds": 600
+            }
+          ]
+        }
+      ]
+    },
+    "controllerSources": {
+      "ai.js": "eecd8e0ffe8337272150d864ce5c2bc1597641ddbaa515135c48e75d448887d6",
+      "awareness.js": "aa4ffb17c1fcf632c46ea4ff9f714ccb836010e7c79353be41faba0d11622e16",
+      "car-specs.js": "5b0b6f871cc3f71ea6daff862ef5a1e4b435ab6bc4ff3c98ccd8fcfdbd79f1ce",
+      "controller.js": "bf39cae11ff61d6e39670e5240f0bbd98090d867d337e8ee386c3808ab79ed3e",
+      "driver-controls.js": "a8c3c7abf1dbd5c29be202db8c2976a693e88e1c9c5c410bbec109cc5a20b5af",
+      "global-pace.js": "2d0abff579cc1acf4d536c100862ba4f76e7a527a433e854e35b8856d6eb99ef",
+      "harbor-ring.js": "714eb88e218e4baddda02e2974f550809d483ee749f05ca581fcb66453e39bc9",
+      "input.js": "5225f6ecd5ace3961712d2406e05331a6aece9a811a657c20c92b06fa4ed772d",
+      "interval.js": "f0eb0fd65851980f78a5493e5e40cb617f24ce4b176fd063f8b49112f6d4ebec",
+      "math.js": "80f3454cbc9d9b4e06fe0217befbe55770e602fdb46c974aa365d4e543e1fcb0",
+      "pace.js": "bf2b6bd1d379dc0470d47918e56bcf1cbec73f72f54c2ab8d8b3ad97a3ded64b",
+      "pack-racing.js": "e1b9e64c519d69c9bc268ebad2ff96ed266ebfccd23bc64578836a98ed958fc6",
+      "perception.js": "de30a5b3c9834f70d1b9a77cee1e7c4b6adeb669ff033c3c530239f8c5241362",
+      "performance.js": "54543d976903a55787855ec8827c17b25b923666f4723e2e8e1a25c6e4cccdee",
+      "planner.js": "b6c05296e57adcabf42972e652ae315498ef1ff81e8fda31824affb622614907",
+      "race-flow.js": "e520909aea5716d7ccf524ccf332f8f842177711d7dc5849c3c58a26fa12d72e",
+      "racecraft-policy.js": "02c217fe64ac98d156603b7816b61c8f212d350ac53ffdc069605a5f6bd196e1",
+      "session.js": "6ccfb8af90c611006b10c7a432005006a49a7e66fc3e0146023f3e0b620865d8",
+      "speed-target.js": "896b6b30ee15f8c2eb3f5422d7373a3c0faa42c4a4a6f76004e5200b4bb0e1dd",
+      "strategy.js": "24bed02c88debedcda263256a9ed124aaf1c47822145e4c6f8609d06158401c4",
+      "supervisor.js": "e9c58fe2c5b6292883c8ee7874ab7f16120ee95a04eea58ff1c947556f70a9d7",
+      "telemetry.js": "8370f75b32a87b3d4956c689adb072a460bc8647c1cfa7f0b7befe36c4670e58",
+      "track.js": "98dd9210c56210dcbeea511b766a8a4d0e28e6d9987eae7f95eace98cc802108",
+      "tyre.js": "dd630e2529120432760d4bae24ee83bc223b6c0503117e36a7578b3bab5a0f19",
+      "vehicle.js": "4d7b5eb2369e5fe255dca90a9e8f2ad7be01b3dbd06c5e01bcbf4ffca5cc0b16"
+    },
+    "hostSources": {
+      "ai.js": "c3280c4d6d1431a1ca61c0a43efa9746b8f6c999004c714d78b72052710547d1",
+      "awareness.js": "78b61e8cb8d4223799c297d760ed309723e84c8c232d0c2a56bcfbca1e2b759e",
+      "car-specs.js": "11a68406f75bb0e99a4cfe1bb9ecec07d6b00d6765fde86ca0605dace68cd17e",
+      "controller.js": "d94d822985162cd5ea528d3d1003e024d97e08f658a8fcc3aec4f3c493d4d875",
+      "driver-controls.js": "0037d10072a502977431ba23cd71e6046ab0c5e16c0e026b63543644869afac8",
+      "gamepad.js": "f0366a103c5246a96dede3c03c820b6912771c241c578f8bac761d96efb2652d",
+      "global-pace.js": "f6d073c7a8b980c199531e9dc44b4253dbf09563351b650d9d7c2b184cd46869",
+      "harbor-entry.js": "72501da63c8fa2d3cd9a08cf9722cafa0050332015a5dbe79a46bcb798711bbd",
+      "harbor-ring.js": "c635c176862455f46c491638c05b634a23b85476793ecfb64ec4ec79c35adb09",
+      "input.js": "709bb62f9b45faebace0c778abd56f460303b5107312d0056950df21ddfdd029",
+      "interval.js": "cb69e9c42b73c4a8324c0668d2de21207a18ff23ae10d26f62109ee4ec048430",
+      "maneuver.js": "2f258c5a81b9384aecf27710f5e8f3168fa9c65af994e4c19aa0e98af6c30c62",
+      "math.js": "a86d6433e4b181aaccb59f3c7f74f14b1f66746c5a7b737c90f3f66bbf5fe2c3",
+      "pace.js": "864f9e6c8b0323a953f37fd6a095829f66ea815af942ca739d161efe92f075a9",
+      "pack-racing.js": "e1b9e64c519d69c9bc268ebad2ff96ed266ebfccd23bc64578836a98ed958fc6",
+      "path-geometry.js": "81e9cd158622ecef83957a7510bb842ea0b1868b824ea93eb421eec91e3b8ed4",
+      "perception.js": "e1739bfe6f937a4dbedb4ffdb791df4893a1c16817ee22fa55b768c7d242fa33",
+      "performance.js": "689ed0e74d3ef41d0ef5b99adac79a36a9e3660ac3a2586adbfb97d4411561f4",
+      "planner.js": "c3612211012d83b5bc3b0cdd34a77d598c68ed4ea26229833e8c4c94c2da0287",
+      "race-continuation.js": "188aafb60e228acb7dc14a6ee2b1a304e69ed8a69fb54ac208fd8e0da9f5aeb6",
+      "race-flow.js": "e520909aea5716d7ccf524ccf332f8f842177711d7dc5849c3c58a26fa12d72e",
+      "race-policy.js": "f98719863ded89f33cbc0f4c87460de38be48ba2cb0a8b253800b70547d3f899",
+      "racecraft-policy.js": "fa456c18f7cddb97592eede4e4ecbaa39094dd7214689299f66e2ef1f68c8e62",
+      "session.js": "7d114ce17a4c2f89ef4603783e54dde6a657f61d3ac8600fcf64e7fc7e7ecb1e",
+      "speed-target.js": "c26fb91a6a658172ab14d368926b17cbcab38c7892c4a4d278392d975cc8aebc",
+      "strategy.js": "4a14c5d63bada0c9e04bc66ea442cef751a006da46454a898a0dbb73ac9a64e3",
+      "supervisor.js": "a78c305305e064c7c4e9f1d128e95240f401cb0b2e4d4adfb95c0eb01a1e7306",
+      "telemetry.js": "4f605d1a706d3be181b5083161e0ae3422b3ca244e41f42ea62f0bc4e944c249",
+      "track.js": "f8e3cc11b7f358010c6b89047ebcc433ecda1ff31844f4361586e680284f8d9f",
+      "tyre.js": "19b84cf4e20a60cfeceab2377d392ac047eb9355d84a53daef6ac96b690c101f",
+      "vehicle.js": "cf031f64a10f0984cb059256425bc2281329c5fd91ee6feb6e9e58863c6b5ce3"
+    },
+    "debugger": false,
+    "dt": 0.008333333333333333,
+    "command": [
+      "C:\\Users\\Martim Costa\\Desktop\\nigger\\racing car\\astra\\scripts\\benchmark-candidate.mjs",
+      "--baseline",
+      "--rotations",
+      "--json=artifacts/pace-baseline-matrix.json"
+    ]
+  },
+  "runs": [
+    {
+      "label": "Rot-1",
+      "order": [
+        "astra",
+        "gpt-racing",
+        "claude-racing",
+        "gemini-supreme",
+        "gemini-grand-prix"
+      ],
+      "laps": 2,
+      "simulatedSeconds": 213.17499999997045,
+      "steps": 25581,
+      "trackLength": 2704.6192489145687,
+      "contacts": {
+        "peakClosing": 9.108703363683937,
+        "severeContacts": 2
+      },
+      "results": [
+        {
+          "candidateId": "gemini-supreme",
+          "label": "Gemini Gauntlet · Supreme",
+          "gridSlot": 3,
+          "finishPosition": 1,
+          "positionsGained": 3,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 162.9750000000161,
+          "bestLap": 77.01666666668046,
+          "progress": 5548.741610477124,
+          "offTrackSeconds": 0,
+          "damage": 0.0967193391430506,
+          "passesMade": 3,
+          "passesSuffered": 0,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "astra",
+          "label": "Astra",
+          "gridSlot": 0,
+          "finishPosition": 2,
+          "positionsGained": -1,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 181.84166666666562,
+          "bestLap": 83.99999999997502,
+          "progress": 6114.707120283656,
+          "offTrackSeconds": 0,
+          "damage": 0,
+          "passesMade": 3,
+          "passesSuffered": 4,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "gemini-grand-prix",
+          "label": "Gemini Gauntlet · Grand Prix",
+          "gridSlot": 4,
+          "finishPosition": 3,
+          "positionsGained": 2,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 187.74999999999358,
+          "bestLap": null,
+          "progress": 5544.180393498738,
+          "offTrackSeconds": 20.483333333332812,
+          "damage": 0.1659600296997485,
+          "passesMade": 6,
+          "passesSuffered": 4,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "claude-racing",
+          "label": "Cloud Racing",
+          "gridSlot": 2,
+          "finishPosition": 4,
+          "positionsGained": -1,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 189.15833333332563,
+          "bestLap": null,
+          "progress": 5901.394618311884,
+          "offTrackSeconds": 69.25000000000118,
+          "damage": 0.4116897881152658,
+          "passesMade": 6,
+          "passesSuffered": 7,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "gpt-racing",
+          "label": "GPT Racing",
+          "gridSlot": 1,
+          "finishPosition": 5,
+          "positionsGained": -3,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 209.16666666664077,
+          "bestLap": null,
+          "progress": 5409.46163545532,
+          "offTrackSeconds": 26.44999999999914,
+          "damage": 0.017710581435840624,
+          "passesMade": 4,
+          "passesSuffered": 7,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        }
+      ]
+    },
+    {
+      "label": "Rot-2",
+      "order": [
+        "gpt-racing",
+        "claude-racing",
+        "gemini-supreme",
+        "gemini-grand-prix",
+        "astra"
+      ],
+      "laps": 2,
+      "simulatedSeconds": 240.00833333327938,
+      "steps": 28801,
+      "trackLength": 2704.6192489145687,
+      "contacts": {
+        "peakClosing": 14.956593971176883,
+        "severeContacts": 3
+      },
+      "results": [
+        {
+          "candidateId": "gemini-supreme",
+          "label": "Gemini Gauntlet · Supreme",
+          "gridSlot": 2,
+          "finishPosition": 1,
+          "positionsGained": 2,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 167.8250000000117,
+          "bestLap": 78.74166666668263,
+          "progress": 5547.095161058561,
+          "offTrackSeconds": 0,
+          "damage": 0.07943373631405885,
+          "passesMade": 3,
+          "passesSuffered": 1,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "astra",
+          "label": "Astra",
+          "gridSlot": 4,
+          "finishPosition": 2,
+          "positionsGained": 3,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 183.52499999999742,
+          "bestLap": 85.09166666663968,
+          "progress": 6724.177642338065,
+          "offTrackSeconds": 0,
+          "damage": 0.027520760998481362,
+          "passesMade": 5,
+          "passesSuffered": 2,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 7
+        },
+        {
+          "candidateId": "gemini-grand-prix",
+          "label": "Gemini Gauntlet · Grand Prix",
+          "gridSlot": 3,
+          "finishPosition": 3,
+          "positionsGained": 1,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 190.71666666665755,
+          "bestLap": null,
+          "progress": 5537.419363045247,
+          "offTrackSeconds": 26.766666666665788,
+          "damage": 0.5298373997114693,
+          "passesMade": 4,
+          "passesSuffered": 3,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "gpt-racing",
+          "label": "GPT Racing",
+          "gridSlot": 0,
+          "finishPosition": 4,
+          "positionsGained": -3,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 206.28333333331005,
+          "bestLap": null,
+          "progress": 5532.858343032803,
+          "offTrackSeconds": 25.183333333332545,
+          "damage": 0.5308308218980409,
+          "passesMade": 4,
+          "passesSuffered": 7,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "claude-racing",
+          "label": "Cloud Racing",
+          "gridSlot": 1,
+          "finishPosition": 5,
+          "positionsGained": -3,
+          "lapsCompleted": 1,
+          "finished": false,
+          "finishTime": null,
+          "bestLap": null,
+          "progress": 3655.97781563415,
+          "offTrackSeconds": 158.4416666666869,
+          "damage": 1,
+          "passesMade": 5,
+          "passesSuffered": 8,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 4
+        }
+      ]
+    },
+    {
+      "label": "Rot-3",
+      "order": [
+        "claude-racing",
+        "gemini-supreme",
+        "gemini-grand-prix",
+        "astra",
+        "gpt-racing"
+      ],
+      "laps": 2,
+      "simulatedSeconds": 240.00833333327938,
+      "steps": 28801,
+      "trackLength": 2704.6192489145687,
+      "contacts": {
+        "peakClosing": 30.329516599588697,
+        "severeContacts": 5
+      },
+      "results": [
+        {
+          "candidateId": "gemini-supreme",
+          "label": "Gemini Gauntlet · Supreme",
+          "gridSlot": 1,
+          "finishPosition": 1,
+          "positionsGained": 1,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 164.558333333348,
+          "bestLap": 78.45833333333341,
+          "progress": 5547.685549265172,
+          "offTrackSeconds": 0,
+          "damage": 0,
+          "passesMade": 1,
+          "passesSuffered": 0,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "astra",
+          "label": "Astra",
+          "gridSlot": 3,
+          "finishPosition": 2,
+          "positionsGained": 2,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 181.07499999999965,
+          "bestLap": 84.20833333330982,
+          "progress": 6773.193336267336,
+          "offTrackSeconds": 0,
+          "damage": 0,
+          "passesMade": 4,
+          "passesSuffered": 2,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 7
+        },
+        {
+          "candidateId": "gemini-grand-prix",
+          "label": "Gemini Gauntlet · Grand Prix",
+          "gridSlot": 2,
+          "finishPosition": 3,
+          "positionsGained": 0,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 195.36666666665332,
+          "bestLap": null,
+          "progress": 5536.781525595161,
+          "offTrackSeconds": 30.6749999999989,
+          "damage": 0.37886327923086055,
+          "passesMade": 7,
+          "passesSuffered": 7,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "gpt-racing",
+          "label": "GPT Racing",
+          "gridSlot": 4,
+          "finishPosition": 4,
+          "positionsGained": 1,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 224.07499999996054,
+          "bestLap": null,
+          "progress": 5532.217656078027,
+          "offTrackSeconds": 46.46666666666467,
+          "damage": 0.2667977812352838,
+          "passesMade": 4,
+          "passesSuffered": 3,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "claude-racing",
+          "label": "Cloud Racing",
+          "gridSlot": 0,
+          "finishPosition": 5,
+          "positionsGained": -4,
+          "lapsCompleted": 1,
+          "finished": false,
+          "finishTime": null,
+          "bestLap": null,
+          "progress": 5278.80522864292,
+          "offTrackSeconds": 135.39166666670786,
+          "damage": 1,
+          "passesMade": 5,
+          "passesSuffered": 9,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 5
+        }
+      ]
+    },
+    {
+      "label": "Rot-4",
+      "order": [
+        "gemini-supreme",
+        "gemini-grand-prix",
+        "astra",
+        "gpt-racing",
+        "claude-racing"
+      ],
+      "laps": 2,
+      "simulatedSeconds": 240.00833333327938,
+      "steps": 28801,
+      "trackLength": 2704.6192489145687,
+      "contacts": {
+        "peakClosing": 16.286694111306204,
+        "severeContacts": 4
+      },
+      "results": [
+        {
+          "candidateId": "gemini-supreme",
+          "label": "Gemini Gauntlet · Supreme",
+          "gridSlot": 0,
+          "finishPosition": 1,
+          "positionsGained": 0,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 176.96666666667005,
+          "bestLap": 79.67499999997989,
+          "progress": 5547.138287624737,
+          "offTrackSeconds": 4.675000000000022,
+          "damage": 0.2124400962634995,
+          "passesMade": 6,
+          "passesSuffered": 6,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "astra",
+          "label": "Astra",
+          "gridSlot": 2,
+          "finishPosition": 2,
+          "positionsGained": 1,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 182.7749999999981,
+          "bestLap": 85.27499999997444,
+          "progress": 6741.654180770678,
+          "offTrackSeconds": 0,
+          "damage": 0,
+          "passesMade": 5,
+          "passesSuffered": 4,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 7
+        },
+        {
+          "candidateId": "gemini-grand-prix",
+          "label": "Gemini Gauntlet · Grand Prix",
+          "gridSlot": 1,
+          "finishPosition": 3,
+          "positionsGained": -1,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 196.64999999998548,
+          "bestLap": null,
+          "progress": 5534.535823926548,
+          "offTrackSeconds": 34.524999999998684,
+          "damage": 0.6165649141270192,
+          "passesMade": 6,
+          "passesSuffered": 7,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "gpt-racing",
+          "label": "GPT Racing",
+          "gridSlot": 3,
+          "finishPosition": 4,
+          "positionsGained": 0,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 204.75833333331144,
+          "bestLap": null,
+          "progress": 5529.974504548699,
+          "offTrackSeconds": 21.716666666666075,
+          "damage": 0.44981567579100645,
+          "passesMade": 5,
+          "passesSuffered": 5,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "claude-racing",
+          "label": "Cloud Racing",
+          "gridSlot": 4,
+          "finishPosition": 5,
+          "positionsGained": 0,
+          "lapsCompleted": 0,
+          "finished": false,
+          "finishTime": null,
+          "bestLap": null,
+          "progress": 2291.6651148655897,
+          "offTrackSeconds": 190.0833333333248,
+          "damage": 1,
+          "passesMade": 5,
+          "passesSuffered": 5,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 2
+        }
+      ]
+    },
+    {
+      "label": "Rot-5",
+      "order": [
+        "gemini-grand-prix",
+        "astra",
+        "gpt-racing",
+        "claude-racing",
+        "gemini-supreme"
+      ],
+      "laps": 2,
+      "simulatedSeconds": 217.8499999999662,
+      "steps": 26142,
+      "trackLength": 2704.6192489145687,
+      "contacts": {
+        "peakClosing": 24.84051855011308,
+        "severeContacts": 2
+      },
+      "results": [
+        {
+          "candidateId": "gemini-supreme",
+          "label": "Gemini Gauntlet · Supreme",
+          "gridSlot": 4,
+          "finishPosition": 1,
+          "positionsGained": 4,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 166.31666666667974,
+          "bestLap": 78.75833333333065,
+          "progress": 5547.03659595671,
+          "offTrackSeconds": 0,
+          "damage": 0,
+          "passesMade": 5,
+          "passesSuffered": 1,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "astra",
+          "label": "Astra",
+          "gridSlot": 1,
+          "finishPosition": 2,
+          "positionsGained": 0,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 180.675,
+          "bestLap": 84.81666666664432,
+          "progress": 6245.518598977195,
+          "offTrackSeconds": 0,
+          "damage": 0.013102292670594047,
+          "passesMade": 3,
+          "passesSuffered": 3,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "gemini-grand-prix",
+          "label": "Gemini Gauntlet · Grand Prix",
+          "gridSlot": 0,
+          "finishPosition": 3,
+          "positionsGained": -2,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 195.98333333331942,
+          "bestLap": null,
+          "progress": 5538.459320898039,
+          "offTrackSeconds": 31.34999999999886,
+          "damage": 0.14335974356155506,
+          "passesMade": 4,
+          "passesSuffered": 6,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "claude-racing",
+          "label": "Cloud Racing",
+          "gridSlot": 3,
+          "finishPosition": 4,
+          "positionsGained": 0,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 206.14166666664352,
+          "bestLap": null,
+          "progress": 5622.0119242092505,
+          "offTrackSeconds": 105.26666666669651,
+          "damage": 0.6882907882178539,
+          "passesMade": 9,
+          "passesSuffered": 9,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        },
+        {
+          "candidateId": "gpt-racing",
+          "label": "GPT Racing",
+          "gridSlot": 2,
+          "finishPosition": 5,
+          "positionsGained": -2,
+          "lapsCompleted": 2,
+          "finished": true,
+          "finishTime": 213.8416666666365,
+          "bestLap": null,
+          "progress": 5409.526442375194,
+          "offTrackSeconds": 19.674999999999525,
+          "damage": 0.01014332132182854,
+          "passesMade": 5,
+          "passesSuffered": 7,
+          "controllerErrors": 0,
+          "lastError": null,
+          "lapCount": 6
+        }
+      ]
+    }
+  ],
+  "aggregate": [
+    {
+      "candidateId": "gemini-supreme",
+      "label": "Gemini Gauntlet · Supreme",
+      "runs": 5,
+      "finishRate": 1,
+      "meanFinishPosition": 1,
+      "meanPositionsGained": 2,
+      "bestLap": 77.01666666668046,
+      "meanBestLapAcrossRotations": 78.53000000000142,
+      "meanOffTrackSeconds": 0.9350000000000044,
+      "meanDamage": 0.07771863434412178,
+      "meanPassesMade": 3.6,
+      "meanPassesSuffered": 1.6,
+      "controllerErrors": 0
+    },
+    {
+      "candidateId": "astra",
+      "label": "Astra",
+      "runs": 5,
+      "finishRate": 1,
+      "meanFinishPosition": 2,
+      "meanPositionsGained": 1,
+      "bestLap": 83.99999999997502,
+      "meanBestLapAcrossRotations": 84.67833333330866,
+      "meanOffTrackSeconds": 0,
+      "meanDamage": 0.008124610733815082,
+      "meanPassesMade": 4,
+      "meanPassesSuffered": 3,
+      "controllerErrors": 0
+    },
+    {
+      "candidateId": "gemini-grand-prix",
+      "label": "Gemini Gauntlet · Grand Prix",
+      "runs": 5,
+      "finishRate": 1,
+      "meanFinishPosition": 3,
+      "meanPositionsGained": 0,
+      "bestLap": null,
+      "meanBestLapAcrossRotations": null,
+      "meanOffTrackSeconds": 28.759999999999007,
+      "meanDamage": 0.3669170732661305,
+      "meanPassesMade": 5.4,
+      "meanPassesSuffered": 5.4,
+      "controllerErrors": 0
+    },
+    {
+      "candidateId": "claude-racing",
+      "label": "Cloud Racing",
+      "runs": 5,
+      "finishRate": 0.4,
+      "meanFinishPosition": 4.6,
+      "meanPositionsGained": -1.6,
+      "bestLap": null,
+      "meanBestLapAcrossRotations": null,
+      "meanOffTrackSeconds": 131.68666666668346,
+      "meanDamage": 0.8199961152666241,
+      "meanPassesMade": 6,
+      "meanPassesSuffered": 7.6,
+      "controllerErrors": 0
+    },
+    {
+      "candidateId": "gpt-racing",
+      "label": "GPT Racing",
+      "runs": 5,
+      "finishRate": 1,
+      "meanFinishPosition": 4.4,
+      "meanPositionsGained": -1.4,
+      "bestLap": null,
+      "meanBestLapAcrossRotations": null,
+      "meanOffTrackSeconds": 27.898333333332392,
+      "meanDamage": 0.25505963633640005,
+      "meanPassesMade": 4.4,
+      "meanPassesSuffered": 5.8,
+      "controllerErrors": 0
+    }
+  ]
+}
