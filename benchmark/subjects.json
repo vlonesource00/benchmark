@@ -182,6 +182,15 @@
           "timeoutSeconds": 600
         }
       ]
+    },
+    {
+      "id": "musespark",
+      "label": "MuseSpark",
+      "repoUrl": "https://github.com/vlonesource00/MuseSpark.git",
+      "branch": "master",
+      "commit": "c8f7cde2d021f560b1f6cc989fba8ecb22e7bf54",
+      "testNotes": "Muse global-optimum + belief + strategy + trajectory + coupled MPCC + safety. Local harness: tools/bridge-smoke.mjs (shared-mode smoke + host-physics solo pace).",
+      "tests": []
     }
   ]
 }

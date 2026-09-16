@@ -3,6 +3,7 @@ import { createAstraBridge, ASTRA_CANDIDATE } from './astra-bridge.js';
 import { createGptBridge, GPT_CANDIDATE } from './gpt-bridge.js';
 import { createGeminiBridge, GEMINI_SUPREME, GEMINI_NMPCC, GEMINI_GRAND_PRIX } from './gemini-bridge.js';
 import { createCloudBridge, CLOUD_CANDIDATE } from './claude-bridge.js';
+import { createMuseBridge, MUSE_CANDIDATE } from './musespark-bridge.js';
 import { NextGenAIController as SupremeController } from '../../subjects/gemini-supreme/src/ai/v2/NextGenAIController.js';
 import { NextGenAIController as NmpccController } from '../../subjects/gemini-nmpcc/src/ai/v2/NextGenAIController.js';
 import { NextGenAIController as GrandPrixController } from '../../subjects/gemini-grand-prix/src/ai/v2/NextGenAIController.js';
@@ -61,6 +62,7 @@ export const SUPREME_WITH_PLAYER = Object.freeze([
 ]);
 
 export const ALL_KNOWN_CANDIDATES = Object.freeze([
+  MUSE_CANDIDATE,
   ...CANDIDATES_5ARCH,
   ...SUPREME_CANDIDATES,
   PLAYER_CANDIDATE,
@@ -166,6 +168,8 @@ export function createField({
       bridges[index] = createGptBridge({ cars, hostTrack, shadowTrack, index });
     } else if (id === 'claude-racing') {
       bridges[index] = createCloudBridge({ cars, hostTrack, index, onStatus });
+    } else if (id === 'musespark') {
+      bridges[index] = createMuseBridge({ candidate: candidatesList.find((entry) => entry.id === id) ?? MUSE_CANDIDATE, cars, hostTrack, shadowTrack, index });
     } else if (id === 'gemini-nmpcc') {
       onStatus('Binding the pinned Gemini NMPCC controller…');
       bridges[index] = createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, index, Controller: NmpccController });
