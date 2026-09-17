@@ -188,7 +188,7 @@
       "label": "MuseSpark",
       "repoUrl": "https://github.com/vlonesource00/MuseSpark.git",
       "branch": "master",
-      "commit": "943fd62b1fd7de6932e28ae04781672ed2e81ec6",
+      "commit": "7af4c1c1009c273497b22bb7610bd512079da8a8",
       "testNotes": "Muse global-optimum + belief + strategy + trajectory + coupled MPCC + safety. Local harness: tools/bridge-smoke.mjs (shared-mode smoke + host-physics solo pace).",
       "tests": []
     }
