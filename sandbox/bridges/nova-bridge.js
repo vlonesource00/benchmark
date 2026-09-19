@@ -1,0 +1,101 @@
+import { Session } from '../../subjects/nova/src/sim/session.js';
+import { Track as NovaTrack } from '../../subjects/nova/src/sim/track.js';
+import { observeVehicle } from '../../subjects/nova/src/sim/native-adapter.js';
+
+export const NOVA_CANDIDATE = Object.freeze({
+  id: 'nova',
+  label: 'DeepSeek NOVA',
+  color: '#00e5a3',
+  stack: 'Latent Intent Belief → Homotopy Discovery → CVaR Trajectory → Coupled MPCC'
+});
+
+export function createNovaBridge({
+  candidate = NOVA_CANDIDATE,
+  cars,
+  hostTrack,
+  shadowTrack,
+  index,
+  options = {}
+}) {
+  if (!cars || !hostTrack) throw new Error('createNovaBridge needs {cars, hostTrack}');
+
+  const trackName = hostTrack.id ?? 'harbor-ring';
+  const novaTrack = new NovaTrack(trackName);
+  const novaSession = new Session(novaTrack, { classId: 'gt' });
+  novaSession.aiKind = 'nova';
+  novaSession.aiOptions = {
+    lineVariant: 'measured',
+    novaSpeedScale: 1.0,
+    strict: false,
+    ...options
+  };
+
+  const nativeDriver = novaSession.makeDriver(novaSession.cars[0]);
+  const novaDriver = nativeDriver.ai;
+
+  const entry = {
+    ...candidate,
+    candidateId: candidate.id ?? 'nova',
+    gridSlot: index,
+    carId: cars[index]?.id,
+    driver: novaDriver,
+    nativeDriver,
+    errors: 0,
+    lastError: null,
+    update(car, allCars, dt, context) {
+      try {
+        const obs = observeVehicle(car, allCars || cars, context, dt);
+        const cmd = novaDriver.step(obs);
+        car.controls = {
+          steer: cmd.steer ?? 0,
+          throttle: cmd.throttle ?? 0,
+          brake: cmd.brake ?? 0,
+          reverse: Boolean(cmd.reverse)
+        };
+      } catch (error) {
+        this.errors += 1;
+        this.lastError = error;
+        car.controls = { throttle: 0, brake: 0.6, steer: 0 };
+      }
+    },
+    reset() {
+      try {
+        nativeDriver.reset();
+      } catch (e) {
+        // ignore
+      }
+      this.errors = 0;
+      this.lastError = null;
+    },
+    debug() {
+      const s = novaDriver.state || {};
+      return {
+        architecture: 'DeepSeek NOVA',
+        state: s.mode ?? 'NOVA',
+        intent: s.intent ?? 'FREE_AIR',
+        planSource: 'NOVA Racecraft (Latent Belief + CVaR + Value Field)',
+        controllerCadence: '120 Hz coupled control / 20 Hz topology replanning',
+        targetSpeed: s.targetSpeed ?? null,
+        targetQ: s.targetQ ?? null,
+        topology: novaDriver.topologyResult?.activeTopology ?? null,
+      };
+    },
+    visualDebug() {
+      const plan = novaDriver.trajectoryPlan;
+      return {
+        selectedTrajectory: plan?.points ? {
+          points: plan.points.map((p) => ({ x: p.x, y: p.y ?? 0, z: p.z, speed: p.speed })),
+          color: '#00e5a3',
+          mode: novaDriver.state?.intent ?? 'FREE_AIR'
+        } : null,
+        trackingPoint: plan?.trackingPoint ? {
+          x: plan.trackingPoint.x,
+          y: plan.trackingPoint.y ?? 0,
+          z: plan.trackingPoint.z
+        } : null
+      };
+    }
+  };
+
+  return entry;
+}

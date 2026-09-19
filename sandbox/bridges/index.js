@@ -4,6 +4,7 @@ import { createGptBridge, GPT_CANDIDATE } from './gpt-bridge.js';
 import { createGeminiBridge, GEMINI_SUPREME, GEMINI_NMPCC, GEMINI_GRAND_PRIX } from './gemini-bridge.js';
 import { createCloudBridge, CLOUD_CANDIDATE } from './claude-bridge.js';
 import { createMuseBridge, MUSE_CANDIDATE } from './musespark-bridge.js';
+import { createNovaBridge, NOVA_CANDIDATE } from './nova-bridge.js';
 import { NextGenAIController as SupremeController } from '../../subjects/gemini-supreme/src/ai/v2/NextGenAIController.js';
 import { NextGenAIController as NmpccController } from '../../subjects/gemini-nmpcc/src/ai/v2/NextGenAIController.js';
 import { NextGenAIController as GrandPrixController } from '../../subjects/gemini-grand-prix/src/ai/v2/NextGenAIController.js';
@@ -61,7 +62,15 @@ export const SUPREME_WITH_PLAYER = Object.freeze([
   ...SUPREME_CANDIDATES
 ]);
 
+export const TRIAD_CANDIDATES = Object.freeze([
+  ASTRA_CANDIDATE,
+  GEMINI_SUPREME,
+  NOVA_CANDIDATE
+]);
+export const TRIAD_IDS = Object.freeze(['astra', 'gemini-supreme', 'nova']);
+
 export const ALL_KNOWN_CANDIDATES = Object.freeze([
+  NOVA_CANDIDATE,
   MUSE_CANDIDATE,
   ...CANDIDATES_5ARCH,
   ...SUPREME_CANDIDATES,
@@ -176,6 +185,9 @@ export function createField({
     } else if (id === 'gemini-grand-prix') {
       onStatus('Binding the pinned Gemini Grand Prix controller…');
       bridges[index] = createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, index, Controller: GrandPrixController });
+    } else if (id === 'nova') {
+      onStatus('Binding DeepSeek NOVA controller…');
+      bridges[index] = createNovaBridge({ candidate: candidatesList.find((entry) => entry.id === id) ?? NOVA_CANDIDATE, cars, hostTrack, shadowTrack, index });
     } else {
       throw new Error(`Unknown benchmark candidate: ${id}`);
     }

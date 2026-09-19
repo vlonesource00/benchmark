@@ -16,6 +16,7 @@ import {
   ALL_KNOWN_CANDIDATES,
   CANDIDATES,
   CANDIDATE_IDS,
+  TRIAD_CANDIDATES,
   createField,
   rotations
 } from './bridges/index.js';
@@ -167,15 +168,42 @@ export const MODES = {
     candidates: SUPREME_WITH_PLAYER,
     order: SUPREME_WITH_PLAYER.map((c) => c.id),
     defaultAutopilot: false
+  },
+  'triad': {
+    id: 'triad',
+    title: 'Harbor Triad Showcase',
+    subtitle: 'Astra vs Gemini Supreme V3.2 vs DeepSeek NOVA',
+    specText: '3 × GT Class (Canonical Triad)',
+    candidates: TRIAD_CANDIDATES,
+    order: ['nova', 'gemini-supreme', 'astra'],
+    defaultAutopilot: true
   }
 };
 
-let currentModeId = '5-arch';
-let activeCandidates = CANDIDATES_5ARCH;
+const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
+let initialModeId = '5-arch';
+if (urlParams.get('mode') === 'triad' || urlParams.has('triad')) {
+  initialModeId = 'triad';
+} else if (urlParams.has('mode') && MODES[urlParams.get('mode')]) {
+  initialModeId = urlParams.get('mode');
+}
+
+let customGridOrder = null;
+if (urlParams.has('grid') || urlParams.has('drivers')) {
+  const parsedOrder = (urlParams.get('grid') || urlParams.get('drivers')).split(',').map((s) => s.trim()).filter(Boolean);
+  if (parsedOrder.length > 0) {
+    customGridOrder = parsedOrder;
+  }
+}
+
+let currentModeId = initialModeId;
+let activeCandidates = customGridOrder
+  ? customGridOrder.map((id) => ALL_KNOWN_CANDIDATES.find((c) => c.id === id) ?? { id, label: id, color: '#ffffff', stack: id })
+  : MODES[currentModeId].candidates;
 
 const session = new Session(track, { classId: 'gt', mixed: false });
 session.laps = RACE_LAPS;
-session.field = CANDIDATE_IDS.length;
+session.field = customGridOrder ? customGridOrder.length : MODES[currentModeId].order.length;
 session.aggression = 0.72;
 session.autopilot = true;
 
@@ -1165,4 +1193,4 @@ function frame(nowMs) {
 requestAnimationFrame(frame);
 updatePilotHud();
 updateDebugScopeHud();
-initField();
+initField(customGridOrder || MODES[currentModeId].order, activeCandidates);

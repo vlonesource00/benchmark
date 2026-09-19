@@ -191,6 +191,15 @@
       "commit": "7af4c1c1009c273497b22bb7610bd512079da8a8",
       "testNotes": "Muse global-optimum + belief + strategy + trajectory + coupled MPCC + safety. Local harness: tools/bridge-smoke.mjs (shared-mode smoke + host-physics solo pace).",
       "tests": []
+    },
+    {
+      "id": "nova",
+      "label": "DeepSeek NOVA",
+      "repoUrl": "https://github.com/vlonesource00/deepseek.git",
+      "branch": "main",
+      "commit": "371c7a70852102736f0d4d9660c87e6939af2d63",
+      "testNotes": "DeepSeek NOVA sub-75s solo pace baseline with value field, latent belief, and CVaR planning.",
+      "tests": []
     }
   ]
 }
