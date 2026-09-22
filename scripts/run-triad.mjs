@@ -71,9 +71,12 @@ export function runTriadHeat({ grid, laps = 3, trackName = 'harbor-ring' }) {
     order: grid,
     candidatesList: TRIAD_CANDIDATES
   });
-  field.attach(true);
-
   session.start({ freshTrack: true });
+  // start() resets the host driver array; bind architecture bridges afterward.
+  field.attach(true);
+  if (field.bridges.some((bridge, index) => session.drivers[index] !== bridge)) {
+    throw new Error('Triad architecture bridges were not installed');
+  }
   // Skip the 4-second standing countdown to begin green-flag racing immediately
   session.phase = 'racing';
   session.countdown = 0;
