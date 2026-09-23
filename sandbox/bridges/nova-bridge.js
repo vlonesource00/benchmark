@@ -1,6 +1,5 @@
 import { Session } from '../../subjects/nova/src/sim/session.js';
 import { Track as NovaTrack } from '../../subjects/nova/src/sim/track.js';
-import { observeVehicle } from '../../subjects/nova/src/sim/native-adapter.js';
 
 export const NOVA_CANDIDATE = Object.freeze({
   id: 'nova',
@@ -44,14 +43,12 @@ export function createNovaBridge({
     lastError: null,
     update(car, allCars, dt, context) {
       try {
-        const obs = observeVehicle(car, allCars || cars, context, dt);
-        const cmd = novaDriver.step(obs);
-        car.controls = {
-          steer: cmd.steer ?? 0,
-          throttle: cmd.throttle ?? 0,
-          brake: cmd.brake ?? 0,
-          reverse: Boolean(cmd.reverse)
-        };
+        const field = allCars || cars;
+        const order = context?.order ?? [...field].sort((a, b) =>
+          (a.race?.finishTime ?? Infinity) - (b.race?.finishTime ?? Infinity)
+          || (b.race?.progress ?? 0) - (a.race?.progress ?? 0));
+        const position = order.findIndex(c => c.id === car.id) + 1;
+        nativeDriver.update(car, field, dt, { ...context, position: position || 1 });
       } catch (error) {
         this.errors += 1;
         this.lastError = error;
