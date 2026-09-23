@@ -4,8 +4,8 @@
   "description": "Pinned benchmark subjects. Each checkout is created under this benchmark repo and is never read from or written to the original development folders.",
   "subjects": [
     {
-      "id":"astra","label":"Astra","repoUrl":"https://github.com/vlonesource00/astra.git","branch":"v1.2","commit":"956ffe4517bf31ea2bbb6c45f63e4b76aefa2aad",
-      "testNotes":"Harbor GT refined final-kink arc: 78.775 s shared solo; five-rotation mean best 80.842 s, P2 in all five, zero reported off-track time. See reports/verified/astra-final-kink-arc.md. Stronger attack/defense and further braking/exit work remain incomplete.",
+      "id":"astra","label":"Astra","repoUrl":"https://github.com/vlonesource00/astra.git","branch":"v1.2","commit":"e44ede0f8bb7bb1caf6422f1dfc8c24873cdbbf0",
+      "testNotes":"Harbor GT 74.850-second solo geometry plus race traffic refinement. The pinned eight-car grid produced a valid 75.717-second second lap, four retained passes, zero Astra offtrack time and zero damage. Stranded offroad cars no longer trigger unnecessary line changes or passing plans; imminent rejoins remain observed. Physics and rival pins unchanged.",
       "tests":[
         {"id":"harbor-classes","label":"Harbor Ring three-class solo validity","command":["node","tests/harbor-quality.mjs","--check"],"scenarioIds":["solo-pace","stability"],"suites":["quick","full"],"timeoutSeconds":180},
         {"id":"harbor-mixed","label":"Harbor Ring mixed-class pack","command":["node","tests/harbor-quality.mjs","--mixed","--check"],"scenarioIds":["pack-race","collision-safety"],"suites":["quick","full"],"timeoutSeconds":240},
