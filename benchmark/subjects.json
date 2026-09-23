@@ -197,7 +197,7 @@
       "label": "DeepSeek NOVA",
       "repoUrl": "https://github.com/vlonesource00/deepseek.git",
       "branch": "main",
-      "commit": "792e97e1fb6237745e167b4704f14024a5a4cad7",
+      "commit": "f4358e03ae152095b5f3ed3e631ceca24f0cd511",
       "testNotes": "Published DeepSeek NOVA with fast-overlap yielding in TRIAD. The native-driver bridge preserves the source controller's position-aware update path.",
       "tests": []
     }
