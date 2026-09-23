@@ -66,15 +66,23 @@ export function createNovaBridge({
     },
     debug() {
       const s = novaDriver.state || {};
+      const topo = novaDriver.topologyResult || {};
+      const activeTopology = topo.activeTopology ?? s.intent ?? 'FREE_AIR';
+      const racecraftPhase = topo.phase ?? s.racecraftPhase ?? 'FREE';
       return {
         architecture: 'DeepSeek NOVA',
         state: s.mode ?? 'NOVA',
-        intent: s.intent ?? 'FREE_AIR',
+        intent: activeTopology,
+        activeTopology,
+        racecraftPhase,
+        phase: racecraftPhase,
+        action: `${activeTopology} · ${racecraftPhase}`,
+        reason: s.limitReason ? `Limit: ${s.limitReason}` : undefined,
         planSource: 'NOVA Racecraft (Latent Belief + CVaR + Value Field)',
         controllerCadence: '120 Hz coupled control / 20 Hz topology replanning',
         targetSpeed: s.targetSpeed ?? null,
         targetQ: s.targetQ ?? null,
-        topology: novaDriver.topologyResult?.activeTopology ?? null,
+        topology: activeTopology,
       };
     },
     visualDebug() {

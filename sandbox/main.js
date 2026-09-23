@@ -142,6 +142,15 @@ let stepOnce = false;
 
 // --- Benchmark Architecture Modes & Presets ---
 export const MODES = {
+  'all-arch': {
+    id: 'all-arch',
+    title: 'All-Architecture Grand Prix',
+    subtitle: 'Astra, GPT, Claude, Gemini Supreme, Grand Prix, NMPCC, DeepSeek NOVA and MuseSpark',
+    specText: '8 × GT Class (All Architectures)',
+    candidates: ALL_KNOWN_CANDIDATES.filter((c) => c.id !== 'player-gt' && !SUPREME_CANDIDATES.some((s) => s.id === c.id)),
+    order: ALL_KNOWN_CANDIDATES.filter((c) => c.id !== 'player-gt' && !SUPREME_CANDIDATES.some((s) => s.id === c.id)).map((c) => c.id),
+    defaultAutopilot: true
+  },
   '5-arch': {
     id: '5-arch',
     title: '5-Architecture Grand Prix',
@@ -351,10 +360,14 @@ function updateTelemetryForCar(car, bridge, dt) {
   stats.peakLatG = Math.max(stats.peakLatG, localLatG);
   stats.peakLongG = Math.max(stats.peakLongG, localLongG);
 
+  const dbg = bridge?.debug?.();
+
   if (session.phase === 'racing' && car.race.finishTime === null) {
     stats.currentLapTime = session.time - stats.lapStartTime;
     const mode = String(currentMode(bridge)).toUpperCase();
-    if (mode.includes('ATTACK') || mode.includes('DEFEND') || mode.includes('COMBAT') || mode.includes('DIVE') || mode.includes('SLING') || mode.includes('OVERTAKE')) {
+    const phase = String(dbg?.racecraftPhase ?? dbg?.phase ?? '').toUpperCase();
+    const combined = `${mode} ${phase}`;
+    if (combined.includes('ATTACK') || combined.includes('DEFEND') || combined.includes('COMBAT') || combined.includes('DIVE') || combined.includes('SLING') || combined.includes('OVERTAKE') || combined.includes('OVERLAP') || combined.includes('CONCEDE') || combined.includes('ABORT') || combined.includes('H_INSIDE') || combined.includes('H_OUTSIDE')) {
       stats.combatSeconds += dt;
     } else {
       stats.totalPacingSeconds += dt;
@@ -399,6 +412,16 @@ function updateTelemetryForCar(car, bridge, dt) {
       stats.lapStartTime = session.time;
       stats.currentLapTime = 0;
       stats.sectorEntryTime = session.time;
+    }
+  } else if (car.race.finishTime !== null && stats.lapTimes.length < car.race.lap - 1) {
+    const lapTime = car.race.lastLap ?? (car.race.finishTime - stats.lapStartTime);
+    stats.lapTimes.push(lapTime);
+    stats.lastLapTime = lapTime;
+    if (!stats.bestLapTime || lapTime < stats.bestLapTime) {
+      stats.bestLapTime = lapTime;
+    }
+    if (lapTime < globalBestLap) {
+      globalBestLap = lapTime;
     }
   }
 }
