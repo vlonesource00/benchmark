@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-12T01:33:03.081Z",
+  "timestamp": "2026-09-23T19:07:16.114Z",
   "baseline": {
     "subjectId": "gemini-supreme",
     "bestLap": 80.48333333334945,
@@ -18,34 +18,34 @@
   },
   "verified": {
     "subjectId": "gemini-supreme",
-    "bestLap": 79.45000000001521,
+    "bestLap": 78.09166666666732,
     "lapTimes": [
-      91.10000000001857,
-      79.57499999999054
+      89.96666666668433,
+      78.09166666666049
     ],
-    "finishTime": 166.66666666667942,
+    "finishTime": 164.05000000001513,
     "offTrackSeconds": 0,
     "damage": 0,
     "spins": 0,
-    "p95SideslipDeg": 7.9,
-    "maxSideslipDeg": 12.59,
-    "maxYawRateRadS": 1.13,
+    "p95SideslipDeg": 8.38,
+    "maxSideslipDeg": 11.8,
+    "maxYawRateRadS": 1.18,
     "controllerErrors": 0
   },
   "referenceAstra": {
     "subjectId": "astra",
-    "bestLap": 84.72500000002078,
+    "bestLap": 74.85000000001193,
     "lapTimes": [
-      98.04166666669076,
-      85.61666666663987
+      86.99166666668197,
+      75.38333333333469
     ],
-    "finishTime": 179.65000000000094,
+    "finishTime": 158.36666666668697,
     "offTrackSeconds": 0,
     "damage": 0,
     "spins": 0,
-    "p95SideslipDeg": 8.41,
-    "maxSideslipDeg": 21.74,
-    "maxYawRateRadS": 1.41,
+    "p95SideslipDeg": 6.95,
+    "maxSideslipDeg": 10.62,
+    "maxYawRateRadS": 0.84,
     "controllerErrors": 0
   }
 }

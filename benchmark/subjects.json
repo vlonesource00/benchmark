@@ -197,8 +197,8 @@
       "label": "DeepSeek NOVA",
       "repoUrl": "https://github.com/vlonesource00/deepseek.git",
       "branch": "main",
-      "commit": "f4358e03ae152095b5f3ed3e631ceca24f0cd511",
-      "testNotes": "Published DeepSeek NOVA with fast-overlap yielding in TRIAD. The native-driver bridge preserves the source controller's position-aware update path.",
+      "commit": "d78bc0158344759f58a93b12afad81bd4e3d0ddf",
+      "testNotes": "DeepSeek NOVA V3 with transient tyre-energy optimization, dynamic programming braking horizon, rear axle anti-lock slip regulation, and native plant telemetry exposure.",
       "tests": []
     }
   ]

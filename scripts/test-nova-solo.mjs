@@ -22,21 +22,28 @@ function runNovaSolo(laps = 5, maxSeconds = 500) {
   const cc = novaDriver.coupledController;
 
   let elapsed = 0;
+  let countdownDuration = 0;
+  let countdownRecorded = false;
+  let lastLapRecorded = 1;
   let lapTimes = [];
-  let lastLap = 1;
-  let lapStart = 0;
   let tyreStates = [];
 
   while (elapsed < maxSeconds && car.race.finishTime == null) {
+    const prevPhase = session.phase;
     session.step(DT, { throttle: 0, brake: 0, steer: 0 });
-    if (session.phase === 'finished') session.phase = 'racing';
     elapsed += DT;
 
-    if (car.race.lap > lastLap) {
-      const lTime = elapsed - lapStart;
+    if (!countdownRecorded && session.phase === 'racing') {
+      countdownDuration = session.time;
+      countdownRecorded = true;
+    }
+
+    if (session.phase === 'finished') session.phase = 'racing';
+
+    if (car.race.lap > lastLapRecorded) {
+      const lTime = car.race.lastLap;
       lapTimes.push(lTime);
-      lapStart = elapsed;
-      lastLap = car.race.lap;
+      lastLapRecorded = car.race.lap;
 
       if (car.wheels && car.wheels.length >= 4) {
         const [fl, fr, rl, rr] = car.wheels.map(w => w.tyre);
@@ -55,10 +62,12 @@ function runNovaSolo(laps = 5, maxSeconds = 500) {
   }
 
   if (car.race.finishTime !== null && lapTimes.length < laps) {
-    lapTimes.push(elapsed - lapStart);
+    const finalLap = car.race.lastLap;
+    lapTimes.push(finalLap);
   }
 
   console.log(`\n=== NOVA SOLO ${laps}-LAP RESULTS ===`);
+  console.log(`Pre-race / Countdown: ${countdownDuration.toFixed(3)}s`);
   lapTimes.forEach((t, i) => {
     const ts = tyreStates[i];
     const detail = ts ? `(tScale: ${ts.tScale.toFixed(4)}, RR Core: ${ts.rrCore.toFixed(1)}°C, RR Surf: ${ts.rrSurf.toFixed(1)}°C, RR Wear: ${(ts.rrWear*100).toFixed(2)}%)` : '';
@@ -70,5 +79,7 @@ function runNovaSolo(laps = 5, maxSeconds = 500) {
   return { lapTimes, tyreStates };
 }
 
-runNovaSolo(5);
+const lapsArg = process.argv.find((a, i) => process.argv[i - 1] === '--laps' || a.startsWith('--laps='));
+const lapsCount = lapsArg ? parseInt(lapsArg.replace('--laps=', ''), 10) : 5;
+runNovaSolo(lapsCount);
 

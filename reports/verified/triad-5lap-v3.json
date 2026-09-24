@@ -1,0 +1,409 @@
+{
+  "benchmark": "harbor-triad",
+  "timestamp": "2026-09-24T00:27:51.429Z",
+  "config": {
+    "laps": 5,
+    "rotations": 1,
+    "totalHeats": 6
+  },
+  "summary": {
+    "nova": {
+      "label": "NOVA",
+      "wins": 1,
+      "p2": 5,
+      "p3": 0,
+      "winPct": 16.7,
+      "meanBestLap": 75.214,
+      "meanGap": 5.719,
+      "totalOfftrackSec": 10.650000000000047,
+      "totalPasses": 7,
+      "totalContacts": 5
+    },
+    "gemini-supreme": {
+      "label": "GEMINI",
+      "wins": 5,
+      "p2": 1,
+      "p3": 0,
+      "winPct": 83.3,
+      "meanBestLap": 75.286,
+      "meanGap": 0.342,
+      "totalOfftrackSec": 36.508333333332885,
+      "totalPasses": 9,
+      "totalContacts": 5
+    },
+    "astra": {
+      "label": "ASTRA",
+      "wins": 0,
+      "p2": 0,
+      "p3": 6,
+      "winPct": 0,
+      "meanBestLap": 75.912,
+      "meanGap": 30.908,
+      "totalOfftrackSec": 0,
+      "totalPasses": 4,
+      "totalContacts": 2
+    }
+  },
+  "heats": [
+    {
+      "heatIndex": 1,
+      "rotation": 1,
+      "grid": [
+        "nova",
+        "gemini-supreme",
+        "astra"
+      ],
+      "laps": 5,
+      "elapsedSimTime": 420.2166666664488,
+      "totalContacts": 0,
+      "winner": "gemini-supreme",
+      "results": [
+        {
+          "position": 1,
+          "id": "gemini-supreme",
+          "name": "GEMINI GAUNTLET · SUPREME",
+          "gridSlot": 2,
+          "finishTime": 388.6333333331442,
+          "bestLap": 75.35000000000782,
+          "lastLap": 77.75833333326261,
+          "completedLaps": 5,
+          "offtrackSec": 3.633333333333323,
+          "contacts": 0,
+          "passes": 1,
+          "valid": false,
+          "gap": 0
+        },
+        {
+          "position": 2,
+          "id": "nova",
+          "name": "DEEPSEEK NOVA",
+          "gridSlot": 1,
+          "finishTime": 392.8333333331404,
+          "bestLap": 75.25833333333716,
+          "lastLap": 78.9833333332615,
+          "completedLaps": 5,
+          "offtrackSec": 0.19999999999999998,
+          "contacts": 0,
+          "passes": 0,
+          "valid": true,
+          "gap": 4.19999999999618
+        },
+        {
+          "position": 3,
+          "id": "astra",
+          "name": "ASTRA",
+          "gridSlot": 3,
+          "finishTime": 420.2166666664488,
+          "bestLap": 76.40833333332637,
+          "lastLap": 87.74999999992019,
+          "completedLaps": 5,
+          "offtrackSec": 0,
+          "contacts": 0,
+          "passes": 0,
+          "valid": true,
+          "gap": 31.58333333330461
+        }
+      ]
+    },
+    {
+      "heatIndex": 2,
+      "rotation": 1,
+      "grid": [
+        "nova",
+        "astra",
+        "gemini-supreme"
+      ],
+      "laps": 5,
+      "elapsedSimTime": 420.3666666664487,
+      "totalContacts": 1,
+      "winner": "gemini-supreme",
+      "results": [
+        {
+          "position": 1,
+          "id": "gemini-supreme",
+          "name": "GEMINI GAUNTLET · SUPREME",
+          "gridSlot": 3,
+          "finishTime": 390.84999999980886,
+          "bestLap": 75.45000000001237,
+          "lastLap": 78.59166666659519,
+          "completedLaps": 5,
+          "offtrackSec": 1.6583333333333299,
+          "contacts": 1,
+          "passes": 2,
+          "valid": false,
+          "gap": 0
+        },
+        {
+          "position": 2,
+          "id": "nova",
+          "name": "DEEPSEEK NOVA",
+          "gridSlot": 1,
+          "finishTime": 393.47499999980647,
+          "bestLap": 75.45000000000375,
+          "lastLap": 79.02499999992813,
+          "completedLaps": 5,
+          "offtrackSec": 0,
+          "contacts": 0,
+          "passes": 1,
+          "valid": true,
+          "gap": 2.6249999999976126
+        },
+        {
+          "position": 3,
+          "id": "astra",
+          "name": "ASTRA",
+          "gridSlot": 2,
+          "finishTime": 420.3666666664487,
+          "bestLap": 74.9583333333267,
+          "lastLap": 87.76666666658684,
+          "completedLaps": 5,
+          "offtrackSec": 0,
+          "contacts": 1,
+          "passes": 1,
+          "valid": true,
+          "gap": 29.51666666663982
+        }
+      ]
+    },
+    {
+      "heatIndex": 3,
+      "rotation": 1,
+      "grid": [
+        "gemini-supreme",
+        "nova",
+        "astra"
+      ],
+      "laps": 5,
+      "elapsedSimTime": 421.22499999978123,
+      "totalContacts": 0,
+      "winner": "gemini-supreme",
+      "results": [
+        {
+          "position": 1,
+          "id": "gemini-supreme",
+          "name": "GEMINI GAUNTLET · SUPREME",
+          "gridSlot": 1,
+          "finishTime": 388.80833333314405,
+          "bestLap": 75.27500000000828,
+          "lastLap": 77.99999999992906,
+          "completedLaps": 5,
+          "offtrackSec": 1.2416666666666647,
+          "contacts": 0,
+          "passes": 1,
+          "valid": false,
+          "gap": 0
+        },
+        {
+          "position": 2,
+          "id": "nova",
+          "name": "DEEPSEEK NOVA",
+          "gridSlot": 2,
+          "finishTime": 405.333333333129,
+          "bestLap": 75.00833333333772,
+          "lastLap": 79.87499999992735,
+          "completedLaps": 5,
+          "offtrackSec": 10.450000000000047,
+          "contacts": 0,
+          "passes": 1,
+          "valid": true,
+          "gap": 16.52499999998497
+        },
+        {
+          "position": 3,
+          "id": "astra",
+          "name": "ASTRA",
+          "gridSlot": 3,
+          "finishTime": 421.22499999978123,
+          "bestLap": 75.6833333333259,
+          "lastLap": 87.67499999992026,
+          "completedLaps": 5,
+          "offtrackSec": 0,
+          "contacts": 0,
+          "passes": 0,
+          "valid": true,
+          "gap": 32.416666666637184
+        }
+      ]
+    },
+    {
+      "heatIndex": 4,
+      "rotation": 1,
+      "grid": [
+        "gemini-supreme",
+        "astra",
+        "nova"
+      ],
+      "laps": 5,
+      "elapsedSimTime": 420.12499999978223,
+      "totalContacts": 0,
+      "winner": "gemini-supreme",
+      "results": [
+        {
+          "position": 1,
+          "id": "gemini-supreme",
+          "name": "GEMINI GAUNTLET · SUPREME",
+          "gridSlot": 1,
+          "finishTime": 388.44999999981104,
+          "bestLap": 75.02500000001197,
+          "lastLap": 77.64999999992938,
+          "completedLaps": 5,
+          "offtrackSec": 6.71666666666679,
+          "contacts": 0,
+          "passes": 1,
+          "valid": false,
+          "gap": 0
+        },
+        {
+          "position": 2,
+          "id": "nova",
+          "name": "DEEPSEEK NOVA",
+          "gridSlot": 3,
+          "finishTime": 392.6666666664739,
+          "bestLap": 75.30833333333752,
+          "lastLap": 79.0166666665948,
+          "completedLaps": 5,
+          "offtrackSec": 0,
+          "contacts": 0,
+          "passes": 1,
+          "valid": true,
+          "gap": 4.216666666662832
+        },
+        {
+          "position": 3,
+          "id": "astra",
+          "name": "ASTRA",
+          "gridSlot": 2,
+          "finishTime": 420.12499999978223,
+          "bestLap": 76.98333333332847,
+          "lastLap": 87.64999999992028,
+          "completedLaps": 5,
+          "offtrackSec": 0,
+          "contacts": 0,
+          "passes": 1,
+          "valid": true,
+          "gap": 31.67499999997119
+        }
+      ]
+    },
+    {
+      "heatIndex": 5,
+      "rotation": 1,
+      "grid": [
+        "astra",
+        "nova",
+        "gemini-supreme"
+      ],
+      "laps": 5,
+      "elapsedSimTime": 420.2416666664488,
+      "totalContacts": 0,
+      "winner": "nova",
+      "results": [
+        {
+          "position": 1,
+          "id": "nova",
+          "name": "DEEPSEEK NOVA",
+          "gridSlot": 2,
+          "finishTime": 391.2749999998085,
+          "bestLap": 74.98333333333976,
+          "lastLap": 79.14999999992801,
+          "completedLaps": 5,
+          "offtrackSec": 0,
+          "contacts": 0,
+          "passes": 2,
+          "valid": true,
+          "gap": 0
+        },
+        {
+          "position": 2,
+          "id": "gemini-supreme",
+          "name": "GEMINI GAUNTLET · SUPREME",
+          "gridSlot": 3,
+          "finishTime": 393.3249999998066,
+          "bestLap": 75.2083333333382,
+          "lastLap": 79.39166666659446,
+          "completedLaps": 5,
+          "offtrackSec": 21.066666666666112,
+          "contacts": 0,
+          "passes": 1,
+          "valid": false,
+          "gap": 2.0499999999981355
+        },
+        {
+          "position": 3,
+          "id": "astra",
+          "name": "ASTRA",
+          "gridSlot": 1,
+          "finishTime": 420.2416666664488,
+          "bestLap": 75.28333333332631,
+          "lastLap": 87.79999999992015,
+          "completedLaps": 5,
+          "offtrackSec": 0,
+          "contacts": 0,
+          "passes": 1,
+          "valid": true,
+          "gap": 28.96666666664032
+        }
+      ]
+    },
+    {
+      "heatIndex": 6,
+      "rotation": 1,
+      "grid": [
+        "astra",
+        "gemini-supreme",
+        "nova"
+      ],
+      "laps": 5,
+      "elapsedSimTime": 420.74166666644834,
+      "totalContacts": 5,
+      "winner": "gemini-supreme",
+      "results": [
+        {
+          "position": 1,
+          "id": "gemini-supreme",
+          "name": "GEMINI GAUNTLET · SUPREME",
+          "gridSlot": 2,
+          "finishTime": 389.44999999981013,
+          "bestLap": 75.40833333326475,
+          "lastLap": 77.99166666659573,
+          "completedLaps": 5,
+          "offtrackSec": 2.1916666666666615,
+          "contacts": 4,
+          "passes": 3,
+          "valid": false,
+          "gap": 0
+        },
+        {
+          "position": 2,
+          "id": "nova",
+          "name": "DEEPSEEK NOVA",
+          "gridSlot": 3,
+          "finishTime": 396.199999999804,
+          "bestLap": 75.27500000000487,
+          "lastLap": 79.00833333326148,
+          "completedLaps": 5,
+          "offtrackSec": 0,
+          "contacts": 5,
+          "passes": 2,
+          "valid": true,
+          "gap": 6.749999999993861
+        },
+        {
+          "position": 3,
+          "id": "astra",
+          "name": "ASTRA",
+          "gridSlot": 1,
+          "finishTime": 420.74166666644834,
+          "bestLap": 76.15833333332716,
+          "lastLap": 87.61666666658698,
+          "completedLaps": 5,
+          "offtrackSec": 0,
+          "contacts": 1,
+          "passes": 1,
+          "valid": true,
+          "gap": 31.291666666638207
+        }
+      ]
+    }
+  ]
+}
