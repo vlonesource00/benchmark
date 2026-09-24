@@ -190,7 +190,7 @@ export const MODES = {
 };
 
 const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
-let initialModeId = '5-arch';
+let initialModeId = 'all-arch';
 if (urlParams.get('mode') === 'triad' || urlParams.has('triad')) {
   initialModeId = 'triad';
 } else if (urlParams.has('mode') && MODES[urlParams.get('mode')]) {

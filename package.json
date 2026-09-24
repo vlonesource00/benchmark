@@ -5,6 +5,7 @@
   "type": "module",
   "description": "Isolated, pinned benchmark harness for the five racing AI architectures.",
   "scripts": {
+    "mobile:serve": "node scripts/mobile-server.mjs",
     "sandbox:astra-smoke": "node scripts/astra-integration-smoke.mjs",
     "verify:astra": "node scripts/verify-pins.mjs --subject astra",
     "prepare": "node scripts/prepare-subjects.mjs",

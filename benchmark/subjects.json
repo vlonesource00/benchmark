@@ -197,8 +197,8 @@
       "label": "DeepSeek NOVA",
       "repoUrl": "https://github.com/vlonesource00/deepseek.git",
       "branch": "main",
-      "commit": "ae86356b0d99d1f48d7be105c26bd67752d75039",
-      "testNotes": "DeepSeek NOVA V3.2 with race-distance optimal control: unit-consistent predictive traction allocation, open differential constraint, launch chatter cap, thermal slip regulation, countersteer snap-back damping, and 0.00s offtrack across 6x3 and 6x5 Triad stints.",
+      "commit": "78f9cf0e16881a49bd1339111d5a4b90eb610401",
+      "testNotes": "DeepSeek NOVA V4 interaction-centric racecraft: persistent InteractionEpisode, dedicated lateral corridor ownership [qLow, qHigh], non-yielding side-by-side combat, decoupled static/slow obstacle bypass, and 0.00s offtrack across 30 laps of Triad stints.",
       "tests": []
     }
   ]

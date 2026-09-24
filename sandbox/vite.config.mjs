@@ -17,6 +17,7 @@ export default {
   },
   preview: {
     host: '127.0.0.1',
+    allowedHosts: ['vlonethug00.tailbde88d.ts.net'],
     port: 4174,
     strictPort: true
   },
@@ -34,6 +35,7 @@ export default {
     rollupOptions: {
       input: {
         benchmark: path.join(sandboxRoot, 'index.html'),
+        mobile: path.join(sandboxRoot, 'mobile.html'),
         claudeNativeSolo: path.join(sandboxRoot, 'claude-solo.html'),
         nativeEngineRace: path.join(sandboxRoot, 'native-race.html')
       }

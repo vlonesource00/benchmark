@@ -15,3 +15,6 @@ dist/
 # Local editor and OS files.
 .DS_Store
 Thumbs.db
+
+# Transient run logs and artifacts
+artifacts/
