@@ -197,8 +197,8 @@
       "label": "DeepSeek NOVA",
       "repoUrl": "https://github.com/vlonesource00/deepseek.git",
       "branch": "main",
-      "commit": "c469c2de1fee210c8cb80d45e60b111c332e5b12",
-      "testNotes": "DeepSeek NOVA V4.1 interaction semantics correctness: numeric ID 0 support, real track-relative lateral velocity dq, orthogonal competitiveRole and dynamicState, dynamic hazard handling for rejoining cars, multi-obstacle continuous bypass with bounded blockage braking, and three-wide diagnostics.",
+      "commit": "ce73c413f583f91f9cd0cbb916e945a92ff66eac",
+      "testNotes": "DeepSeek NOVA V4.2 combat activation and momentum preservation: physical corridor reachability graph, authoritative candidate q(t) conflict verification, continuous gap buffer law, committed attack corridor lead-speed bypass, early pull-out corridor discovery, and corridor bounds exposure.",
       "tests": []
     }
   ]
