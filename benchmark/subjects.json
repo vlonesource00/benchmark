@@ -197,7 +197,7 @@
       "label": "DeepSeek NOVA",
       "repoUrl": "https://github.com/vlonesource00/deepseek.git",
       "branch": "main",
-      "commit": "4897b03f1388f43f8f6c556f3aeaf265f3b66f49",
+      "commit": "14e03309e3246a64607fed7d3eac3d5525efaa65",
       "testNotes": "DeepSeek NOVA V4.2 combat activation and momentum preservation: physical corridor reachability graph, authoritative candidate q(t) conflict verification, continuous gap buffer law, committed attack corridor lead-speed bypass, early pull-out corridor discovery, and corridor bounds exposure.",
       "tests": []
     }
