@@ -204,6 +204,7 @@ export function runTriadHeat({ grid, laps = 3, trackName = 'harbor-ring' }) {
       completedLaps: car.race.lap - 1,
       offtrackSec,
       offtrackEpisodes: episodes.length,
+      episodesList: episodes,
       contacts: contactsCount,
       passes: passes[candId] || 0,
       valid: car.race.valid,
