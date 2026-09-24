@@ -4,8 +4,8 @@
   "description": "Pinned benchmark subjects. Each checkout is created under this benchmark repo and is never read from or written to the original development folders.",
   "subjects": [
     {
-      "id":"astra","label":"Astra","repoUrl":"https://github.com/vlonesource00/astra.git","branch":"v1.2","commit":"b3fd0c0eb571ee9b0ff6d578bdd0df7184087e13",
-      "testNotes":"Harbor GT 74.850-second opening solo lap. Delayed thermal line handoff improved Astra's mean finish by 2.204 seconds over three laps and 1.718 seconds over five laps across six grid permutations versus f964e85, with unchanged incidents. Those runs used the earlier NOVA ae86356b and benchmark 50c8cd0 pins; their race figures must not be attributed to the current V4.1 TRIAD. Physics unchanged; detailed measurements are in Astra's R3 report.",
+      "id":"astra","label":"Astra","repoUrl":"https://github.com/vlonesource00/astra.git","branch":"v1.2","commit":"ce7630e85425958582e86048e7d28e3bc1f6e78b",
+      "testNotes":"Latest published Astra with the safe b3fd0c0 driving code and a 74.850-second opening solo lap. The V4.1 stale-brake candidate improved its exact six-grid campaign but regressed with current NOVA V4.2, so it was reverted. Current V4.2 probes and exact prior pins are documented in Astra's R3 reports; no V4.2 six-grid improvement is claimed. Vehicle physics unchanged.",
       "tests":[
         {"id":"harbor-classes","label":"Harbor Ring three-class solo validity","command":["node","tests/harbor-quality.mjs","--check"],"scenarioIds":["solo-pace","stability"],"suites":["quick","full"],"timeoutSeconds":180},
         {"id":"harbor-mixed","label":"Harbor Ring mixed-class pack","command":["node","tests/harbor-quality.mjs","--mixed","--check"],"scenarioIds":["pack-race","collision-safety"],"suites":["quick","full"],"timeoutSeconds":240},
