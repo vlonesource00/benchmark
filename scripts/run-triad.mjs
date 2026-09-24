@@ -56,6 +56,12 @@ function parseArgs() {
   return options;
 }
 
+function wrapTrackDelta(ds, trackLength) {
+  let d = ((ds % trackLength) + trackLength) % trackLength;
+  if (d > trackLength * 0.5) d -= trackLength;
+  return d;
+}
+
 export function runTriadHeat({ grid, laps = 3, trackName = 'harbor-ring' }) {
   const track = new Track(trackName);
   const session = new Session(track, { classId: 'gt', mixed: false });
@@ -88,6 +94,13 @@ export function runTriadHeat({ grid, laps = 3, trackName = 'harbor-ring' }) {
   let steps = 0;
   let prevOrder = grid.slice();
   const passes = { 'nova': 0, 'gemini-supreme': 0, 'astra': 0 };
+  const completedPasses = { 'nova': 0, 'gemini-supreme': 0, 'astra': 0 };
+  const retainedPasses = { 'nova': 0, 'gemini-supreme': 0, 'astra': 0 };
+  const bodyOverlaps = { 'nova': 0, 'gemini-supreme': 0, 'astra': 0 };
+  const overlapSpeedLossList = { 'nova': [], 'gemini-supreme': [], 'astra': [] };
+  const overlapEpisodes = new Map();
+  const previousGaps = new Map();
+  const pendingPassList = [];
   const contactTracker = new Map(grid.map(id => [id, 0]));
   const gridToLineTimes = {};
   const carLapTimes = { 'nova': [], 'gemini-supreme': [], 'astra': [] };
@@ -158,9 +171,105 @@ export function runTriadHeat({ grid, laps = 3, trackName = 'harbor-ring' }) {
     }
     prevOrder = currentOrder;
 
+    // Track pair interactions: body overlap, speed loss, and pass completion/retention
+    const activeCarList = session.activeCars;
+    for (let i = 0; i < activeCarList.length; i++) {
+      const carA = activeCarList[i];
+      const candA = field.bridges[carA.id]?.candidateId;
+      if (!candA) continue;
+
+      for (let j = 0; j < activeCarList.length; j++) {
+        if (i === j) continue;
+        const carB = activeCarList[j];
+        const candB = field.bridges[carB.id]?.candidateId;
+        if (!candB) continue;
+
+        // 1. Pass completion & retention tracking (directed: candA passing candB)
+        const pairKeyDirected = `${candA}:${candB}`;
+        const prevGap = previousGaps.get(pairKeyDirected);
+        const currentGap = carA.race.progress - carB.race.progress;
+        // Bumper clears rival (progress delta > 5.2m, car length is ~4.65m)
+        if (prevGap !== undefined && prevGap <= 5.2 && currentGap > 5.2) {
+          completedPasses[candA]++;
+          pendingPassList.push({
+            car: candA,
+            rival: candB,
+            carObj: carA,
+            rivalObj: carB,
+            startProgress: carA.race.progress,
+            retained: null
+          });
+        }
+        previousGaps.set(pairKeyDirected, currentGap);
+
+        // 2. Overlap & speed loss tracking (undirected pair key to avoid duplicate episode counts)
+        if (i < j) {
+          const pairKeyUndirected = candA < candB ? `${candA}:${candB}` : `${candB}:${candA}`;
+          const ds = Math.abs(wrapTrackDelta(carA.s - carB.s, track.length));
+          const isOverlapping = ds <= 4.65; // Within one car body length along track
+          let ep = overlapEpisodes.get(pairKeyUndirected);
+          if (!ep) {
+            ep = { active: false, entrySpeeds: {}, minSpeeds: {} };
+            overlapEpisodes.set(pairKeyUndirected, ep);
+          }
+
+          if (isOverlapping) {
+            if (!ep.active) {
+              ep.active = true;
+              ep.entrySpeeds = { [candA]: carA.speed, [candB]: carB.speed };
+              ep.minSpeeds = { [candA]: carA.speed, [candB]: carB.speed };
+              bodyOverlaps[candA]++;
+              bodyOverlaps[candB]++;
+            } else {
+              ep.minSpeeds[candA] = Math.min(ep.minSpeeds[candA], carA.speed);
+              ep.minSpeeds[candB] = Math.min(ep.minSpeeds[candB], carB.speed);
+            }
+          } else if (ep.active) {
+            // Overlap ended
+            ep.active = false;
+            const lossA = Math.max(0, ep.entrySpeeds[candA] - ep.minSpeeds[candA]);
+            const lossB = Math.max(0, ep.entrySpeeds[candB] - ep.minSpeeds[candB]);
+            overlapSpeedLossList[candA].push(lossA);
+            overlapSpeedLossList[candB].push(lossB);
+          }
+        }
+      }
+    }
+
+    // Check pending passes for retention (over 100m)
+    for (const p of pendingPassList) {
+      if (p.retained !== null) continue;
+      if (p.carObj.race.progress - p.startProgress >= 100) {
+        p.retained = p.carObj.race.progress > p.rivalObj.race.progress;
+        if (p.retained) retainedPasses[p.car]++;
+      }
+    }
+
     // Check if all 3 cars have finished
     const allFinished = session.activeCars.every(c => c.race.finishTime !== null);
     if (allFinished) break;
+  }
+
+  // Finalize any active overlaps
+  for (const [key, ep] of overlapEpisodes) {
+    if (ep.active) {
+      ep.active = false;
+      const [c1, c2] = key.split(':');
+      if (ep.entrySpeeds[c1] !== undefined) {
+        overlapSpeedLossList[c1].push(Math.max(0, ep.entrySpeeds[c1] - ep.minSpeeds[c1]));
+      }
+      if (ep.entrySpeeds[c2] !== undefined) {
+        overlapSpeedLossList[c2].push(Math.max(0, ep.entrySpeeds[c2] - ep.minSpeeds[c2]));
+      }
+    }
+  }
+
+  // Finalize any pending passes that hadn't reached 100m before the finish
+  for (const p of pendingPassList) {
+    if (p.retained === null) {
+      p.retained = p.carObj.race.progress > p.rivalObj.race.progress;
+      if (p.retained) retainedPasses[p.car]++;
+    }
   }
 
   // Push any final lap not yet captured in carLapTimes
@@ -190,6 +299,11 @@ export function runTriadHeat({ grid, laps = 3, trackName = 'harbor-ring' }) {
     if (contactPenalty > 0) penaltyReasons.push(`+${contactPenalty.toFixed(1)}s (${contactsCount} contacts)`);
     const penaltyDescription = penaltyReasons.length ? penaltyReasons.join(', ') : 'Clean (0 penalties)';
 
+    const speedLosses = overlapSpeedLossList[candId] || [];
+    const meanSpeedLoss = speedLosses.length > 0
+      ? Number((speedLosses.reduce((a, b) => a + b, 0) / speedLosses.length).toFixed(3))
+      : 0;
+
     return {
       rawPosition: pos + 1,
       position: pos + 1,
@@ -207,6 +321,11 @@ export function runTriadHeat({ grid, laps = 3, trackName = 'harbor-ring' }) {
       episodesList: episodes,
       contacts: contactsCount,
       passes: passes[candId] || 0,
+      completedPasses: completedPasses[candId] || 0,
+      retainedPasses: retainedPasses[candId] || 0,
+      bodyOverlaps: bodyOverlaps[candId] || 0,
+      overlapSpeedLossMps: meanSpeedLoss,
+      overlapSpeedLossList: speedLosses,
       valid: car.race.valid,
       penalties: {
         offtrackPenalty,
@@ -258,9 +377,9 @@ export function runTriadBenchmark(options) {
 
   const heats = [];
   const stats = {
-    'nova': { id: 'nova', label: 'NOVA', rawWins: 0, legalWins: 0, p2: 0, p3: 0, finishTimes: [], legalFinishTimes: [], gaps: [], bestLaps: [], offtrackSec: 0, offtrackEpisodes: 0, passes: 0, contacts: 0 },
-    'gemini-supreme': { id: 'gemini-supreme', label: 'GEMINI', rawWins: 0, legalWins: 0, p2: 0, p3: 0, finishTimes: [], legalFinishTimes: [], gaps: [], bestLaps: [], offtrackSec: 0, offtrackEpisodes: 0, passes: 0, contacts: 0 },
-    'astra': { id: 'astra', label: 'ASTRA', rawWins: 0, legalWins: 0, p2: 0, p3: 0, finishTimes: [], legalFinishTimes: [], gaps: [], bestLaps: [], offtrackSec: 0, offtrackEpisodes: 0, passes: 0, contacts: 0 }
+    'nova': { id: 'nova', label: 'NOVA', rawWins: 0, legalWins: 0, p2: 0, p3: 0, finishTimes: [], legalFinishTimes: [], gaps: [], bestLaps: [], offtrackSec: 0, offtrackEpisodes: 0, passes: 0, completedPasses: 0, retainedPasses: 0, bodyOverlaps: 0, overlapSpeedLossList: [], contacts: 0 },
+    'gemini-supreme': { id: 'gemini-supreme', label: 'GEMINI', rawWins: 0, legalWins: 0, p2: 0, p3: 0, finishTimes: [], legalFinishTimes: [], gaps: [], bestLaps: [], offtrackSec: 0, offtrackEpisodes: 0, passes: 0, completedPasses: 0, retainedPasses: 0, bodyOverlaps: 0, overlapSpeedLossList: [], contacts: 0 },
+    'astra': { id: 'astra', label: 'ASTRA', rawWins: 0, legalWins: 0, p2: 0, p3: 0, finishTimes: [], legalFinishTimes: [], gaps: [], bestLaps: [], offtrackSec: 0, offtrackEpisodes: 0, passes: 0, completedPasses: 0, retainedPasses: 0, bodyOverlaps: 0, overlapSpeedLossList: [], contacts: 0 }
   };
 
   let heatCount = 0;
@@ -299,17 +418,23 @@ export function runTriadBenchmark(options) {
         s.offtrackSec += res.offtrackSec;
         s.offtrackEpisodes += res.offtrackEpisodes;
         s.passes += res.passes;
+        s.completedPasses += res.completedPasses;
+        s.retainedPasses += res.retainedPasses;
+        s.bodyOverlaps += res.bodyOverlaps;
+        if (res.overlapSpeedLossList && res.overlapSpeedLossList.length > 0) {
+          s.overlapSpeedLossList.push(...res.overlapSpeedLossList);
+        }
         s.contacts += res.contacts;
       }
     }
   }
 
   // Compute aggregate averages
-  console.log(`\n================================================================================`);
+  console.log(`\n================================================================================================================================================================`);
   console.log(`TRIAD BENCHMARK SUMMARY (${heatCount} HEATS)`);
-  console.log(`--------------------------------------------------------------------------------`);
-  console.log(`| Driver         | Raw Wins | Legal Wins | P2  | P3  | Legal Win% | Mean Best Lap | Mean Gap (s) | Offtrack (s) | Contacts | Passes |`);
-  console.log(`--------------------------------------------------------------------------------`);
+  console.log(`----------------------------------------------------------------------------------------------------------------------------------------------------------------`);
+  console.log(`| Driver         | Raw W | Legal W | P2  | P3  | Win % | Mean Best Lap | Mean Gap (s) | Offtrack (s) | Contacts | Body Overlaps | Passes | Retained | Overlap Spd Loss |`);
+  console.log(`----------------------------------------------------------------------------------------------------------------------------------------------------------------`);
 
   const summary = {};
   for (const id of ['nova', 'gemini-supreme', 'astra']) {
@@ -318,6 +443,9 @@ export function runTriadBenchmark(options) {
     const meanBestLap = s.bestLaps.length ? (s.bestLaps.reduce((a, b) => a + b, 0) / s.bestLaps.length).toFixed(3) : '—';
     const meanGap = s.gaps.length ? (s.gaps.reduce((a, b) => a + b, 0) / s.gaps.length).toFixed(3) : '—';
     const offtrack = s.offtrackSec.toFixed(2);
+    const meanSpeedLoss = s.overlapSpeedLossList.length > 0
+      ? (s.overlapSpeedLossList.reduce((a, b) => a + b, 0) / s.overlapSpeedLossList.length).toFixed(2)
+      : '0.00';
 
     summary[id] = {
       label: s.label,
@@ -331,14 +459,18 @@ export function runTriadBenchmark(options) {
       totalOfftrackSec: s.offtrackSec,
       totalOfftrackEpisodes: s.offtrackEpisodes,
       totalPasses: s.passes,
+      totalCompletedPasses: s.completedPasses,
+      totalRetainedPasses: s.retainedPasses,
+      totalBodyOverlaps: s.bodyOverlaps,
+      meanOverlapSpeedLossMps: Number(meanSpeedLoss),
       totalContacts: s.contacts
     };
 
     console.log(
-      `| ${TRIAD_SUBJECTS[id].name.padEnd(14)} | ${String(s.rawWins).padStart(8)} | ${String(s.legalWins).padStart(10)} | ${String(s.p2).padStart(3)} | ${String(s.p3).padStart(3)} | ${legalWinPct.padStart(9)}% | ${meanBestLap.padStart(13)} | ${meanGap.padStart(12)} | ${offtrack.padStart(12)} | ${String(s.contacts).padStart(8)} | ${String(s.passes).padStart(6)} |`
+      `| ${TRIAD_SUBJECTS[id].name.padEnd(14)} | ${String(s.rawWins).padStart(5)} | ${String(s.legalWins).padStart(7)} | ${String(s.p2).padStart(3)} | ${String(s.p3).padStart(3)} | ${legalWinPct.padStart(5)}% | ${meanBestLap.padStart(13)} | ${meanGap.padStart(12)} | ${offtrack.padStart(12)} | ${String(s.contacts).padStart(8)} | ${String(s.bodyOverlaps).padStart(13)} | ${String(s.completedPasses).padStart(6)} | ${String(s.retainedPasses).padStart(8)} | ${(meanSpeedLoss + ' m/s').padStart(16)} |`
     );
   }
-  console.log(`================================================================================\n`);
+  console.log(`================================================================================================================================================================\n`);
 
   const benchmarkPayload = {
     benchmark: 'harbor-triad',
