@@ -4,8 +4,8 @@
   "description": "Pinned benchmark subjects. Each checkout is created under this benchmark repo and is never read from or written to the original development folders.",
   "subjects": [
     {
-      "id":"astra","label":"Astra","repoUrl":"https://github.com/vlonesource00/astra.git","branch":"v1.2","commit":"e44ede0f8bb7bb1caf6422f1dfc8c24873cdbbf0",
-      "testNotes":"Harbor GT 74.850-second solo geometry plus race traffic refinement. The pinned eight-car grid produced a valid 75.717-second second lap, four retained passes, zero Astra offtrack time and zero damage. Stranded offroad cars no longer trigger unnecessary line changes or passing plans; imminent rejoins remain observed. Physics and rival pins unchanged.",
+      "id":"astra","label":"Astra","repoUrl":"https://github.com/vlonesource00/astra.git","branch":"v1.2","commit":"f964e8518ed8b938ed1495a5e672b6a3f987e237",
+      "testNotes":"Harbor GT 74.850-second opening solo lap with measured-grip late-stint control. Against the earlier pinned TRIAD rivals, six five-lap grids averaged 2.960 seconds quicker than Astra e44ede0 with unchanged incidents; Astra remained third with no completed passes. Those results predate the current NOVA pin and should not be attributed to this full subject combination. Physics unchanged.",
       "tests":[
         {"id":"harbor-classes","label":"Harbor Ring three-class solo validity","command":["node","tests/harbor-quality.mjs","--check"],"scenarioIds":["solo-pace","stability"],"suites":["quick","full"],"timeoutSeconds":180},
         {"id":"harbor-mixed","label":"Harbor Ring mixed-class pack","command":["node","tests/harbor-quality.mjs","--mixed","--check"],"scenarioIds":["pack-race","collision-safety"],"suites":["quick","full"],"timeoutSeconds":240},
