@@ -197,8 +197,8 @@
       "label": "DeepSeek NOVA",
       "repoUrl": "https://github.com/vlonesource00/deepseek.git",
       "branch": "main",
-      "commit": "d78bc0158344759f58a93b12afad81bd4e3d0ddf",
-      "testNotes": "DeepSeek NOVA V3 with transient tyre-energy optimization, dynamic programming braking horizon, rear axle anti-lock slip regulation, and native plant telemetry exposure.",
+      "commit": "d688f74db0539046071e7119b9ccdf01cddc4b66",
+      "testNotes": "DeepSeek NOVA V3.1 with omnidirectional yaw damping, smooth continuous boundary assist, rate-limited tactical lateral offsets, dynamic programming braking horizon, rear axle slip regulation, and 0.00s offtrack across multi-car Triad stints.",
       "tests": []
     }
   ]

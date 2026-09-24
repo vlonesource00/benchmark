@@ -103,7 +103,8 @@ export function createGeminiBridge({ candidate, cars, hostTrack, shadowTrack, in
 
   // Pass adapted vehicle specs directly into controller options so global
   // time-optimal solvers and analytical performance models see the canonical Astra GT plant
-  const controller = new Controller(index, {
+  const controllerId = options.controllerId !== undefined ? options.controllerId : (candidate?.id === 'gemini-supreme' ? 0 : index);
+  const controller = new Controller(controllerId, {
     track,
     aggression: 0.9,
     spec: self.spec,

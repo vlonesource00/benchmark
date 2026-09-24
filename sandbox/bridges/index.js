@@ -158,6 +158,7 @@ export function createField({
       };
     } else if (id.startsWith('gemini-supreme')) {
       onStatus(`Binding Gemini Supreme controller for ${candidate.label}…`);
+      const isMultiGemini = id.startsWith('gemini-supreme-');
       bridges[index] = createGeminiBridge({
         candidate,
         cars,
@@ -166,8 +167,9 @@ export function createField({
         index,
         Controller: SupremeController,
         options: {
-          aggression: 0.88 + (index % 5) * 0.02,
-          skill: 0.94 + (index % 5) * 0.01
+          aggression: isMultiGemini ? 0.88 + (index % 5) * 0.02 : 0.90,
+          skill: isMultiGemini ? 0.94 + (index % 5) * 0.01 : 0.95,
+          controllerId: isMultiGemini ? index : 0
         }
       });
     } else if (id === 'astra') {
