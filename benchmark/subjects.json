@@ -206,7 +206,7 @@
       "label": "VORTEX",
       "repoUrl": "../VORTEX",
       "branch": "master",
-      "commit": "7f039ea2bb9ce2a76b0fbaa959ca61d7c250d580",
+      "commit": "ffcfd9d1721766b06f0623bb6de15337128f707f",
       "testNotes": "VORTEX (Value-Optimized Reactive Trajectory & EXecution): offline TrackOracle racing line with a validated physical vehicle envelope, oracle-backed TrackAtlas, multi-corner corridor planner, engagement graph and attack/defence contract, 120 Hz steering servo with actuator-lag-compensated curvature feed-forward, and a braking-point speed law in station coordinates. src/sim, src/render and public/assets are byte-identical to the canonical Astra host and are verified as such by sandbox:vortex:parity. Measured solo Harbor Ring flying lap at this pin: 74.767 s.",
       "tests": [
         {
