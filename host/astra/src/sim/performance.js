@@ -56,7 +56,7 @@ export class PerformanceModel {
     const SPEC=c.spec??DEFAULT_SPEC;
     const mass=SPEC.mass+c.fuel*.75,q=.5*1.225*speed*speed;
     const platform=clamp(1-Math.abs(c.pitch)*1.4,.65,1);
-    const downforce=q*SPEC.area*(SPEC.cl+(c.setup.wing-6)*.11)*platform*(1-c.aero.wake*.32);
+    const downforce=q*SPEC.area*(SPEC.cl+(c.setup.wing-6)*.11)*platform*(1-c.aero.wake*.16);
     const load=(mass*9.81+downforce)/4;
     const mu=this.tyreFactor*SPEC.tyreGrip*clamp(1-.13*Math.log(Math.max(.1,load/3300)),.68,1.18);
     const p=this.track.at(s),lane=this.track.laneAt(lateral);
@@ -70,7 +70,7 @@ export class PerformanceModel {
     const lateralFraction=.78+(PACE.lateralReserve-.78)*this.paceBlend;
     const balanceReserve=Math.min(this.frontFactor,this.rearFactor)/this.tyreFactor;
     const lateralCapacity=mu*surface*(9.81+downforce/mass)*lateralFraction*balanceReserve;
-    const drag=q*SPEC.area*(SPEC.cd+(c.setup.wing-6)*.013)*(1-c.aero.wake*.24)*(1+c.damage*.2)/mass;
+    const drag=q*SPEC.area*(SPEC.cd+(c.setup.wing-6)*.013)*(1-c.aero.wake*.42)*(1+c.damage*.2)/mass;
     let gear=1;
     while(gear<6&&speed/SPEC.radius*SPEC.gears[gear]*SPEC.finalDrive*9.5493>7450)gear++;
     const ratio=SPEC.gears[gear]*SPEC.finalDrive,rpm=Math.max(1100,speed/SPEC.radius*ratio*9.5493);

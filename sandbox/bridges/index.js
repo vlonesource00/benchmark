@@ -5,6 +5,7 @@ import { createGeminiBridge, GEMINI_SUPREME, GEMINI_NMPCC, GEMINI_GRAND_PRIX } f
 import { createCloudBridge, CLOUD_CANDIDATE } from './claude-bridge.js';
 import { createMuseBridge, MUSE_CANDIDATE } from './musespark-bridge.js';
 import { createNovaBridge, NOVA_CANDIDATE } from './nova-bridge.js';
+import { createVortexBridge, VORTEX_CANDIDATE } from './vortex-bridge.js';
 import { NextGenAIController as SupremeController } from '../../subjects/gemini-supreme/src/ai/v2/NextGenAIController.js';
 import { NextGenAIController as NmpccController } from '../../subjects/gemini-nmpcc/src/ai/v2/NextGenAIController.js';
 import { NextGenAIController as GrandPrixController } from '../../subjects/gemini-grand-prix/src/ai/v2/NextGenAIController.js';
@@ -63,13 +64,22 @@ export const SUPREME_WITH_PLAYER = Object.freeze([
 ]);
 
 export const TRIAD_CANDIDATES = Object.freeze([
+  VORTEX_CANDIDATE,
+  NOVA_CANDIDATE,
+  GEMINI_SUPREME,
+  ASTRA_CANDIDATE
+]);
+export const TRIAD_IDS = Object.freeze(['vortex', 'nova', 'gemini-supreme', 'astra']);
+export const VORTEX_QUAD_CANDIDATES = Object.freeze([
+  VORTEX_CANDIDATE,
   ASTRA_CANDIDATE,
   GEMINI_SUPREME,
   NOVA_CANDIDATE
 ]);
-export const TRIAD_IDS = Object.freeze(['astra', 'gemini-supreme', 'nova']);
+export const VORTEX_QUAD_IDS = Object.freeze(VORTEX_QUAD_CANDIDATES.map((candidate) => candidate.id));
 
 export const ALL_KNOWN_CANDIDATES = Object.freeze([
+  VORTEX_CANDIDATE,
   NOVA_CANDIDATE,
   MUSE_CANDIDATE,
   ...CANDIDATES_5ARCH,
@@ -172,6 +182,8 @@ export function createField({
           controllerId: isMultiGemini ? index : 0
         }
       });
+    } else if (id === 'vortex') {
+      bridges[index] = createVortexBridge({ line: session.lineFor(car), index, aggression: session.aggression });
     } else if (id === 'astra') {
       bridges[index] = createAstraBridge({ line: session.lineFor(car), index, aggression: session.aggression });
     } else if (id === 'gpt-racing') {

@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { ROOT, git, gitStatus, loadManifest, subjectPath, assertCommit } from './lib.mjs';
+import { ROOT, git, gitStatus, loadManifest, repositoryUrl, subjectPath, assertCommit } from './lib.mjs';
 
 const manifest = loadManifest();
 const subjectIndex=process.argv.indexOf('--subject');
@@ -13,16 +13,17 @@ const rows = [];
 for (const subject of subjects) {
   try {
     assertCommit(subject.commit, `${subject.id}.commit`);
+    const repoUrl = repositoryUrl(subject);
     const dir = subjectPath(subject);
     await fs.access(path.join(dir, '.git'));
     const actual = git(dir, ['rev-parse', 'HEAD']).toLowerCase();
     const origin = git(dir, ['config', '--get', 'remote.origin.url']);
     const changes = gitStatus(dir).stdout.trim();
     const clean = changes.length === 0;
-    const ok = actual === subject.commit.toLowerCase() && origin === subject.repoUrl && clean;
+    const ok = actual === subject.commit.toLowerCase() && origin === repoUrl && clean;
     rows.push({ id: subject.id, commit: actual.slice(0, 12), origin, status: ok ? 'OK' : clean ? 'MISMATCH' : 'DIRTY' });
     if (!ok) {
-      if (actual !== subject.commit.toLowerCase() || origin !== subject.repoUrl) failures.push(`${subject.id}: expected ${subject.commit} from ${subject.repoUrl}, got ${actual} from ${origin}`);
+      if (actual !== subject.commit.toLowerCase() || origin !== repoUrl) failures.push(`${subject.id}: expected ${subject.commit} from ${repoUrl}, got ${actual} from ${origin}`);
       if (!clean) failures.push(`${subject.id}: benchmark-owned checkout has tracked or untracked changes:\n${changes}`);
     }
   } catch (error) {

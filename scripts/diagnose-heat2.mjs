@@ -65,7 +65,7 @@ export async function diagnoseHeat2() {
     session.step(1 / 120, { throttle: 0, brake: 0, steer: 0 });
     steps++;
 
-    if (session.time > 55.0) break;
+    if (session.time > 90.0) break;
   }
 
   console.log(`\nTotal Offtrack Samples: ${offtrackSamples.length}`);

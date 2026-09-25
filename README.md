@@ -101,3 +101,18 @@ $env:SANDBOX_TICKS = 70000
 $env:SANDBOX_REQUIRE_COMPLETE = 1
 npm run sandbox:smoke
 ```
+
+## VORTEX on the canonical Harbor host
+
+The `VORTEX Harbor Quad` mode runs VORTEX with Astra, Gemini Supreme, and DeepSeek NOVA in the existing 120 Hz Astra host. `VORTEX Nine-Architecture Grand Prix` adds a ninth canonical GT `Vehicle` to the session roster so VORTEX can race all eight existing controllers. The original eight-car mode remains available. VORTEX is a separate sibling project. Its benchmark checkout under `subjects/vortex` is detached at the exact commit in `benchmark/subjects.json`; the live sandbox never imports the development checkout. Neither mode changes the canonical vehicle, tyre, track, collision, renderer, or timing source.
+
+```powershell
+npm run prepare -- --subject vortex
+npm run verify:vortex
+npm run sandbox:vortex:parity
+npm run benchmark:vortex:solo -- --laps=3
+npm run benchmark:vortex -- --laps=3 --rotations=4
+npm run sandbox
+```
+
+Choose either VORTEX mode from the race menu or open the sandbox with `?mode=vortex-quad` or `?mode=vortex-all-arch`. `benchmark:vortex:solo -- --subject=astra` measures the pinned Astra bridge under the same host. The parity smoke checks copied physical assets and bit-identical VORTEX commands from standalone and bridge entry points on a non-leading 120 Hz stint.

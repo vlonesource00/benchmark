@@ -57,7 +57,7 @@ export const TRIAD_GRID_PERMUTATIONS = Object.freeze(gridPermutations(FIELDS.tri
 function parseArgs() {
   const args = process.argv.slice(2);
   const options = {
-    field: 'triad',
+    field: 'quad',
     laps: 3,
     rotations: 1, // 1 to 5 sets of the full permutation set (default 1 = one heat per grid order)
     seed: 20260919,

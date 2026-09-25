@@ -3,6 +3,7 @@ import { createSafeWebGLRenderer } from './safe-renderer.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Track } from '../host/astra/src/sim/track.js';
 import { Session } from '../host/astra/src/sim/session.js';
+import { Vehicle } from '../host/astra/src/sim/vehicle.js';
 import { Keyboard } from '../host/astra/src/sim/input.js';
 import { World } from '../host/astra/src/render/world.js';
 import { CarModel } from '../host/astra/src/render/car.js';
@@ -17,6 +18,7 @@ import {
   CANDIDATES,
   CANDIDATE_IDS,
   TRIAD_CANDIDATES,
+  VORTEX_QUAD_CANDIDATES,
   createField,
   rotations
 } from './bridges/index.js';
@@ -135,7 +137,7 @@ world.setLighting('golden');
 const finish = new VisualFinish(renderer, scene, camera);
 finish.setQuality('high');
 const effects = new CarEffects(scene);
-const visualDebugger = new MultiCarVisualDebugger(scene, track, 8);
+const visualDebugger = new MultiCarVisualDebugger(scene, track, 9);
 const keyboard = new Keyboard(() => {});
 let simPaused = false;
 let stepOnce = false;
@@ -147,6 +149,15 @@ export const MODES = {
     title: 'All-Architecture Grand Prix',
     subtitle: 'Astra, GPT, Claude, Gemini Supreme, Grand Prix, NMPCC, DeepSeek NOVA and MuseSpark',
     specText: '8 × GT Class (All Architectures)',
+    candidates: ALL_KNOWN_CANDIDATES.filter((c) => c.id !== 'player-gt' && c.id !== 'vortex' && !SUPREME_CANDIDATES.some((s) => s.id === c.id)),
+    order: ALL_KNOWN_CANDIDATES.filter((c) => c.id !== 'player-gt' && c.id !== 'vortex' && !SUPREME_CANDIDATES.some((s) => s.id === c.id)).map((c) => c.id),
+    defaultAutopilot: true
+  },
+  'vortex-all-arch': {
+    id: 'vortex-all-arch',
+    title: 'VORTEX Nine-Architecture Grand Prix',
+    subtitle: 'VORTEX races all eight existing architecture controllers',
+    specText: '9 × GT Class (VORTEX + 8 architectures)',
     candidates: ALL_KNOWN_CANDIDATES.filter((c) => c.id !== 'player-gt' && !SUPREME_CANDIDATES.some((s) => s.id === c.id)),
     order: ALL_KNOWN_CANDIDATES.filter((c) => c.id !== 'player-gt' && !SUPREME_CANDIDATES.some((s) => s.id === c.id)).map((c) => c.id),
     defaultAutopilot: true
@@ -180,11 +191,20 @@ export const MODES = {
   },
   'triad': {
     id: 'triad',
-    title: 'Harbor Triad Showcase',
-    subtitle: 'Astra vs Gemini Supreme V3.2 vs DeepSeek NOVA',
-    specText: '3 × GT Class (Canonical Triad)',
+    title: 'Harbor Quad Showcase (VORTEX / NOVA / GEMINI / ASTRA)',
+    subtitle: 'VORTEX vs DeepSeek NOVA vs Gemini Supreme V3.2 vs Astra Host',
+    specText: '4 × GT Class (VORTEX / NOVA / Gemini / Astra)',
     candidates: TRIAD_CANDIDATES,
-    order: ['nova', 'gemini-supreme', 'astra'],
+    order: ['vortex', 'nova', 'gemini-supreme', 'astra'],
+    defaultAutopilot: true
+  },
+  'vortex-quad': {
+    id: 'vortex-quad',
+    title: 'VORTEX Harbor Quad',
+    subtitle: 'VORTEX, Astra, Gemini Supreme and DeepSeek NOVA on the canonical host',
+    specText: '4 × GT Class (VORTEX / Astra / Gemini / NOVA)',
+    candidates: VORTEX_QUAD_CANDIDATES,
+    order: VORTEX_QUAD_CANDIDATES.map((candidate) => candidate.id),
     defaultAutopilot: true
   }
 };
@@ -232,6 +252,13 @@ const carTelemetry = new Map();
 function initField(order = MODES[currentModeId].order, candidates = MODES[currentModeId].candidates) {
   activeCandidates = candidates;
   const modeDef = MODES[currentModeId] || MODES['5-arch'];
+  if (order.length > 9) throw new Error('Canonical Harbor host supports at most nine grid entries');
+  while (session.cars.length < order.length) {
+    const id = session.cars.length;
+    session.cars.push(new Vehicle(id, `GRID ${id + 1}`, '#bdff64', 'gt'));
+  }
+  if (order.length <= 8 && session.cars.length > 8) session.cars.length = 8;
+  session.drivers.length = session.cars.length;
 
   const titleEl = byId('masthead-title');
   if (titleEl) {

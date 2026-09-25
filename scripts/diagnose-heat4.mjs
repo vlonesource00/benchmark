@@ -3,7 +3,7 @@ import { Session } from '../host/astra/src/sim/session.js';
 import { createField, TRIAD_CANDIDATES } from '../sandbox/bridges/index.js';
 
 export async function diagnoseHeat4() {
-  const grid = ['gemini-supreme', 'astra', 'nova'];
+  const grid = ['nova', 'astra', 'gemini-supreme'];
   const track = new Track('harbor-ring');
   const session = new Session(track, { classId: 'gt' });
   session.laps = 3;
@@ -19,7 +19,11 @@ export async function diagnoseHeat4() {
   session.countdown = 0;
 
   const novaBridge = field.bridges.find(b => b.candidateId === 'nova');
+  const geminiBridge = field.bridges.find(b => b.candidateId === 'gemini-supreme');
+  const astraBridge = field.bridges.find(b => b.candidateId === 'astra');
   const novaCar = session.cars[novaBridge.carId];
+  const geminiCar = session.cars[geminiBridge.carId];
+  const astraCar = session.cars[astraBridge.carId];
   const novaDriver = novaBridge.driver;
 
   let prevOfftrack = 0;
@@ -28,22 +32,23 @@ export async function diagnoseHeat4() {
   let steps = 0;
   const maxSteps = Math.ceil(340 * 120);
 
-  console.log('Simulating Grid 4 [gemini-supreme, astra, nova] for 3 laps...');
+  console.log(`Simulating Grid [${grid.join(', ')}] for 3 laps...`);
 
   while (steps < maxSteps) {
     const novaAi = novaDriver; // novaBridge.driver is novaAi (NovaDriver)
     const dbg = novaAi?.coupledController?.state?.debugSteer || {};
     const topo = novaAi?.topologyResult;
-    const isApproach = session.time >= 31.0 && session.time <= 36.5;
+    const isApproach = session.time >= 42.0 && session.time <= 46.5;
     if (isApproach && steps % 4 === 0) {
-      const g = session.cars[0];
-      const a = session.cars[1];
-      const n = session.cars[2];
+      const dbg = novaAi?.coupledController?.state?.debugSteer || {};
       const cc = novaAi?.coupledController;
-      const dbg = cc?.state?.debugSteer || {};
-      const ccState = cc?.state || {};
-      const refQ = cc?.ref ? cc.ref.q[Math.round(n.s / cc.ref.ds) % cc.ref.n] : 0;
-      console.log(`t=${session.time.toFixed(2)} | s=${n.s.toFixed(1)} q=${n.lateral.toFixed(2)} refQ=${refQ.toFixed(2)} trkOff=${(cc.trackedTacticalOffset??0).toFixed(2)} v=${(n.speed*3.6).toFixed(1)} str=${n.controls.steer.toFixed(2)} thr=${n.controls.throttle.toFixed(2)} brk=${n.controls.brake.toFixed(2)} | pp=${(dbg.pp??0).toFixed(2)} ff=${(dbg.ff??0).toFixed(2)} damp=${(dbg.damp??0).toFixed(2)} bnd=${(dbg.boundarySteerCorrection??0).toFixed(2)} satR=${(dbg.satR??0).toFixed(2)} isOS=${dbg.isOversteering} beta=${(cc.lastBeta??0).toFixed(3)} | topo=${topo?.activeTopology} ph=${novaDriver.topologyPlanner?.phase} tgtQ=${(topo?.targetQ??0).toFixed(2)} side=${novaDriver.topologyPlanner?.selectedSide}`);
+      const n = novaCar;
+      console.log(`t=${session.time.toFixed(2)} | s=${n.s.toFixed(1)} q=${n.lateral.toFixed(2)} tgtQ=${(topo?.targetQ??0).toFixed(2)} | str=${n.controls.steer.toFixed(2)} pp=${(dbg.pp??0).toFixed(2)} ff=${(dbg.ff??0).toFixed(2)} damp=${(dbg.damp??0).toFixed(2)} bnd=${(dbg.boundarySteerCorrection??0).toFixed(2)} satR=${(dbg.satR??0).toFixed(2)} beta=${(cc?.lastBeta??0).toFixed(3)} | v=${(n.speed*3.6).toFixed(1)} thr=${n.controls.throttle.toFixed(2)} brk=${n.controls.brake.toFixed(2)}`);
+      if (session.time >= 25.0 && session.time <= 26.0) {
+        for (const c of topo?.candidates ?? []) {
+          console.log(`   cand: ${c.topology} cost=${c.cost.toFixed(2)} feas=${c.trajectory?.corridorFeasible} risk=${c.predicted?.physicalCollisionRisk ?? 0}`);
+        }
+      }
     }
     if (session.phase === 'finished' && !session.activeCars.every((c) => c.race.finishTime !== null)) {
       session.phase = 'racing';

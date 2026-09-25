@@ -7,6 +7,7 @@ import {
   ensureDir,
   git,
   loadManifest,
+  repositoryUrl,
   subjectPath,
   trackedChanges,
   assertCommit
@@ -47,20 +48,21 @@ function clone(repoUrl, destination) {
 
 for (const subject of subjects) {
   assertCommit(subject.commit, `${subject.id}.commit`);
+  const repoUrl = repositoryUrl(subject);
   const destination = subjectPath(subject);
   const exists = await directoryExists(destination);
 
   if (!exists) {
     console.log(`CLONE  ${subject.label} -> ${path.relative(ROOT, destination)}`);
-    clone(subject.repoUrl, destination);
+    clone(repoUrl, destination);
   } else {
     const gitDir = path.join(destination, '.git');
     if (!(await directoryExists(gitDir))) {
       throw new Error(`Refusing to use non-git directory as ${subject.id}: ${destination}`);
     }
     const origin = git(destination, ['config', '--get', 'remote.origin.url']);
-    if (origin !== subject.repoUrl) {
-      throw new Error(`Refusing to reuse ${destination}: origin is ${origin}, expected ${subject.repoUrl}`);
+    if (origin !== repoUrl) {
+      throw new Error(`Refusing to reuse ${destination}: origin is ${origin}, expected ${repoUrl}`);
     }
     if (trackedChanges(destination)) {
       throw new Error(`Refusing to change ${subject.id}: tracked changes exist in benchmark-owned checkout ${destination}`);

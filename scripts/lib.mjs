@@ -13,6 +13,12 @@ export function loadManifest() {
   return JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
 }
 
+// Local sibling subjects are resolved from the benchmark root before cloning.
+// Their detached benchmark checkout still pins an exact immutable commit.
+export function repositoryUrl(subject) {
+  return subject.repoUrl.startsWith('.') ? path.resolve(ROOT, subject.repoUrl) : subject.repoUrl;
+}
+
 export function subjectPath(subject) {
   const destination = path.resolve(ROOT, subject.workdir || path.join('subjects', subject.id));
   assertInside(ROOT, destination, `subject ${subject.id}`);
