@@ -2,29 +2,64 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { Track } from '../host/astra/src/sim/track.js';
 import { Session } from '../host/astra/src/sim/session.js';
-import { createField, TRIAD_CANDIDATES } from '../sandbox/bridges/index.js';
+import { createField, ALL_KNOWN_CANDIDATES } from '../sandbox/bridges/index.js';
 
-// The 6 canonical grid permutations for the 3-car Triad
-export const TRIAD_GRID_PERMUTATIONS = [
-  ['nova', 'gemini-supreme', 'astra'],
-  ['nova', 'astra', 'gemini-supreme'],
-  ['gemini-supreme', 'nova', 'astra'],
-  ['gemini-supreme', 'astra', 'nova'],
-  ['astra', 'nova', 'gemini-supreme'],
-  ['astra', 'gemini-supreme', 'nova']
-];
+/**
+ * Field presets.
+ *
+ * The triad is the long-standing Astra / Gemini Supreme / NOVA baseline and is
+ * kept bit-for-bit so its historical numbers stay comparable. The quad adds
+ * VORTEX as a fourth car over the same three architectures. Every metric table
+ * is derived from the preset's id list rather than being hard-coded to three,
+ * so the two fields cannot drift apart.
+ */
+export const FIELDS = Object.freeze({
+  triad: Object.freeze({
+    id: 'triad',
+    title: 'HARBOR TRIAD BENCHMARK',
+    note: 'Canonical Astra host (120 Hz)',
+    ids: Object.freeze(['nova', 'gemini-supreme', 'astra']),
+    subjects: Object.freeze({
+      'nova': { id: 'nova', name: 'DeepSeek NOVA', label: 'NOVA' },
+      'gemini-supreme': { id: 'gemini-supreme', name: 'Gemini Supreme V3.2', label: 'GEMINI' },
+      'astra': { id: 'astra', name: 'Astra (Host Baseline)', label: 'ASTRA' }
+    })
+  }),
+  quad: Object.freeze({
+    id: 'quad',
+    title: 'HARBOR QUAD BENCHMARK',
+    note: 'Canonical Astra host (120 Hz)',
+    ids: Object.freeze(['vortex', 'nova', 'gemini-supreme', 'astra']),
+    subjects: Object.freeze({
+      'vortex': { id: 'vortex', name: 'VORTEX', label: 'VORTEX' },
+      'nova': { id: 'nova', name: 'DeepSeek NOVA', label: 'NOVA' },
+      'gemini-supreme': { id: 'gemini-supreme', name: 'Gemini Supreme V3.2', label: 'GEMINI' },
+      'astra': { id: 'astra', name: 'Astra (Host Baseline)', label: 'ASTRA' }
+    })
+  })
+});
 
-export const TRIAD_SUBJECTS = {
-  'nova': { id: 'nova', name: 'DeepSeek NOVA', label: 'NOVA' },
-  'gemini-supreme': { id: 'gemini-supreme', name: 'Gemini Supreme V3.2', label: 'GEMINI' },
-  'astra': { id: 'astra', name: 'Astra (Host Baseline)', label: 'ASTRA' }
-};
+/** Every grid ordering of a field, so no car keeps a start-slot advantage. */
+export function gridPermutations(ids) {
+  if (ids.length <= 1) return [ids.slice()];
+  const out = [];
+  for (let i = 0; i < ids.length; i++) {
+    const rest = ids.slice(0, i).concat(ids.slice(i + 1));
+    for (const tail of gridPermutations(rest)) out.push([ids[i], ...tail]);
+  }
+  return out;
+}
+
+// Preserved for the audit scripts, which iterate the baseline triad only.
+export const TRIAD_SUBJECTS = FIELDS.triad.subjects;
+export const TRIAD_GRID_PERMUTATIONS = Object.freeze(gridPermutations(FIELDS.triad.ids).map((row) => Object.freeze(row)));
 
 function parseArgs() {
   const args = process.argv.slice(2);
   const options = {
+    field: 'triad',
     laps: 3,
-    rotations: 1, // 1 to 5 sets of the 6 permutations (default 1 = 6 heats)
+    rotations: 1, // 1 to 5 sets of the full permutation set (default 1 = one heat per grid order)
     seed: 20260919,
     json: null,
     verbose: false
@@ -32,7 +67,11 @@ function parseArgs() {
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    if (arg === '--laps' && args[i + 1]) {
+    if (arg === '--field' && args[i + 1]) {
+      options.field = args[++i];
+    } else if (arg.startsWith('--field=')) {
+      options.field = arg.slice(7);
+    } else if (arg === '--laps' && args[i + 1]) {
       options.laps = parseInt(args[++i], 10);
     } else if (arg.startsWith('--laps=')) {
       options.laps = parseInt(arg.slice(7), 10);
@@ -53,6 +92,9 @@ function parseArgs() {
     }
   }
 
+  if (!FIELDS[options.field]) {
+    throw new Error(`Unknown field "${options.field}". Expected one of: ${Object.keys(FIELDS).join(', ')}`);
+  }
   return options;
 }
 
@@ -62,26 +104,30 @@ function wrapTrackDelta(ds, trackLength) {
   return d;
 }
 
+const zeroTally = (grid) => Object.fromEntries(grid.map((id) => [id, 0]));
+const listTally = (grid) => Object.fromEntries(grid.map((id) => [id, []]));
+
 export function runTriadHeat({ grid, laps = 3, trackName = 'harbor-ring' }) {
+  const fieldSize = grid.length;
   const track = new Track(trackName);
   const session = new Session(track, { classId: 'gt', mixed: false });
   session.laps = laps;
-  session.field = 3;
-  session.cars = session.cars.slice(0, 3);
-  session.drivers = session.drivers.slice(0, 3);
+  session.field = fieldSize;
+  session.cars = session.cars.slice(0, fieldSize);
+  session.drivers = session.drivers.slice(0, fieldSize);
   session.autopilot = true;
 
   const field = createField({
     session,
     hostTrack: track,
     order: grid,
-    candidatesList: TRIAD_CANDIDATES
+    candidatesList: ALL_KNOWN_CANDIDATES
   });
   session.start({ freshTrack: true });
   // start() resets the host driver array; bind architecture bridges afterward.
   field.attach(true);
   if (field.bridges.some((bridge, index) => session.drivers[index] !== bridge)) {
-    throw new Error('Triad architecture bridges were not installed');
+    throw new Error('Architecture bridges were not installed');
   }
   // Skip the 4-second standing countdown to begin green-flag racing immediately
   session.phase = 'racing';
@@ -93,20 +139,20 @@ export function runTriadHeat({ grid, laps = 3, trackName = 'harbor-ring' }) {
 
   let steps = 0;
   let prevOrder = grid.slice();
-  const passes = { 'nova': 0, 'gemini-supreme': 0, 'astra': 0 };
-  const completedPasses = { 'nova': 0, 'gemini-supreme': 0, 'astra': 0 };
-  const retainedPasses = { 'nova': 0, 'gemini-supreme': 0, 'astra': 0 };
-  const bodyOverlaps = { 'nova': 0, 'gemini-supreme': 0, 'astra': 0 };
-  const overlapSpeedLossList = { 'nova': [], 'gemini-supreme': [], 'astra': [] };
+  const passes = zeroTally(grid);
+  const completedPasses = zeroTally(grid);
+  const retainedPasses = zeroTally(grid);
+  const bodyOverlaps = zeroTally(grid);
+  const overlapSpeedLossList = listTally(grid);
   const overlapEpisodes = new Map();
   const previousGaps = new Map();
   const pendingPassList = [];
   const contactTracker = new Map(grid.map(id => [id, 0]));
   const gridToLineTimes = {};
-  const carLapTimes = { 'nova': [], 'gemini-supreme': [], 'astra': [] };
-  const lastLapRecorded = { 'nova': 1, 'gemini-supreme': 1, 'astra': 1 };
-  const prevOfftrack = { 'nova': 0, 'gemini-supreme': 0, 'astra': 0 };
-  const offtrackEpisodes = { 'nova': [], 'gemini-supreme': [], 'astra': [] };
+  const carLapTimes = listTally(grid);
+  const lastLapRecorded = Object.fromEntries(grid.map(id => [id, 1]));
+  const prevOfftrack = zeroTally(grid);
+  const offtrackEpisodes = listTally(grid);
 
   while (steps < maxSteps) {
     const prevContacts = session.contacts;
@@ -245,7 +291,7 @@ export function runTriadHeat({ grid, laps = 3, trackName = 'harbor-ring' }) {
       }
     }
 
-    // Check if all 3 cars have finished
+    // Check if all cars have finished
     const allFinished = session.activeCars.every(c => c.race.finishTime !== null);
     if (allFinished) break;
   }
@@ -368,35 +414,47 @@ export function runTriadHeat({ grid, laps = 3, trackName = 'harbor-ring' }) {
 }
 
 export function runTriadBenchmark(options) {
-  const { laps, rotations, json, verbose } = options;
+  const { laps, rotations, json } = options;
+  const preset = FIELDS[options.field ?? 'triad'];
+  const ids = preset.ids;
+  const permutations = gridPermutations(ids);
+  const totalHeats = rotations * permutations.length;
+
   console.log(`\n================================================================================`);
-  console.log(`HARBOR TRIAD BENCHMARK — CANONICAL ASTRA HOST (120 Hz)`);
-  console.log(`Subjects: Astra vs Gemini Supreme V3.2 vs DeepSeek NOVA`);
-  console.log(`Format: ${rotations} rotation(s) × 6 canonical grid heats = ${rotations * 6} total heats (${laps} laps/heat)`);
+  console.log(`${preset.title} — ${preset.note}`);
+  console.log(`Subjects: ${ids.map((id) => preset.subjects[id].label).join(' vs ')}`);
+  console.log(`Format: ${rotations} rotation(s) × ${permutations.length} grid orders = ${totalHeats} total heats (${laps} laps/heat)`);
   console.log(`================================================================================\n`);
 
   const heats = [];
-  const stats = {
-    'nova': { id: 'nova', label: 'NOVA', rawWins: 0, legalWins: 0, p2: 0, p3: 0, finishTimes: [], legalFinishTimes: [], gaps: [], bestLaps: [], offtrackSec: 0, offtrackEpisodes: 0, passes: 0, completedPasses: 0, retainedPasses: 0, bodyOverlaps: 0, overlapSpeedLossList: [], contacts: 0 },
-    'gemini-supreme': { id: 'gemini-supreme', label: 'GEMINI', rawWins: 0, legalWins: 0, p2: 0, p3: 0, finishTimes: [], legalFinishTimes: [], gaps: [], bestLaps: [], offtrackSec: 0, offtrackEpisodes: 0, passes: 0, completedPasses: 0, retainedPasses: 0, bodyOverlaps: 0, overlapSpeedLossList: [], contacts: 0 },
-    'astra': { id: 'astra', label: 'ASTRA', rawWins: 0, legalWins: 0, p2: 0, p3: 0, finishTimes: [], legalFinishTimes: [], gaps: [], bestLaps: [], offtrackSec: 0, offtrackEpisodes: 0, passes: 0, completedPasses: 0, retainedPasses: 0, bodyOverlaps: 0, overlapSpeedLossList: [], contacts: 0 }
-  };
+  const stats = {};
+  for (const id of ids) {
+    stats[id] = {
+      id, label: preset.subjects[id].label,
+      rawWins: 0, legalWins: 0,
+      p2: 0, p3: 0, other: 0,
+      finishTimes: [], legalFinishTimes: [], gaps: [], bestLaps: [],
+      offtrackSec: 0, offtrackEpisodes: 0,
+      passes: 0, completedPasses: 0, retainedPasses: 0,
+      bodyOverlaps: 0, overlapSpeedLossList: [], contacts: 0
+    };
+  }
 
   let heatCount = 0;
   for (let rot = 0; rot < rotations; rot++) {
-    for (let permIdx = 0; permIdx < TRIAD_GRID_PERMUTATIONS.length; permIdx++) {
+    for (let permIdx = 0; permIdx < permutations.length; permIdx++) {
       heatCount++;
-      const grid = TRIAD_GRID_PERMUTATIONS[permIdx];
-      const gridStr = grid.map(id => TRIAD_SUBJECTS[id]?.label || id).join(' / ');
-      process.stdout.write(`Heat ${String(heatCount).padStart(2, '0')}/${rotations * 6} [${gridStr}] ... `);
+      const grid = permutations[permIdx];
+      const gridStr = grid.map(id => preset.subjects[id]?.label || id).join(' / ');
+      process.stdout.write(`Heat ${String(heatCount).padStart(2, '0')}/${totalHeats} [${gridStr}] ... `);
 
       const heatResult = runTriadHeat({ grid, laps });
       heats.push({ heatIndex: heatCount, rotation: rot + 1, ...heatResult });
 
       const w = heatResult.winner;
       const lw = heatResult.legalWinner;
-      const wLabel = TRIAD_SUBJECTS[w]?.label || w;
-      const lwLabel = TRIAD_SUBJECTS[lw]?.label || lw;
+      const wLabel = preset.subjects[w]?.label || w;
+      const lwLabel = preset.subjects[lw]?.label || lw;
       const wTime = heatResult.results[0]?.finishTime?.toFixed(2) ?? 'DNF';
       const gap2 = heatResult.results[1]?.gap?.toFixed(3) ?? '—';
       const gap3 = heatResult.results[2]?.gap?.toFixed(3) ?? '—';
@@ -410,6 +468,7 @@ export function runTriadBenchmark(options) {
         if (res.legalPosition === 1) s.legalWins++;
         if (res.legalPosition === 2) s.p2++;
         else if (res.legalPosition === 3) s.p3++;
+        else s.other++;
 
         if (res.finishTime !== null) s.finishTimes.push(res.finishTime);
         if (res.legalFinishTime !== null) s.legalFinishTimes.push(res.legalFinishTime);
@@ -430,14 +489,14 @@ export function runTriadBenchmark(options) {
   }
 
   // Compute aggregate averages
-  console.log(`\n================================================================================================================================================================`);
-  console.log(`TRIAD BENCHMARK SUMMARY (${heatCount} HEATS)`);
-  console.log(`----------------------------------------------------------------------------------------------------------------------------------------------------------------`);
+  console.log(`\n${'='.repeat(150)}`);
+  console.log(`${preset.title} SUMMARY (${heatCount} HEATS)`);
+  console.log(`${'-'.repeat(150)}`);
   console.log(`| Driver         | Raw W | Legal W | P2  | P3  | Win % | Mean Best Lap | Mean Gap (s) | Offtrack (s) | Contacts | Body Overlaps | Passes | Retained | Overlap Spd Loss |`);
-  console.log(`----------------------------------------------------------------------------------------------------------------------------------------------------------------`);
+  console.log(`${'-'.repeat(150)}`);
 
   const summary = {};
-  for (const id of ['nova', 'gemini-supreme', 'astra']) {
+  for (const id of ids) {
     const s = stats[id];
     const legalWinPct = ((s.legalWins / heatCount) * 100).toFixed(1);
     const meanBestLap = s.bestLaps.length ? (s.bestLaps.reduce((a, b) => a + b, 0) / s.bestLaps.length).toFixed(3) : '—';
@@ -453,6 +512,7 @@ export function runTriadBenchmark(options) {
       legalWins: s.legalWins,
       p2: s.p2,
       p3: s.p3,
+      other: s.other,
       legalWinPct: Number(legalWinPct),
       meanBestLap: Number(meanBestLap) || null,
       meanGap: Number(meanGap) || 0,
@@ -467,15 +527,15 @@ export function runTriadBenchmark(options) {
     };
 
     console.log(
-      `| ${TRIAD_SUBJECTS[id].name.padEnd(14)} | ${String(s.rawWins).padStart(5)} | ${String(s.legalWins).padStart(7)} | ${String(s.p2).padStart(3)} | ${String(s.p3).padStart(3)} | ${legalWinPct.padStart(5)}% | ${meanBestLap.padStart(13)} | ${meanGap.padStart(12)} | ${offtrack.padStart(12)} | ${String(s.contacts).padStart(8)} | ${String(s.bodyOverlaps).padStart(13)} | ${String(s.completedPasses).padStart(6)} | ${String(s.retainedPasses).padStart(8)} | ${(meanSpeedLoss + ' m/s').padStart(16)} |`
+      `| ${preset.subjects[id].name.padEnd(14)} | ${String(s.rawWins).padStart(5)} | ${String(s.legalWins).padStart(7)} | ${String(s.p2).padStart(3)} | ${String(s.p3).padStart(3)} | ${legalWinPct.padStart(5)}% | ${String(meanBestLap).padStart(13)} | ${String(meanGap).padStart(12)} | ${offtrack.padStart(12)} | ${String(s.contacts).padStart(8)} | ${String(s.bodyOverlaps).padStart(13)} | ${String(s.completedPasses).padStart(6)} | ${String(s.retainedPasses).padStart(8)} | ${(meanSpeedLoss + ' m/s').padStart(16)} |`
     );
   }
-  console.log(`================================================================================================================================================================\n`);
+  console.log(`${'='.repeat(150)}\n`);
 
   const benchmarkPayload = {
-    benchmark: 'harbor-triad',
+    benchmark: `harbor-${preset.id}`,
     timestamp: new Date().toISOString(),
-    config: { laps, rotations, totalHeats: heatCount },
+    config: { field: preset.id, ids, laps, rotations, totalHeats: heatCount },
     summary,
     heats
   };

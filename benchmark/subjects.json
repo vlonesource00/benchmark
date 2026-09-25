@@ -200,6 +200,40 @@
       "commit": "14e03309e3246a64607fed7d3eac3d5525efaa65",
       "testNotes": "DeepSeek NOVA V4.2 combat activation and momentum preservation: physical corridor reachability graph, authoritative candidate q(t) conflict verification, continuous gap buffer law, committed attack corridor lead-speed bypass, early pull-out corridor discovery, and corridor bounds exposure.",
       "tests": []
+    },
+    {
+      "id": "vortex",
+      "label": "VORTEX",
+      "repoUrl": "../VORTEX",
+      "branch": "master",
+      "commit": "578304f70cb8616ab33622294465f659838342c6",
+      "testNotes": "VORTEX (Value-Optimized Reactive Trajectory & EXecution): offline TrackOracle racing line with a validated physical vehicle envelope, oracle-backed TrackAtlas, multi-corner corridor planner, engagement graph and attack/defence contract, 120 Hz steering servo with actuator-lag-compensated curvature feed-forward, and a braking-point speed law in station coordinates. src/sim, src/render and public/assets are byte-identical to the canonical Astra host and are verified as such by sandbox:vortex:parity. Measured solo Harbor Ring flying lap at this pin: 74.767 s.",
+      "tests": [
+        {
+          "id": "vortex-core",
+          "label": "VORTEX core unit tests",
+          "command": ["node", "--test", "tests/vortex-core.test.js"],
+          "scenarioIds": ["solo-pace", "stability"],
+          "suites": ["quick", "full"],
+          "timeoutSeconds": 120
+        },
+        {
+          "id": "vortex-parity",
+          "label": "VORTEX bridge parity and host immutability",
+          "command": ["node", "../scripts/vortex-parity-smoke.mjs"],
+          "scenarioIds": ["stability"],
+          "suites": ["quick", "full"],
+          "timeoutSeconds": 180
+        },
+        {
+          "id": "vortex-solo-pace",
+          "label": "VORTEX solo Harbor Ring pace",
+          "command": ["node", "tools/run-vortex-campaign.mjs", "--field", "1", "--laps", "3"],
+          "scenarioIds": ["solo-pace", "stability"],
+          "suites": ["quick", "full"],
+          "timeoutSeconds": 300
+        }
+      ]
     }
   ]
 }
