@@ -206,8 +206,8 @@
       "label": "VORTEX",
       "repoUrl": "../VORTEX",
       "branch": "master",
-      "commit": "1f3c3294fcb956483fb4df75b8dcf72f42575a37",
-      "testNotes": "VORTEX (Value-Optimized Reactive Trajectory & EXecution): major combat architecture block with dynamic multi-car corridor ownership, swept-body continuous conflict prediction, squeeze collision avoidance, tow-aware slipstream speed acceleration, and 4/4 clean valid laps reliability.",
+      "commit": "53eb219eae0cb9c98200ca540afcc93273d73974",
+      "testNotes": "VORTEX (Value-Optimized Reactive Trajectory & EXecution): combat architecture retained (dynamic multi-car corridor ownership, swept-body continuous conflict prediction, squeeze collision avoidance, tow-aware slipstream speed acceleration) with the free-air tax removed. The Q0 candidate now collapses to the oracle line instead of ramping to it through a distorted corridor, brakeAuthority drops its 0.82 fudge factor, and throttle demand is bounded to the torque the tyre can hold so the degraded-stint final lap no longer spins. Harbor Ring solo 4 laps: 75.617 / 75.217 / 76.125 / 78.933, 4/4 valid, zero contacts.",
       "tests": [
         {
           "id": "vortex-core",
