@@ -206,8 +206,8 @@
       "label": "VORTEX",
       "repoUrl": "../VORTEX",
       "branch": "master",
-      "commit": "3fd9bc8b411ed42d673e6b5004b8cc69070045a3",
-      "testNotes": "VORTEX (Value-Optimized Reactive Trajectory & EXecution): combat architecture retained (dynamic multi-car corridor ownership, swept-body continuous conflict prediction, squeeze collision avoidance, tow-aware slipstream speed acceleration) with the free-air tax removed. Adds a predictive driven-tyre rollout and torque-value allocator that spans the throttle gap with candidate commands and prices them in race time against the plant's own grip law. Measured across 20 configurations the fresh-pace over-ask and the degraded-stint departure are one behaviour, so the bounded map is the default and the predictive machinery stays selectable. Harbor Ring solo 4 laps: 75.617 / 75.217 / 76.125 / 78.933, 4/4 valid, zero contacts.",
+      "commit": "7f31251cee4613d99c59b4a9dd3d9491508f98fd",
+      "testNotes": "VORTEX (Value-Optimized Reactive Trajectory & EXecution): combat architecture retained (dynamic multi-car corridor ownership, swept-body continuous conflict prediction, squeeze collision avoidance, tow-aware slipstream speed acceleration) with the free-air tax removed. Adds a final-corner robustness laboratory and grip-adaptive free-air line. The lab confirms the degraded departure is a geometry problem in isolation (0.034 s fresh cost removes it), but no full-stint application beats the default, so the machinery ships disabled. Harbor Ring solo 4 laps: 75.617 / 75.217 / 76.125 / 78.933, total 305.892 s, 4/4 valid, zero contacts.",
       "tests": [
         {
           "id": "vortex-core",
