@@ -206,8 +206,8 @@
       "label": "VORTEX",
       "repoUrl": "../VORTEX",
       "branch": "master",
-      "commit": "7f31251cee4613d99c59b4a9dd3d9491508f98fd",
-      "testNotes": "VORTEX (Value-Optimized Reactive Trajectory & EXecution): combat architecture retained (dynamic multi-car corridor ownership, swept-body continuous conflict prediction, squeeze collision avoidance, tow-aware slipstream speed acceleration) with the free-air tax removed. Adds a final-corner robustness laboratory and grip-adaptive free-air line. The lab confirms the degraded departure is a geometry problem in isolation (0.034 s fresh cost removes it), but no full-stint application beats the default, so the machinery ships disabled. Harbor Ring solo 4 laps: 75.617 / 75.217 / 76.125 / 78.933, total 305.892 s, 4/4 valid, zero contacts.",
+      "commit": "eb24c39ab350edfbdcd709854bf50de45db8af0e",
+      "testNotes": "VORTEX (Value-Optimized Reactive Trajectory & EXecution): combat architecture retained (dynamic multi-car corridor ownership, swept-body continuous conflict prediction, squeeze collision avoidance, tow-aware slipstream speed acceleration) with the free-air tax removed. Adds a yaw-demand census that rejects the approach-yaw-transient fragility metric on three independent measurements, so the selective-geometry branch stops rather than growing a threshold on a metric that has not earned one. Production unchanged. Harbor Ring solo 4 laps: 75.617 / 75.217 / 76.125 / 78.933, total 305.892 s, 4/4 valid, zero contacts.",
       "tests": [
         {
           "id": "vortex-core",
