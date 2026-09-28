@@ -146,27 +146,27 @@ let stepOnce = false;
 export const MODES = {
   'all-arch': {
     id: 'all-arch',
-    title: 'All-Architecture Grand Prix',
-    subtitle: 'Astra, GPT, Claude, Gemini Supreme, Grand Prix, NMPCC, DeepSeek NOVA and MuseSpark',
-    specText: '8 × GT Class (All Architectures)',
+    title: 'Active-Generation Grand Prix',
+    subtitle: 'Astra, DeepSeek NOVA and Gemini Supreme 3.2 (VORTEX runs in vortex-all-arch)',
+    specText: '3 × GT Class (Active Generation)',
     candidates: ALL_KNOWN_CANDIDATES.filter((c) => c.id !== 'player-gt' && c.id !== 'vortex' && !SUPREME_CANDIDATES.some((s) => s.id === c.id)),
     order: ALL_KNOWN_CANDIDATES.filter((c) => c.id !== 'player-gt' && c.id !== 'vortex' && !SUPREME_CANDIDATES.some((s) => s.id === c.id)).map((c) => c.id),
     defaultAutopilot: true
   },
   'vortex-all-arch': {
     id: 'vortex-all-arch',
-    title: 'VORTEX Nine-Architecture Grand Prix',
-    subtitle: 'VORTEX races all eight existing architecture controllers',
-    specText: '9 × GT Class (VORTEX + 8 architectures)',
+    title: 'VORTEX Active-Generation Grand Prix',
+    subtitle: 'VORTEX vs Astra, DeepSeek NOVA and Gemini Supreme 3.2',
+    specText: '4 × GT Class (VORTEX + active generation)',
     candidates: ALL_KNOWN_CANDIDATES.filter((c) => c.id !== 'player-gt' && !SUPREME_CANDIDATES.some((s) => s.id === c.id)),
     order: ALL_KNOWN_CANDIDATES.filter((c) => c.id !== 'player-gt' && !SUPREME_CANDIDATES.some((s) => s.id === c.id)).map((c) => c.id),
     defaultAutopilot: true
   },
   '5-arch': {
     id: '5-arch',
-    title: '5-Architecture Grand Prix',
-    subtitle: 'Astra, GPT Racing, Claude Racing, Gemini Supreme, Gemini Grand Prix',
-    specText: '5 × GT Class (5 Architectures)',
+    title: 'Active-Generation Cup',
+    subtitle: 'Astra, DeepSeek NOVA, Gemini Supreme 3.2, VORTEX',
+    specText: '4 × GT Class (Active Generation)',
     candidates: CANDIDATES_5ARCH,
     order: CANDIDATES_5ARCH.map((c) => c.id),
     defaultAutopilot: true
@@ -210,7 +210,7 @@ export const MODES = {
 };
 
 const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
-let initialModeId = 'all-arch';
+let initialModeId = 'vortex-all-arch';
 if (urlParams.get('mode') === 'triad' || urlParams.has('triad')) {
   initialModeId = 'triad';
 } else if (urlParams.has('mode') && MODES[urlParams.get('mode')]) {

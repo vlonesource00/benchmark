@@ -10,13 +10,47 @@ import { NextGenAIController as SupremeController } from '../../subjects/gemini-
 import { NextGenAIController as NmpccController } from '../../subjects/gemini-nmpcc/src/ai/v2/NextGenAIController.js';
 import { NextGenAIController as GrandPrixController } from '../../subjects/gemini-grand-prix/src/ai/v2/NextGenAIController.js';
 
-export const CANDIDATES_5ARCH = Object.freeze([
+/**
+ * ACTIVE / CURRENT GENERATION.
+ *
+ * The benchmark field. These are the architectures under active development
+ * and the ones the benchmark game and the test manifest carry.
+ */
+export const ACTIVE_CANDIDATES = Object.freeze([
+  VORTEX_CANDIDATE,
+  NOVA_CANDIDATE,
   ASTRA_CANDIDATE,
+  GEMINI_SUPREME
+]);
+
+/**
+ * LEGACY / ARCHIVED.
+ *
+ * Retired from the active field and from the test manifest. Their bridges and
+ * subject checkouts are preserved so the implementations stay inspectable, but
+ * they no longer run in the benchmark game or the benchmark test matrix.
+ *
+ *   GPT Racing        field-arbitrated racecraft; superseded by architectures
+ *                     with richer spatial reasoning and physical trajectory
+ *                     planning.
+ *   Claude Racing     offline TrackGrid / value-function + runtime lattice.
+ *                     Architecturally distinct, so archived rather than
+ *                     deleted. Rendered in-game as "Cloud Racing".
+ *   Gemini NMPCC      earlier V2 / NMPCC branch; superseded by Supreme 3.2.
+ *   Gemini Grand Prix 25 Hz tactical committed-side-by-side concept; Supreme
+ *                     is the Gemini representative worth keeping.
+ *   MuseSpark         global-optimum / belief / strategy / MPCC stack; no
+ *                     benchmark-native test suite, not under active work.
+ */
+export const RETIRED_CANDIDATES = Object.freeze([
   GPT_CANDIDATE,
   CLOUD_CANDIDATE,
-  GEMINI_SUPREME,
-  GEMINI_GRAND_PRIX
+  GEMINI_NMPCC,
+  GEMINI_GRAND_PRIX,
+  MUSE_CANDIDATE
 ]);
+
+export const CANDIDATES_5ARCH = ACTIVE_CANDIDATES;
 
 export const SUPREME_CANDIDATES = Object.freeze([
   {
@@ -79,13 +113,9 @@ export const VORTEX_QUAD_CANDIDATES = Object.freeze([
 export const VORTEX_QUAD_IDS = Object.freeze(VORTEX_QUAD_CANDIDATES.map((candidate) => candidate.id));
 
 export const ALL_KNOWN_CANDIDATES = Object.freeze([
-  VORTEX_CANDIDATE,
-  NOVA_CANDIDATE,
-  MUSE_CANDIDATE,
-  ...CANDIDATES_5ARCH,
+  ...ACTIVE_CANDIDATES,
   ...SUPREME_CANDIDATES,
-  PLAYER_CANDIDATE,
-  GEMINI_NMPCC
+  PLAYER_CANDIDATE
 ]);
 
 export const CANDIDATES = CANDIDATES_5ARCH;

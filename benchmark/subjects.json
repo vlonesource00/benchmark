@@ -1,109 +1,87 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "createdAt": "2026-08-25",
-  "description": "Pinned benchmark subjects. Each checkout is created under this benchmark repo and is never read from or written to the original development folders.",
+  "retiredAt": "2026-09-28",
+  "description": "Pinned benchmark subjects. Each checkout is created under this benchmark repo and is never read from or written to the original development folders. `subjects` is the ACTIVE / CURRENT GENERATION field; `retired` preserves the LEGACY / ARCHIVED architectures with their pins, kept for inspection but excluded from the test matrix and the benchmark game.",
   "subjects": [
     {
-      "id":"astra","label":"Astra","repoUrl":"https://github.com/vlonesource00/astra.git","branch":"v1.2","commit":"ce7630e85425958582e86048e7d28e3bc1f6e78b",
-      "testNotes":"Latest published Astra with the safe b3fd0c0 driving code and a 74.850-second opening solo lap. The V4.1 stale-brake candidate improved its exact six-grid campaign but regressed with current NOVA V4.2, so it was reverted. Current V4.2 probes and exact prior pins are documented in Astra's R3 reports; no V4.2 six-grid improvement is claimed. Vehicle physics unchanged.",
-      "tests":[
-        {"id":"harbor-classes","label":"Harbor Ring three-class solo validity","command":["node","tests/harbor-quality.mjs","--check"],"scenarioIds":["solo-pace","stability"],"suites":["quick","full"],"timeoutSeconds":180},
-        {"id":"harbor-mixed","label":"Harbor Ring mixed-class pack","command":["node","tests/harbor-quality.mjs","--mixed","--check"],"scenarioIds":["pack-race","collision-safety"],"suites":["quick","full"],"timeoutSeconds":240},
-        {"id":"lost-momentum","label":"Lost-momentum passing","command":["node","tests/flow-benchmark.mjs","--check"],"scenarioIds":["obstacle-bypass","slower-pass"],"suites":["quick","full"],"timeoutSeconds":120},
-        {"id":"showcase-stint","label":"Three-lap showcase regression","command":["node","tests/showcase-quality.mjs","--check"],"scenarioIds":["endurance"],"suites":["full"],"timeoutSeconds":240}
-      ]
-    },
-    {
-      "id": "gpt-racing",
-      "label": "GPT Racing",
-      "repoUrl": "https://github.com/vlonesource00/apex-sim-racing.git",
-      "branch": "codex/flat-track-racecraft",
-      "commit": "0dcd4744d4e5f4036db0894a62ab9976d091e370",
-      "testNotes": "Field-arbitrated racecraft stack.",
+      "id": "astra",
+      "label": "Astra",
+      "repoUrl": "https://github.com/vlonesource00/astra.git",
+      "branch": "v1.2",
+      "commit": "ce7630e85425958582e86048e7d28e3bc1f6e78b",
+      "testNotes": "Latest published Astra with the safe b3fd0c0 driving code and a 74.850-second opening solo lap. The V4.1 stale-brake candidate improved its exact six-grid campaign but regressed with current NOVA V4.2, so it was reverted. Current V4.2 probes and exact prior pins are documented in Astra's R3 reports; no V4.2 six-grid improvement is claimed. Vehicle physics unchanged.",
       "tests": [
         {
-          "id": "solo-pace",
-          "label": "Solo pace and stability",
-          "command": ["node", "tests/ai-solo-pace.mjs"],
-          "scenarioIds": ["solo-pace", "stability"],
-          "suites": ["quick", "full"],
+          "id": "harbor-classes",
+          "label": "Harbor Ring three-class solo validity",
+          "command": [
+            "node",
+            "tests/harbor-quality.mjs",
+            "--check"
+          ],
+          "scenarioIds": [
+            "solo-pace",
+            "stability"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
           "timeoutSeconds": 180
         },
         {
-          "id": "field-race",
-          "label": "Eight-car field race",
-          "command": ["node", "tests/ai-field-race.mjs"],
-          "scenarioIds": ["pack-race", "collision-safety"],
-          "suites": ["quick", "full"],
+          "id": "harbor-mixed",
+          "label": "Harbor Ring mixed-class pack",
+          "command": [
+            "node",
+            "tests/harbor-quality.mjs",
+            "--mixed",
+            "--check"
+          ],
+          "scenarioIds": [
+            "pack-race",
+            "collision-safety"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
           "timeoutSeconds": 240
         },
         {
-          "id": "three-lap-soak",
-          "label": "Three-lap field soak",
-          "command": ["node", "tests/ai-three-lap-soak.mjs"],
-          "scenarioIds": ["endurance"],
-          "suites": ["full"],
-          "timeoutSeconds": 360
-        }
-      ]
-    },
-    {
-      "id": "claude-racing",
-      "label": "Claude Racing",
-      "repoUrl": "https://github.com/vlonesource00/claude-racing.git",
-      "branch": "main",
-      "commit": "96334bc195255ecccf47416894c9ab072c447aed",
-      "testNotes": "Offline TrackGrid/value-function plus runtime lattice and racecraft.",
-      "tests": [
-        {
-          "id": "solo-pace",
-          "label": "Solo pace versus offline optimum",
-          "command": ["node", "tests/ai-lap.mjs"],
-          "scenarioIds": ["solo-pace", "stability"],
-          "suites": ["quick", "full"],
-          "timeoutSeconds": 300
+          "id": "lost-momentum",
+          "label": "Lost-momentum passing",
+          "command": [
+            "node",
+            "tests/flow-benchmark.mjs",
+            "--check"
+          ],
+          "scenarioIds": [
+            "obstacle-bypass",
+            "slower-pass"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
+          "timeoutSeconds": 120
         },
         {
-          "id": "duel-racecraft",
-          "label": "Racecraft duel scenarios",
-          "command": ["node", "tests/duel.mjs"],
-          "scenarioIds": ["obstacle-bypass", "slower-pass", "defense", "planner-budget"],
-          "suites": ["quick", "full"],
-          "timeoutSeconds": 360
-        }
-      ]
-    },
-    {
-      "id": "gemini-nmpcc",
-      "label": "Gemini NMPCC",
-      "repoUrl": "https://github.com/vlonesource00/gemini-gauntlet.git",
-      "branch": "feat/apex-nmpcc-combat-ai",
-      "commit": "17ccafbd3a65a4b8cc0f4b3d32342c6a127c714a",
-      "testNotes": "Earlier V2/NMPCC branch; kept as a separate architecture as requested.",
-      "tests": [
-        {
-          "id": "pace-benchmark",
-          "label": "Multi-class pace benchmark",
-          "command": ["node", "tests/pace-benchmark-test.mjs"],
-          "scenarioIds": ["solo-pace", "stability", "track-complexity"],
-          "suites": ["quick", "full"],
-          "timeoutSeconds": 420
-        },
-        {
-          "id": "full-grid",
-          "label": "Twelve-car full grid",
-          "command": ["node", "tests/twelve-car-race-test.mjs"],
-          "scenarioIds": ["pack-race", "collision-safety", "wake-awareness"],
-          "suites": ["quick", "full"],
+          "id": "showcase-stint",
+          "label": "Three-lap showcase regression",
+          "command": [
+            "node",
+            "tests/showcase-quality.mjs",
+            "--check"
+          ],
+          "scenarioIds": [
+            "endurance"
+          ],
+          "suites": [
+            "full"
+          ],
           "timeoutSeconds": 240
-        },
-        {
-          "id": "generation-head-to-head",
-          "label": "V1 versus V2 head-to-head",
-          "command": ["node", "tests/head-to-head-generations-test.mjs"],
-          "scenarioIds": ["generation-head-to-head", "tactical-combat"],
-          "suites": ["full"],
-          "timeoutSeconds": 600
         }
       ]
     },
@@ -118,79 +96,73 @@
         {
           "id": "pace-benchmark",
           "label": "Multi-class pace benchmark",
-          "command": ["node", "tests/pace-benchmark-test.mjs"],
-          "scenarioIds": ["solo-pace", "stability", "track-complexity"],
-          "suites": ["quick", "full"],
+          "command": [
+            "node",
+            "tests/pace-benchmark-test.mjs"
+          ],
+          "scenarioIds": [
+            "solo-pace",
+            "stability",
+            "track-complexity"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
           "timeoutSeconds": 420
         },
         {
           "id": "decision-stability",
           "label": "Decision stability and anti-indecision",
-          "command": ["node", "tests/decision-stability-test.mjs"],
-          "scenarioIds": ["tactical-combat", "stability"],
-          "suites": ["quick", "full"],
+          "command": [
+            "node",
+            "tests/decision-stability-test.mjs"
+          ],
+          "scenarioIds": [
+            "tactical-combat",
+            "stability"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
           "timeoutSeconds": 120
         },
         {
           "id": "full-grid",
           "label": "Twelve-car full grid",
-          "command": ["node", "tests/twelve-car-race-test.mjs"],
-          "scenarioIds": ["pack-race", "collision-safety", "wake-awareness"],
-          "suites": ["quick", "full"],
+          "command": [
+            "node",
+            "tests/twelve-car-race-test.mjs"
+          ],
+          "scenarioIds": [
+            "pack-race",
+            "collision-safety",
+            "wake-awareness"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
           "timeoutSeconds": 240
         },
         {
           "id": "generation-head-to-head",
           "label": "V1 versus V2 head-to-head",
-          "command": ["node", "tests/head-to-head-generations-test.mjs"],
-          "scenarioIds": ["generation-head-to-head", "tactical-combat"],
-          "suites": ["full"],
+          "command": [
+            "node",
+            "tests/head-to-head-generations-test.mjs"
+          ],
+          "scenarioIds": [
+            "generation-head-to-head",
+            "tactical-combat"
+          ],
+          "suites": [
+            "full"
+          ],
           "timeoutSeconds": 600
         }
       ]
-    },
-    {
-      "id": "gemini-grand-prix",
-      "label": "Gemini Grand Prix",
-      "repoUrl": "https://github.com/vlonesource00/gemini-gauntlet.git",
-      "branch": "feat/grand-prix-sim-and-cockpit-hud",
-      "commit": "cbced43f5538bc72a497b17fbc74849f21955397",
-      "testNotes": "Later Gemini GP branch with strict 25 Hz tactical replanning and committed side-by-side maneuvers.",
-      "tests": [
-        {
-          "id": "pace-benchmark",
-          "label": "Multi-class pace benchmark",
-          "command": ["node", "tests/pace-benchmark-test.mjs"],
-          "scenarioIds": ["solo-pace", "stability", "track-complexity"],
-          "suites": ["quick", "full"],
-          "timeoutSeconds": 420
-        },
-        {
-          "id": "full-grid",
-          "label": "Twelve-car full grid",
-          "command": ["node", "tests/twelve-car-race-test.mjs"],
-          "scenarioIds": ["pack-race", "collision-safety", "wake-awareness"],
-          "suites": ["quick", "full"],
-          "timeoutSeconds": 240
-        },
-        {
-          "id": "generation-head-to-head",
-          "label": "V1 versus V2 head-to-head",
-          "command": ["node", "tests/head-to-head-generations-test.mjs"],
-          "scenarioIds": ["generation-head-to-head", "tactical-combat"],
-          "suites": ["full"],
-          "timeoutSeconds": 600
-        }
-      ]
-    },
-    {
-      "id": "musespark",
-      "label": "MuseSpark",
-      "repoUrl": "https://github.com/vlonesource00/MuseSpark.git",
-      "branch": "master",
-      "commit": "7af4c1c1009c273497b22bb7610bd512079da8a8",
-      "testNotes": "Muse global-optimum + belief + strategy + trajectory + coupled MPCC + safety. Local harness: tools/bridge-smoke.mjs (shared-mode smoke + host-physics solo pace).",
-      "tests": []
     },
     {
       "id": "nova",
@@ -212,28 +184,304 @@
         {
           "id": "vortex-core",
           "label": "VORTEX core unit tests",
-          "command": ["node", "--test", "tests/vortex-core.test.js"],
-          "scenarioIds": ["solo-pace", "stability"],
-          "suites": ["quick", "full"],
+          "command": [
+            "node",
+            "--test",
+            "tests/vortex-core.test.js"
+          ],
+          "scenarioIds": [
+            "solo-pace",
+            "stability"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
           "timeoutSeconds": 120
         },
         {
           "id": "vortex-parity",
           "label": "VORTEX bridge parity and host immutability",
-          "command": ["node", "../scripts/vortex-parity-smoke.mjs"],
-          "scenarioIds": ["stability"],
-          "suites": ["quick", "full"],
+          "command": [
+            "node",
+            "../scripts/vortex-parity-smoke.mjs"
+          ],
+          "scenarioIds": [
+            "stability"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
           "timeoutSeconds": 180
         },
         {
           "id": "vortex-solo-pace",
           "label": "VORTEX solo Harbor Ring pace",
-          "command": ["node", "tools/run-vortex-campaign.mjs", "--field", "1", "--laps", "3"],
-          "scenarioIds": ["solo-pace", "stability"],
-          "suites": ["quick", "full"],
+          "command": [
+            "node",
+            "tools/run-vortex-campaign.mjs",
+            "--field",
+            "1",
+            "--laps",
+            "3"
+          ],
+          "scenarioIds": [
+            "solo-pace",
+            "stability"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
           "timeoutSeconds": 300
         }
       ]
+    }
+  ],
+  "retired": [
+    {
+      "id": "gpt-racing",
+      "label": "GPT Racing",
+      "repoUrl": "https://github.com/vlonesource00/apex-sim-racing.git",
+      "branch": "codex/flat-track-racecraft",
+      "commit": "0dcd4744d4e5f4036db0894a62ab9976d091e370",
+      "testNotes": "Field-arbitrated racecraft stack.",
+      "tests": [
+        {
+          "id": "solo-pace",
+          "label": "Solo pace and stability",
+          "command": [
+            "node",
+            "tests/ai-solo-pace.mjs"
+          ],
+          "scenarioIds": [
+            "solo-pace",
+            "stability"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
+          "timeoutSeconds": 180
+        },
+        {
+          "id": "field-race",
+          "label": "Eight-car field race",
+          "command": [
+            "node",
+            "tests/ai-field-race.mjs"
+          ],
+          "scenarioIds": [
+            "pack-race",
+            "collision-safety"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
+          "timeoutSeconds": 240
+        },
+        {
+          "id": "three-lap-soak",
+          "label": "Three-lap field soak",
+          "command": [
+            "node",
+            "tests/ai-three-lap-soak.mjs"
+          ],
+          "scenarioIds": [
+            "endurance"
+          ],
+          "suites": [
+            "full"
+          ],
+          "timeoutSeconds": 360
+        }
+      ],
+      "retiredReason": "Field-arbitrated racecraft, superseded by architectures with richer spatial reasoning and physical trajectory planning."
+    },
+    {
+      "id": "claude-racing",
+      "label": "Claude Racing",
+      "repoUrl": "https://github.com/vlonesource00/claude-racing.git",
+      "branch": "main",
+      "commit": "96334bc195255ecccf47416894c9ab072c447aed",
+      "testNotes": "Offline TrackGrid/value-function plus runtime lattice and racecraft.",
+      "tests": [
+        {
+          "id": "solo-pace",
+          "label": "Solo pace versus offline optimum",
+          "command": [
+            "node",
+            "tests/ai-lap.mjs"
+          ],
+          "scenarioIds": [
+            "solo-pace",
+            "stability"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
+          "timeoutSeconds": 300
+        },
+        {
+          "id": "duel-racecraft",
+          "label": "Racecraft duel scenarios",
+          "command": [
+            "node",
+            "tests/duel.mjs"
+          ],
+          "scenarioIds": [
+            "obstacle-bypass",
+            "slower-pass",
+            "defense",
+            "planner-budget"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
+          "timeoutSeconds": 360
+        }
+      ],
+      "retiredReason": "Offline TrackGrid / value-function + runtime lattice. Architecturally distinct, archived rather than deleted. Rendered in-game as \"Cloud Racing\"."
+    },
+    {
+      "id": "gemini-nmpcc",
+      "label": "Gemini NMPCC",
+      "repoUrl": "https://github.com/vlonesource00/gemini-gauntlet.git",
+      "branch": "feat/apex-nmpcc-combat-ai",
+      "commit": "17ccafbd3a65a4b8cc0f4b3d32342c6a127c714a",
+      "testNotes": "Earlier V2/NMPCC branch; kept as a separate architecture as requested.",
+      "tests": [
+        {
+          "id": "pace-benchmark",
+          "label": "Multi-class pace benchmark",
+          "command": [
+            "node",
+            "tests/pace-benchmark-test.mjs"
+          ],
+          "scenarioIds": [
+            "solo-pace",
+            "stability",
+            "track-complexity"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
+          "timeoutSeconds": 420
+        },
+        {
+          "id": "full-grid",
+          "label": "Twelve-car full grid",
+          "command": [
+            "node",
+            "tests/twelve-car-race-test.mjs"
+          ],
+          "scenarioIds": [
+            "pack-race",
+            "collision-safety",
+            "wake-awareness"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
+          "timeoutSeconds": 240
+        },
+        {
+          "id": "generation-head-to-head",
+          "label": "V1 versus V2 head-to-head",
+          "command": [
+            "node",
+            "tests/head-to-head-generations-test.mjs"
+          ],
+          "scenarioIds": [
+            "generation-head-to-head",
+            "tactical-combat"
+          ],
+          "suites": [
+            "full"
+          ],
+          "timeoutSeconds": 600
+        }
+      ],
+      "retiredReason": "Earlier V2/NMPCC branch, superseded by Gemini Supreme 3.2."
+    },
+    {
+      "id": "gemini-grand-prix",
+      "label": "Gemini Grand Prix",
+      "repoUrl": "https://github.com/vlonesource00/gemini-gauntlet.git",
+      "branch": "feat/grand-prix-sim-and-cockpit-hud",
+      "commit": "cbced43f5538bc72a497b17fbc74849f21955397",
+      "testNotes": "Later Gemini GP branch with strict 25 Hz tactical replanning and committed side-by-side maneuvers.",
+      "tests": [
+        {
+          "id": "pace-benchmark",
+          "label": "Multi-class pace benchmark",
+          "command": [
+            "node",
+            "tests/pace-benchmark-test.mjs"
+          ],
+          "scenarioIds": [
+            "solo-pace",
+            "stability",
+            "track-complexity"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
+          "timeoutSeconds": 420
+        },
+        {
+          "id": "full-grid",
+          "label": "Twelve-car full grid",
+          "command": [
+            "node",
+            "tests/twelve-car-race-test.mjs"
+          ],
+          "scenarioIds": [
+            "pack-race",
+            "collision-safety",
+            "wake-awareness"
+          ],
+          "suites": [
+            "quick",
+            "full"
+          ],
+          "timeoutSeconds": 240
+        },
+        {
+          "id": "generation-head-to-head",
+          "label": "V1 versus V2 head-to-head",
+          "command": [
+            "node",
+            "tests/head-to-head-generations-test.mjs"
+          ],
+          "scenarioIds": [
+            "generation-head-to-head",
+            "tactical-combat"
+          ],
+          "suites": [
+            "full"
+          ],
+          "timeoutSeconds": 600
+        }
+      ],
+      "retiredReason": "25 Hz tactical committed-side-by-side concept; Supreme is the Gemini representative worth keeping."
+    },
+    {
+      "id": "musespark",
+      "label": "MuseSpark",
+      "repoUrl": "https://github.com/vlonesource00/MuseSpark.git",
+      "branch": "master",
+      "commit": "7af4c1c1009c273497b22bb7610bd512079da8a8",
+      "testNotes": "Muse global-optimum + belief + strategy + trajectory + coupled MPCC + safety. Local harness: tools/bridge-smoke.mjs (shared-mode smoke + host-physics solo pace).",
+      "tests": [],
+      "retiredReason": "Global-optimum / belief / strategy / MPCC stack; no benchmark-native test suite, not under active development."
     }
   ]
 }
